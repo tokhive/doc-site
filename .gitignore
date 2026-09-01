@@ -1,0 +1,7 @@
+.workbuddy
+.DS_Store
+.docusaurus
+build
+node_modules
+research
+outputs

@@ -1,0 +1,710 @@
+# TEE zkTLS: Technical Principles
+
+## 1. Trusted Execution Environment (TEE)
+
+A **Trusted Execution Environment (TEE)** is an isolated execution environment protected by hardware.
+
+Typical implementations include:
+
+- Intel SGX
+- Intel TDX
+- AMD SEV-SNP
+- AWS Nitro Enclaves
+
+The most important properties of a TEE for zkTLS are:
+
+### 1.1 Isolated Execution
+
+Code and data inside the TEE are isolated from the host operating system.
+
+Even if the host machine is compromised, it should not be able to directly read or modify sensitive data inside the TEE, such as:
+
+- TLS session keys
+- HTTP request/response data
+- Signing private keys
+- Internal application state
+
+This allows security-sensitive TLS processing and proof generation to run inside a trusted boundary.
+
+### 1.2 Code Measurement
+
+When a TEE starts, the platform computes a cryptographic measurement of the code and configuration running inside it.
+
+Conceptually:
+
+```text
+measurement = HASH(code + runtime + configuration)
+```
+
+If the program is modified, its measurement changes.
+
+A verifier can therefore check:
+
+```text
+measurement == expected_measurement
+```
+
+to confirm that the TEE is running an approved version of the program.
+
+### 1.3 Remote Attestation
+
+A program cannot simply claim that it is running inside a TEE.
+
+Instead, the hardware platform generates an **Attestation Report** containing information such as:
+
+```text
+Attestation Report
+{
+    measurement,
+    TCB_version,
+    public_key,
+    nonce,
+    ...
+}
+```
+
+The report is authenticated through the hardware vendor's trust infrastructure.
+
+A remote verifier can therefore establish the following trust chain:
+
+```text
+Hardware Root of Trust
+        ↓
+Remote Attestation
+        ↓
+Code Measurement
+        ↓
+Trusted TEE Program
+```
+
+---
+
+# 2. TLS Overview
+
+TLS is the security protocol underlying HTTPS.
+
+It mainly provides three properties:
+
+```text
+Authentication
+Confidentiality
+Integrity
+```
+
+A simplified TLS connection looks like this:
+
+```text
+Client                         Server
+
+ClientHello (key_share)
+     ------------------------>
+
+                    ServerHello (key_share)
+                    [ECDHE complete, Handshake Traffic Keys derived]
+
+                    {EncryptedExtensions}
+                    {Certificate}
+                    {CertificateVerify}
+                    {Finished}
+     <------------------------
+
+Verify Server Certificate
+
+     {Finished}
+     ------------------------>
+
+Derive Application Traffic Keys
+
+Encrypted HTTP Request
+     ------------------------>
+
+Encrypted HTTP Response
+     <------------------------
+```
+
+Note: in TLS 1.3, the (EC)DHE key-exchange material (`key_share`) is carried directly in `ClientHello` / `ServerHello`, and the Handshake Traffic Keys can be derived right after `ServerHello`. The subsequent `Certificate`, `CertificateVerify`, and `Finished` messages (shown as `{...}` above) are already **encrypted under the Handshake Traffic Keys** — they are not sent in the clear before a separate key-exchange step. This differs from TLS 1.2, where `ServerKeyExchange`/`ClientKeyExchange` are standalone plaintext messages negotiated after the certificate exchange. The diagram above reflects the actual TLS 1.3 ordering.
+
+Two TLS properties are particularly important for TEE zkTLS.
+
+### 2.1 Server Authentication
+
+The server presents a certificate during the TLS handshake.
+
+The TLS client verifies:
+
+```text
+Certificate Chain
+       ↓
+Trusted CA
+       ↓
+Hostname Verification
+```
+
+Therefore, the client can verify that it is communicating with the expected server, such as:
+
+```text
+api.example.com
+```
+
+### 2.2 Data Integrity
+
+TLS 1.3 uses authenticated encryption algorithms such as:
+
+```text
+AES-GCM
+ChaCha20-Poly1305
+```
+
+These algorithms are used as:
+
+```text
+ciphertext, tag =
+    AEAD_Encrypt(
+        session_key,
+        nonce,
+        plaintext,
+        associated_data
+    )
+```
+
+```text
+plaintext =
+    AEAD_Decrypt(
+        session_key,
+        nonce,
+        ciphertext,
+        tag,
+        associated_data
+    )
+```
+
+Here `nonce` is derived from a fixed IV combined with the TLS record sequence number, and `associated_data` (AAD) is the TLS record header (type / version / length). Including the header as AAD means that even though the header itself is not encrypted, it is still covered by the integrity check — any tampering with it causes authentication to fail.
+
+If an attacker modifies encrypted TLS records in transit, authentication fails.
+
+Therefore, successfully authenticated TLS records guarantee that the transmitted data has not been modified.
+
+---
+
+# 3. How TEE zkTLS Works
+
+The key idea of TEE zkTLS is simple:
+
+> Run the security-critical TLS logic inside a remotely attested TEE.
+
+The architecture can be simplified as:
+
+```text
+Verifier
+
+   ↑ Proof
+
+Trusted TEE
+ ├── TLS Client
+ ├── Certificate Verification
+ ├── HTTP Request / Response Processing
+ ├── Proof Generator
+ └── Signing Key
+
+   ↕ TLS / HTTPS
+
+HTTPS Server
+```
+
+The host operating system may still handle networking and socket forwarding, but the security-sensitive operations remain inside the TEE.
+
+The TEE performs:
+
+- TLS handshake
+- Server certificate verification
+- TLS key derivation
+- TLS record authentication
+- HTTP request processing
+- HTTP response verification
+- Proof generation
+- Result signing
+
+The untrusted host cannot directly modify the verified result without being detected.
+
+---
+
+# 4. Proof Generation and Verification
+
+Assume a client sends:
+
+```text
+POST https://api.example.com/v1/query
+```
+
+and receives:
+
+```json
+{
+  "balance": 100
+}
+```
+
+A typical TEE zkTLS proof flow works as follows.
+
+## Step 1: Establish Trust in the TEE
+
+The TEE generates a key pair:
+
+```text
+TEE_private_key
+TEE_public_key
+```
+
+The public key is bound to the TEE's Remote Attestation:
+
+```text
+Attestation {
+    measurement,
+    public_key: TEE_public_key,
+    nonce
+}
+```
+
+The verifier checks the attestation and confirms that:
+
+```text
+TEE_public_key
+       ↓
+belongs to
+       ↓
+Approved TEE Program
+```
+
+---
+
+## Step 2: Establish the TLS Connection
+
+The TEE connects to the target HTTPS server and performs the TLS handshake.
+
+It verifies:
+
+```text
+Certificate Chain
+Hostname
+CertificateVerify
+TLS Finished
+```
+
+Only after these checks succeed does the TEE accept the connection.
+
+---
+
+## Step 3: Send the HTTP Request
+
+The TEE sends the HTTP request, for example:
+
+```text
+POST /v1/query
+Host: api.example.com
+Authorization: Bearer xxx
+
+{"user":"alice"}
+```
+
+It can bind the request to the proof using:
+
+```text
+request_hash = SHA256(request)
+```
+
+---
+
+## Step 4: Verify the Response
+
+The server returns authenticated TLS records.
+
+The TEE verifies and decrypts them using the negotiated TLS session keys.
+
+After verification, the TEE obtains the real HTTP response:
+
+```text
+HTTP/1.1 200 OK
+
+{"balance":100}
+```
+
+It can then compute:
+
+```text
+response_hash = SHA256(response)
+```
+
+---
+
+## Step 5: Generate the Proof
+
+The TEE constructs proof data such as:
+
+```text
+ProofData {
+    server_name,
+    request_hash,
+    response_hash,
+    timestamp,
+    nonce,
+    result
+}
+```
+
+It then signs the proof:
+
+```text
+signature =
+    Sign(
+        TEE_private_key,
+        HASH(ProofData)
+    )
+```
+
+The final proof may contain:
+
+```text
+TEE Proof
+{
+    AttestationReport,
+    ProofData,
+    Signature
+}
+```
+
+In many TEE-based zkTLS systems, this is not a traditional SNARK/STARK zero-knowledge proof.
+
+Instead, the security is primarily based on:
+
+```text
+Hardware Attestation
+        +
+Trusted Code Measurement
+        +
+TLS Security
+        +
+Digital Signature
+```
+
+Zero-knowledge techniques can optionally be added when selective disclosure or private predicates are required.
+
+---
+
+## Step 6: Verify the Proof
+
+The verifier performs checks such as:
+
+```text
+1. Verify the Attestation Report
+
+2. Verify:
+   measurement == expected_measurement
+
+3. Extract:
+   TEE_public_key
+
+4. Verify:
+   signature over ProofData
+
+5. Verify:
+   nonce == expected_nonce
+
+6. Check:
+   timestamp / expiration
+
+7. Check:
+   server_name == expected server
+
+8. Check:
+   request_hash == expected request
+
+9. Validate:
+   response_hash or claimed result
+```
+
+If all checks succeed, the verifier can trust that the result was produced by the approved TEE program from an authenticated TLS session with the specified server.
+
+---
+
+# 5. Preventing Cheating and Tampering
+
+TEE zkTLS protects against several major attack scenarios.
+
+### 5.1 Fake Server
+
+An attacker may attempt to connect the TEE to a fake server.
+
+The TEE verifies the TLS certificate and hostname.
+
+Without control of the legitimate server's certificate private key, the attacker cannot successfully impersonate the target HTTPS server.
+
+---
+
+### 5.2 Modified TLS Response
+
+An attacker may attempt to change:
+
+```text
+{"balance":10}
+```
+
+into:
+
+```text
+{"balance":1000000}
+```
+
+TLS authenticated encryption prevents this.
+
+Any modification to the encrypted TLS records causes integrity verification to fail.
+
+---
+
+### 5.3 Malicious Host
+
+The host operating system is considered untrusted.
+
+Sensitive TLS processing and proof generation occur inside the TEE.
+
+The host therefore cannot directly:
+
+```text
+Read TLS session keys
+Modify verified response data
+Access the TEE signing key
+Forge a valid proof signature
+```
+
+---
+
+### 5.4 Modified TEE Program
+
+An attacker may modify the program so that TLS verification is skipped.
+
+For example:
+
+```text
+verify_tls()
+```
+
+could be changed into malicious logic.
+
+However, modifying the program changes its code measurement.
+
+The verifier requires:
+
+```text
+measurement == approved_measurement
+```
+
+so the modified program will fail Remote Attestation.
+
+---
+
+### 5.5 Forged Signing Key
+
+An attacker can create their own private/public key pair and sign arbitrary data.
+
+However, the verifier only accepts public keys that are cryptographically bound to a valid TEE Attestation Report.
+
+The trust relationship is therefore:
+
+```text
+Hardware Attestation
+        ↓
+TEE Public Key
+        ↓
+Proof Signature
+```
+
+An arbitrary key cannot satisfy this chain.
+
+---
+
+### 5.6 Replay Attacks
+
+An attacker may attempt to reuse an old valid proof.
+
+To prevent this, the proof should include:
+
+```text
+nonce
+timestamp
+request_id
+expiration
+```
+
+The verifier generates a fresh nonce for each challenge.
+
+An old proof will contain the wrong nonce and therefore be rejected.
+
+---
+
+### 5.7 Modified Requests
+
+Proving that a response came from a real server is not sufficient if the attacker can change the request.
+
+For example:
+
+```text
+Expected:
+GET /balance?user=Alice
+
+Actual:
+GET /balance?user=Bob
+```
+
+Therefore, the proof should bind both sides of the HTTP exchange:
+
+```text
+request_hash
++
+response_hash
+```
+
+The trusted statement effectively becomes:
+
+```text
+Server Identity
++
+Request
++
+Response
++
+Nonce / Timestamp
+```
+
+---
+
+# 6. Trust Model
+
+The complete trust chain of TEE zkTLS is:
+
+```text
+Hardware Root of Trust
+        ↓
+Remote Attestation
+        ↓
+Approved Code Measurement
+        ↓
+TEE Public Key
+        ↓
+TLS Client inside TEE
+        ↓
+TLS Server Authentication
+        ↓
+Authenticated HTTP Response
+        ↓
+TEE Signature
+        ↓
+Verifier
+```
+
+The verifier does not need to trust the user or the host machine.
+
+Instead, it trusts:
+
+```text
+TEE Hardware
++
+Attestation Infrastructure
++
+Approved TEE Program
++
+TLS Security
+```
+
+---
+
+# 7. TEE zkTLS vs. MPC zkTLS
+
+Traditional MPC-based zkTLS typically distributes TLS computation between multiple parties using MPC or related cryptographic protocols.
+
+Conceptually:
+
+```text
+MPC zkTLS
+
+Cryptographic Protocol
+        ↓
+Proves correct TLS execution
+```
+
+TEE zkTLS takes a different approach:
+
+```text
+TEE zkTLS
+
+Remote Attestation
+        ↓
+Proves approved code is running
+        ↓
+Trusted code executes TLS
+```
+
+The main trade-off is the trust model.
+
+```text
+MPC zkTLS
+- Stronger cryptographic trust model
+- Lower dependency on trusted hardware
+- Higher computation and communication cost
+
+TEE zkTLS
+- Relies on trusted hardware and attestation
+- Much simpler architecture
+- Lower computation overhead
+- Performance can be close to normal HTTPS
+```
+
+---
+
+# 8. Summary
+
+TEE zkTLS can be summarized as:
+
+> An attested TEE executes an HTTPS request, verifies the TLS connection and server identity, processes the authenticated response, and signs a proof that can be independently verified by a third party.
+
+The essential trust chain is:
+
+```text
+Hardware Root of Trust
+        ↓
+Remote Attestation
+        ↓
+Trusted TEE Code
+        ↓
+TLS Certificate Verification
+        ↓
+Authenticated TLS Session
+        ↓
+Request + Response
+        ↓
+TEE Signature
+        ↓
+Verifier
+```
+
+Ordinary HTTPS provides:
+
+```text
+Server ── TLS ── Client
+```
+
+The client knows the response is authentic, but cannot easily prove that fact to a third party.
+
+TEE zkTLS adds a trusted execution and attestation layer:
+
+```text
+Server
+   │
+   │ TLS
+   ▼
+Trusted TEE
+   │
+   │ Attested Proof
+   ▼
+Verifier
+```
+
+This allows the verifier to confirm that an approved TEE obtained the data from the specified HTTPS server and that the request and response were not tampered with.
