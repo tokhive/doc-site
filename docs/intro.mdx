@@ -3,46 +3,275 @@ sidebar_position: 1
 slug: /
 ---
 
-# Tutorial Intro
+# TokHive
 
-Let's discover **Docusaurus in less than 5 minutes**.
+**Tok(en)Hive** is an open **AI Token marketplace** designed to connect two types of users:
 
-## Getting Started
+* **Provider**: users who have large amounts of idle AI subscription quota and want to monetize it;
+* **Consumer**: users who want to use AI at a lower cost while still being guaranteed model quality and genuine service.
 
-Get started by **creating a new site**.
+TokHive uses automated supply-demand matching and request scheduling to bring idle AI subscription quota back into circulation in the market.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+For Providers, unused subscription quota can be converted into income; for AI users, it means access to **real, verifiable original-vendor model tokens** at a lower price.
 
-### What you'll need
+---
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+## Why TokHive is needed
 
-## Generate a new site
+As AI technology develops rapidly, more and more developers, businesses, and individuals are using AI to improve productivity.
 
-Generate a new Docusaurus site using the **classic template**.
+At the same time, the cost of using AI is growing quickly. On one hand, high-performance models require substantial compute; on the other hand, as new generations of models become more capable, token prices keep rising. For pay-as-you-go users, a single complex coding, research, or agent task can easily cost several dollars, or even tens of dollars.
 
-The classic template will automatically be added to your project after you run the command:
+Meanwhile, mainstream AI vendors generally also offer another pricing model: **AI subscriptions**.
 
-```bash
-npm init docusaurus@latest my-website classic
+Subscription plans typically have the following characteristics:
+
+1. **Prepaid + fixed quota**
+
+   Users usually pay a fixed monthly fee and receive a certain amount of model usage quota for that period.
+
+2. **Lower effective token price**
+
+   For users who can fully utilize their subscription quota, the effective token cost is usually noticeably lower than pay-as-you-go API pricing.
+
+3. **Not enough during peak times, wasted during idle periods**
+
+   During busy periods, users may quickly exhaust their quota; but at night, on weekends, holidays, or during quieter work periods, a large amount of subscription quota goes unused.
+
+For most users, it is difficult to use AI around the clock, so subscription quota naturally ends up idle much of the time.
+
+What TokHive aims to solve is exactly this **imbalance in the distribution of AI compute resources across time and across users**.
+
+By opening up an AI Token marketplace, TokHive automatically connects Providers who have idle quota with Consumers who need tokens, allowing subscription quota that would otherwise go to waste to generate value again.
+
+At the same time, TokHive uses techniques such as security isolation, trusted execution, and Web Proof to protect, as much as possible, both the security of Providers' account credentials and the authenticity of Consumers' request data and services.
+
+---
+
+## Monetizing idle tokens
+
+Users with idle AI subscription quota can install the TokHive Provider client and connect their AI accounts to the TokHive network.
+
+When AI requests arise in the network, TokHive automatically schedules them based on factors such as Provider status, model capability, remaining quota, network quality, and price.
+
+Once a request is completed, the platform settles payment based on the actual number of tokens contributed.
+
+The income a Provider earns can be:
+
+* Cashed out directly; or
+* Kept within TokHive to purchase other AI token services in the future.
+
+One important design principle of TokHive is:
+
+> **Account credentials belong to the Provider. TokHive should not have plaintext access to them.**
+
+AI requests are, as much as possible, sent out through the Provider's own PC, server, or VPC, preserving the Provider's original network environment and reducing the account risk that could arise from sharing a service.
+
+For sensitive credentials such as access tokens, OAuth tokens, or API keys, TokHive protects them through encryption, permission isolation, and trusted execution environments. Sensitive information is never directly exposed to Consumers or ordinary Hub services, and is only used within a verified, trusted environment.
+
+TokHive's Provider client and key TEE components will remain open source, so that anyone can review the critical code and security mechanisms.
+
+---
+
+## Benefits for AI users
+
+Connecting to TokHive is very simple for AI users.
+
+TokHive provides interfaces compatible with mainstream AI API ecosystems, for example:
+
+* Chat Completions API
+* Responses API
+* Messages API
+
+For existing applications, you usually only need to change:
+
+```text
+base_url
+API Key
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+to switch requests over to TokHive, without needing to make large-scale changes to your existing business code.
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+### Lower token costs
 
-## Start your site
+TokHive's tokens mainly come from Providers' idle subscription quota.
 
-Run the development server:
+Since the effective cost of subscription quota is usually already lower than pay-as-you-go API pricing, and Providers are selling quota that would otherwise be wasted, TokHive has the opportunity to further lower the market price of tokens.
 
-```bash
-cd my-website
-npm run start
-```
+For some models with sufficient supply, AI users' actual usage cost could be **80%-90% lower** than the original vendor's API.
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+---
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+## Verifiable original-vendor models
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Low price is not the only thing TokHive cares about.
+
+AI relay/proxy services face a long-standing, hard-to-solve trust problem:
+
+> **How can a user confirm that what they purchased is really the original-vendor model it claims to be?**
+
+A service provider could easily claim to be offering an expensive flagship model while actually substituting the request with a cheaper model, an open-source model, or even a completely different upstream service behind the scenes.
+
+Traditional relay services typically have only one answer to this problem:
+
+> "Please trust that we wouldn't do that."
+
+TokHive aims to take a completely different approach.
+
+The platform will introduce **Web Proof** technology to build verifiable proofs for critical AI requests, enabling the system to verify:
+
+* The request was indeed sent to the specified AI vendor;
+* The target service and key parameters of the request were not secretly swapped;
+* The returned result truly came from the specified upstream service;
+* The request and response were not tampered with at any critical stage.
+
+In other words:
+
+**TokHive does not ask users to trust the platform — instead, it makes the service itself verifiable wherever possible.**
+
+---
+
+## High-availability service
+
+A decentralized supply network inherently faces the challenge of a fluctuating number of Providers.
+
+For example, there may be fewer Providers online during certain time windows, or a particular model may temporarily lack sufficient shared quota.
+
+For this reason, TokHive does not rely entirely on the Provider network, and instead adopts a **multi-source liquidity** design.
+
+Service sources can include:
+
+* The TokHive Provider network;
+* Official API services;
+* Other verified original-vendor service sources.
+
+When the Provider network has ample supply, the system prioritizes lower-cost shared tokens; when shared supply is insufficient, it can automatically switch to original-vendor service sources.
+
+This approach maintains the low-cost advantage while improving the overall stability and availability of the service.
+
+---
+
+## System architecture
+
+![TokHive Architecture](./img/tokenhive_architecture_en_v3.png)
+
+TokHive is made up of three main roles:
+
+### Consumer
+
+The user of AI tokens.
+
+Consumers connect to TokHive through standard AI APIs, without needing to know which Provider actually executes the underlying request.
+
+### Hub
+
+TokHive's central scheduling service.
+
+Its main responsibilities include:
+
+* Provider status management;
+* Request routing;
+* Model matching;
+* Authentication;
+* Usage metering;
+* Billing and settlement;
+* Connection management between Providers and Consumers.
+
+The Hub coordinates the network, but under TokHive's security design, **it should never have plaintext access to a Provider's sensitive credentials**.
+
+### Provider
+
+The contributor of AI quota.
+
+A Provider runs the TokHive client, executes assigned requests using their own AI subscription account, and earns income based on their actual contribution.
+
+---
+
+## Platform advantages
+
+TokHive's core advantages can be summarized in three areas.
+
+### 1. Verifiable original-vendor model service
+
+TokHive will use [Web Proof technology](./web-proof.md) to verify that AI requests are indeed executed by the specified upstream model service.
+
+This addresses one of the most fundamental problems in the AI relay market:
+
+**Is the user paying for "the name of a model," or for a genuine original-vendor model service?**
+
+TokHive aims to turn this trust from a platform promise into **verifiable technical proof**.
+
+### 2. Highly competitive token pricing
+
+TokHive does not simply purchase API tokens and resell them at a markup — instead, it obtains token supply by reusing subscription quota that would otherwise be wasted.
+
+As a result, its cost structure is fundamentally different from that of traditional API relay services.
+
+As the Provider network grows, TokHive has the opportunity to offer pricing more competitive than ordinary API relay services, and even some "subscription-to-API" services.
+
+### 3. Provider account security
+
+A Provider's account and credentials are always among the most sensitive assets in the entire system.
+
+TokHive will, through:
+
+* Local request egress on the Provider side;
+* Isolation of sensitive credentials;
+* Encrypted transmission;
+* TEE trusted execution environments;
+* Remote Attestation;
+* Open-source client and critical trusted code;
+
+minimize opportunities for Consumers, the Hub, or other third parties to access Provider credentials, reducing the risk of account leakage and misuse at the architectural level.
+
+### 4. User data privacy
+
+An optional end-to-end encryption scheme ensures the privacy and security of user request data during transmission and processing. Even the Hive platform itself cannot see users' prompt data.
+
+---
+
+## Roadmap
+
+### Phase 1: Infrastructure
+
+Build TokHive's foundational network, including:
+
+* The Hub central scheduling service;
+* The Provider client;
+* Provider connection pool;
+* AI request routing;
+* API authentication;
+* Token usage metering;
+* Billing and settlement system.
+
+Complete the basic service loop of Provider → Hub → Consumer.
+
+### Phase 2: Security and verifiable services
+
+Introduce security mechanisms such as Web Proof, TEE, and Remote Attestation.
+
+Key focus areas:
+
+* Protecting Provider credentials;
+* Verifying the authenticity of upstream AI services;
+* Detecting model substitution;
+* Detecting request tampering;
+* Making service results verifiable for Consumers.
+
+Gradually realize a **Verifiable AI Token Service**.
+
+### Phase 3: Multiple models and multiple service sources
+
+Expand the AI service ecosystem TokHive supports, for example:
+
+* OpenAI
+* Anthropic
+* Google
+* Kimi
+* Other mainstream AI vendors
+
+At the same time, build multiple sources of token liquidity, such as the Provider Network and official APIs, to improve the platform's overall model coverage, stability, and availability.
+
+Ultimately, TokHive aims to build an open, efficient, low-cost, and **verifiable AI Token marketplace**:
+
+> **Let idle tokens create value, and make genuine original-vendor tokens more affordable.**
