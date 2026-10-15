@@ -1,0 +1,202 @@
+---
+sidebar_position: 5
+title: Troubleshooting
+---
+
+# Troubleshooting
+
+## Where to start
+
+1. **`bee status`** shows in a few lines whether each account is taking work and, if not, why.
+2. **`bee doctor`** runs every check in order and tells you what to fix. It reads the same configuration `bee run` uses and is read-only, so it is safe to run while Bee is running.
+3. **The terminal where Bee runs.** Problems are printed with an error code and a fix.
+
+`bee doctor` checks the device configuration, the egress configuration, each platform's local login, the connection to Hive and the device identity, and finally each account and its supply state on the Hive side. Each line is `ok`, `WARN`, `FAIL` or `skip`:
+
+```text
+ok    device                  "My MacBook" paired with you@example.com on https://dev.tokhive.ai
+ok    egress                  /home/you/.config/tokhive/egress.json supplies openai and claude
+ok    authorization (openai)  ...
+FAIL  supply (claude)         [quota_exhausted] ...
+                              fix: ...
+```
+
+A line marked **`fix (administrator)`** needs the marketplace administrator; everything else you can fix yourself. Add `--json` for a machine-readable report.
+
+Bee prints error codes such as `BEE-CONFIG-TARGET-MISSING` in its terminal output and in `bee doctor --json`. Codes never change once published, so you can search this page for them or quote them when you ask for help. When you report a problem, include the code, the time it happened and the output of `bee version`.
+
+## Common problems
+
+### `bee: command not found`
+
+The install directory is not on your `PATH`. The install script uses `~/.local/bin`. Add it to your shell profile (for example `export PATH="$HOME/.local/bin:$PATH"` in `~/.zshrc` or `~/.bashrc`) and open a new terminal.
+
+### macOS refuses to open Bee
+
+A binary downloaded through a browser is quarantined. Run `xattr -d com.apple.quarantine bee`, or install with the install script. See [Install](./install.mdx#manual-download).
+
+### Pairing doesn't complete
+
+- The code is valid for 10 minutes and can be used once. If it expired, run `bee start` again; it resumes the pairing with a new code.
+- Open the link in a browser where you are signed in to TokHive **with the account that should own this device**.
+- Don't delete `bee.json` to start over; the same file resumes where it stopped.
+- `BEE-START-HIVE`: the machine is not paired and Bee doesn't know your Hive. Pass `--hive https://dev.tokhive.ai`, or copy the command from the **Bee Device** page.
+- "this machine is paired with … ; use a separate --config path for another Hive": the configuration already belongs to another Hive. See [Configuration](./configuration.mdx#device-configuration).
+
+### Bee doesn't find my subscription
+
+`bee setup` only finds logins of the **same system user** that runs Bee.
+
+- **OpenAI:** sign in with `codex login`. If your Codex directory is not `~/.codex`, pass `--codex-home` or set `CODEX_HOME`. Error: `BEE-SETUP-CODEX-NOT-FOUND`.
+- **Claude on macOS:** sign in with `claude`. When Bee first reads the Keychain, macOS may ask for permission; allow it. If the Keychain is locked, unlock it.
+- **Claude on Linux:** sign in with `claude` so that `~/.claude/.credentials.json` exists (or `$CLAUDE_CONFIG_DIR/.credentials.json`). It must be a regular file, not a symbolic link, and readable by the user running Bee.
+- Running from a script or without a terminal: add `--yes` (`BEE-SETUP-NO-ANSWER`).
+
+You can check what Bee sees without contacting Hive:
+
+```sh
+bee codex-status
+bee claude-status
+```
+
+### Bee is online, but an account doesn't take work
+
+Run `bee status`, then look up the reason in [Why an account is not taking work](#why-an-account-is-not-taking-work). `bee supply-status --platform openai` (or `claude`) shows the details for one platform. Some reasons are temporary and clear by themselves: right after starting, the first model and quota report usually takes a few minutes.
+
+### No requests arrive although the account is ready
+
+Being ready means Hive *may* send work to the account. Requests only arrive when buyers ask for models your account offers, and the market matches them to you. Check that your quote on the **My Quote** page is competitive.
+
+### Network and proxy
+
+- `BEE-HIVE-UNREACHABLE`: Bee can't reach Hive. Check the network and the Hive address. Bee keeps retrying on its own.
+- `BEE-EGRESS-DIAL`: Bee can't reach `chatgpt.com` or `api.anthropic.com`. Check DNS, firewall, and whether this machine needs a proxy.
+- `BEE-EGRESS-PROXY`: the proxy in `connect_proxy` isn't running or refused the `CONNECT`.
+
+If the machine needs a proxy for the upstream platforms, set one with `bee setup --connect-proxy http://127.0.0.1:PORT`, or export `HTTPS_PROXY`. See [Configuration](./configuration.mdx#connect_proxy).
+
+### I switched accounts in the official client
+
+Bee doesn't silently switch to a different account. New work for that platform is paused, and `bee status` reports that the account changed. Look at the pending account, then confirm it:
+
+```sh
+bee account-status --platform claude
+bee confirm-account --platform claude --account-fingerprint <full fingerprint>
+```
+
+### The official client asks me to sign in again
+
+When Bee and the official client use the same account, a refresh of the login on both sides at the same moment can, rarely, sign the official client out. Sign in again; Bee picks up the new login automatically and work already settled is not affected.
+
+### `BEE-DEVICE-REPLACED`
+
+Another machine was paired to your account and replaced this one. Run Bee on the new machine. To supply from this machine again, run `bee login` here and confirm the replacement in the console.
+
+## Why an account is not taking work
+
+These are the reasons Hive gives. `bee status` shows the description; `bee supply-status` and the **Bee Device** page show the code. Reasons marked **administrator** need the marketplace administrator.
+
+| Code | `bee status` shows | What to do |
+| --- | --- | --- |
+| `offline` | Bee offline | Start Bee and make sure it can reach Hive. |
+| `manually_paused` | manually paused | `bee resume --platform <platform>`. |
+| `not_configured` | supply not configured | Add the platform with `bee setup` and restart Bee. If it is already configured, ask the administrator whether the market offers this platform. |
+| `capabilities_unknown` | account capabilities unknown or expired | Keep Bee running with capability reports on; a report usually arrives within a few minutes. |
+| `authorization_unavailable` | no valid online authorization envelope | Keep Bee running. If it persists, sign in again with the official client. |
+| `quota_unknown` | quota awaiting a new query | Keep Bee running; it retries the quota query. |
+| `quota_exhausted` | account quota exhausted | Nothing to do; supply resumes when the quota window resets. |
+| `rate_limited` | upstream rate limit cooldown active | Nothing to do; supply resumes when the cooldown ends. |
+| `concurrency_full` | account concurrency limit reached | Nothing to do; new work arrives as requests in flight finish. |
+| `model_unavailable` | model not tradable | None of the market's models is available to this plan. Check the plan in the official client. |
+| `codex_source_unavailable` | waiting for official Codex authorization recovery | Sign in again with `codex login`; a running Bee picks it up. |
+| `claude_source_unavailable` | waiting for official Claude Code authorization recovery | Sign in to Claude Code again; a running Bee picks it up. |
+| `codex_authorization_rejected` | Codex authorization rejected by upstream | Sign in again with `codex login`. |
+| `claude_authorization_rejected` | Claude authorization rejected by upstream | Sign in to Claude Code again. |
+| `codex_confirmation_required` | OpenAI account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
+| `claude_confirmation_required` | Claude account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
+| `device_draining` | device being replaced; finishing in-flight execution and settlement | Run the new Bee; it takes over once the old one has drained. |
+| `plan_not_configured` | no concurrency limit configured for this plan | **Administrator.** |
+| `banned` | banned by administrator | **Administrator.** |
+
+## Error code reference
+
+### Setup
+
+| Code | Meaning and fix |
+| --- | --- |
+| `BEE-SETUP-NEEDED` | No subscriptions chosen yet. Bee stays online but supplies nothing. Run `bee setup`, then restart Bee. |
+| `BEE-START-HIVE` | Not paired and no Hive address given. Pass `--hive`, or copy the command from the **Bee Device** page. |
+| `BEE-SETUP-PLATFORM` | `--platform` names an unknown platform. Use `openai`, `claude`, or `openai,claude`. |
+| `BEE-SETUP-CODEX-NOT-FOUND` | No Codex directory at `--codex-home`, `$CODEX_HOME` or `~/.codex`. Sign in with `codex login`, or pass the directory. |
+| `BEE-SETUP-NO-ANSWER` | Setup needs an answer but has no terminal. Run it in a terminal, or add `--yes`. |
+| `BEE-SETUP-NOTHING` | No account selected, so nothing was written. Sign in to the official clients and run `bee setup` again. |
+| `BEE-SETUP-WRITE` | The egress configuration couldn't be written. Usually the directory doesn't exist or belongs to another user. |
+| `BEE-SETUP-MANUAL` | The existing file has settings `bee setup` doesn't manage, so it is left alone. Edit it by hand, or write elsewhere with `--egress-config`. |
+
+### Device and Hive
+
+| Code | Meaning and fix |
+| --- | --- |
+| `BEE-DEVICE-CONFIG` | `bee.json` can't be used: wrong permissions, not a regular file, or corrupted. Check the path and run `chmod 600`. **Don't delete it.** |
+| `BEE-DEVICE-NOT-PAIRED` | Pairing hasn't finished. Run `bee start` or `bee login` and confirm the code in the console. |
+| `BEE-DEVICE-REPLACED` | Another Bee replaced this device. Run the new one, or pair this machine again with `bee login`. |
+| `BEE-HIVE-UNREACHABLE` | Can't connect to Hive. Check the network and the Hive address. |
+| `BEE-HIVE-CREDENTIAL` | Hive rejected the device credential. Check that the configuration belongs to this Hive; if so, pair again with `bee login`. |
+| `BEE-HIVE-ERROR` | Hive returned an unexpected error. Try again later; if it persists, report the code, HTTP status and time to the administrator. |
+
+### Local login
+
+| Code | Meaning and fix |
+| --- | --- |
+| `BEE-CODEX-SOURCE` | Can't read the Codex login; the message gives the reason. Sign in with `codex login` and check `codex.home` and `codex.store`. |
+| `BEE-CODEX-EXPIRED` | Warning: the Codex token expired. While Bee is online Hive schedules a refresh; if supply doesn't recover, sign in again. |
+| `BEE-CLAUDE-SOURCE` | Can't read the Claude Code login. Sign in with `claude` as the user running Bee; on macOS allow Keychain access, on Linux check `.credentials.json`. |
+| `BEE-CLAUDE-EXPIRED` | The Claude token expired. Open Claude Code so it renews the login, or enable `claude.refresh`. |
+| `BEE-CLAUDE-SCOPE` | The login lacks the `user:inference` scope. Sign in to Claude Code again with a subscription account. |
+| `BEE-CLAUDE-UNSUPPORTED` | `claude.store` is `keychain` on Linux. Set it to `file`, or run `bee setup` again. |
+
+### Egress configuration
+
+These appear when `egress.json` was edited by hand. Running `bee setup` again usually fixes them.
+
+| Code | Meaning and fix |
+| --- | --- |
+| `BEE-CONFIG-NOT-FOUND` | The file doesn't exist. Check the `--egress-config` path. |
+| `BEE-CONFIG-NOT-REGULAR` | The path is a directory or a symbolic link. Point to the file itself. |
+| `BEE-CONFIG-PERMISSIONS` | Other users can access the file. Run `chmod 600`. |
+| `BEE-CONFIG-UNREADABLE` | The file can't be read, usually because another user owns it. |
+| `BEE-CONFIG-TOO-LARGE` | The file is larger than 64 KiB. |
+| `BEE-CONFIG-SYNTAX` | Invalid JSON; the message gives line and column. |
+| `BEE-CONFIG-UNKNOWN-FIELD` | A field Bee doesn't recognize, often a typo. |
+| `BEE-CONFIG-FIELD-TYPE` | A field has the wrong type, for example `targets` as a string instead of a list. |
+| `BEE-CONFIG-TRAILING-DATA` | Content after the JSON object. |
+| `BEE-CONFIG-NO-TARGETS` | `targets` is empty or missing. |
+| `BEE-CONFIG-TOO-MANY-TARGETS` | More than 16 targets. |
+| `BEE-CONFIG-TARGET-FORMAT` | A target isn't `host:port`. |
+| `BEE-CONFIG-TARGET-MISSING` | A configured platform's address is missing from `targets`: `chatgpt.com:443` for `codex`, `api.anthropic.com:443` for `claude`. |
+| `BEE-CONFIG-NO-SOURCE` | Neither `codex` nor `claude` is configured. |
+| `BEE-CONFIG-PROXY` | `connect_proxy` isn't `http://127.0.0.1:PORT` (or another loopback address). |
+| `BEE-CONFIG-CAPABILITIES-SOURCE` | The top-level `capabilities` needs `codex`. For Claude, use `claude.capabilities: true`. |
+| `BEE-CONFIG-CLAUDE-STORE` | `claude.store` must be `keychain` (macOS) or `file`. |
+| `BEE-CONFIG-STATIC-MIXED`, `BEE-CONFIG-STATIC-CREDENTIAL`, `BEE-CONFIG-INBOX-KEY`, `BEE-CONFIG-CAPABILITIES-URL` | Fields for test setups only (`credential`, `inbox_key_id`, `capabilities.local_url`). Remove them for real supply. |
+
+### Upstream connections
+
+`bee run` logs these as `WARN` lines while serving work. The same code and host are logged at most once a minute. They are also reported to Hive, without any traffic, so the administrator can help diagnose them.
+
+| Code | Meaning and fix |
+| --- | --- |
+| `BEE-EGRESS-DIAL` | Can't connect to the upstream platform; the log gives the system's reason (DNS, timeout, refused). Check network, DNS and firewall, or set a proxy. |
+| `BEE-EGRESS-PROXY` | Couldn't open a tunnel through `connect_proxy`. Make sure the proxy runs and allows `CONNECT`. |
+| `BEE-EGRESS-NOT-ALLOWED` | Hive asked for an address not in `targets`, and Bee refused. If it belongs to a platform you supply, add it to `targets`; otherwise the allowlist is working as designed. |
+| `BEE-EGRESS-METADATA` | Bee didn't understand a request from Hive, usually because Bee is out of date. [Upgrade Bee](./install.mdx#upgrade). |
+
+## Getting more detail
+
+```sh
+TOKHIVE_LOG_LEVEL=debug bee start      # verbose logs
+TOKHIVE_LOG_FORMAT=logfmt bee start    # structured logs in the terminal
+bee doctor --json                      # machine-readable report
+```
+
+Logs never contain your tokens, buyer prompts or model responses, but they do contain account fingerprints and your Hive address. Review them before sharing.

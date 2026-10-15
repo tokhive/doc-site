@@ -1,0 +1,152 @@
+---
+sidebar_position: 6
+title: Glossary
+---
+
+# Glossary
+
+Terms used across the TokHive documentation, in alphabetical order.
+
+### Account fingerprint
+
+A stable identifier Bee derives from a subscription account, shown as a short prefix in `bee setup` and `bee status`. Bee uses it to notice when the official client has switched to a different account, and asks you to confirm the change before supplying it.
+
+### API key
+
+A key issued by Hive that a Consumer uses to call the TokHive API. Keys start with `hive_`, are shown only once when created, and can be revoked at any time. All keys of an account share the same balance. Not to be confused with a [device credential](#device-credential) or a subscription login.
+
+### Balance
+
+The US-dollar funds a Consumer spends on calls. It grows through deposits and through transfers from [earnings](#earnings). A request only needs a balance above 0 to start, and is charged for its actual usage when it finishes, so the balance can go below 0. It is an entry check, not a spending cap.
+
+### Base price
+
+The upstream vendor's own per-token price for a model, with separate prices for input, output and cached tokens. Provider quotes are expressed as a [multiplier](#quote-multiplier) of it.
+
+### Bee
+
+The Provider client. Bee runs on the Provider's own macOS or Linux machine, keeps the Provider's subscriptions available to the network, and relays encrypted traffic between the [TEE](#tee) and the upstream AI vendor. It cannot read buyer requests or responses. Each Provider has one active Bee, which can supply one subscription account per platform. See the [Provider guide](./provider/overview.mdx).
+
+### Buyer price
+
+What a Consumer pays for a model: the Provider's [quote](#quote) plus the platform [commission](#commission), that is `quote × (1 + commission rate)`.
+
+### Commission
+
+The fee Hive charges the Consumer on top of the Provider's quote. It is calculated on the quote and is not deducted from the Provider's earnings.
+
+### Concurrency limit
+
+The maximum number of requests that may run at once. For Consumers it applies per API key (`429 concurrency_limit`); for Providers it applies per subscription account, depending on the plan (`concurrency_full`).
+
+### Consumer
+
+A user who calls AI models through TokHive. Also called a buyer. The same TokHive account can act as both a Consumer and a Provider.
+
+### Deposit address
+
+The address TokHive assigns to your account for stablecoin deposits. Funds sent to it are credited to your [balance](#balance) after the network's confirmations.
+
+### Device credential
+
+The secret Bee receives when it is paired with a TokHive account, stored in Bee's device configuration. It proves the device's identity to Hive. It is not a subscription login and gives no access to an upstream AI vendor.
+
+### Earnings
+
+What a Provider has earned from settled requests, kept separate from the [balance](#balance). Earnings can be [transferred](#earnings-transfer) to the balance and spent on calls. Cashing out is planned.
+
+### Earnings transfer
+
+A one-way, immediate move of funds from earnings to the balance of the same account. It can't be reversed.
+
+### Egress configuration
+
+The `egress.json` file that tells Bee which subscriptions to supply and which upstream hosts it may connect to (the [targets](#targets)). `bee setup` writes it. See [Configuration](./provider/configuration.mdx#egress-configuration).
+
+### Execution attempt
+
+One dispatch of a [request](#request) to one Provider. If a Provider fails, Hive can retry with another Provider, which is a new attempt with its own price. Failed attempts are not charged.
+
+### Execution receipt
+
+A record signed by the TEE for every execution, proving what was executed. Receipts are listed on the **Execution Receipts** page of the console. See [Execution Receipts](./trust/execution-receipts.mdx).
+
+### Hive
+
+TokHive's marketplace service. Hive authenticates Consumers, routes each request to a suitable Provider, hands it to the TEE, meters usage and settles payments. It keeps the connections to all Bees. Hive never sees Provider credentials in plaintext; it does handle buyer requests in plaintext.
+
+### Locked price
+
+The base price, quote multiplier and commission rate fixed when an [execution attempt](#execution-attempt) is dispatched. Later price changes don't affect it.
+
+### Official client
+
+The vendor's own client whose login Bee reads: Codex for an OpenAI subscription, Claude Code for a Claude subscription. Bee only reads the login; it doesn't sign you in or out.
+
+### Pairing
+
+Linking a Bee to a TokHive account. Bee prints a link with a short code, valid for 10 minutes, and you confirm it in the console. Pairing a new machine replaces the previous Bee.
+
+### Platform
+
+An upstream AI vendor that Bee can supply: `openai` (ChatGPT subscriptions, via Codex) or `claude` (Claude subscriptions, via Claude Code).
+
+### Provider
+
+A user who supplies idle AI subscription quota to TokHive by running Bee, and earns from the requests it serves. "Provider" means the person, not the upstream AI vendor and not the Bee software.
+
+### Quota window
+
+The time window over which an upstream subscription limits usage, for example 5 hours or 1 week. When any applicable window is exhausted, Bee stops taking work for that account until it resets (`quota_exhausted`).
+
+### Quote
+
+The price a Provider receives for its supply, before commission. A Provider either accepts the platform default or sets its own [multiplier](#quote-multiplier) on the **My Quote** page; the choice applies to all of its models.
+
+### Quote multiplier
+
+The factor applied to a model's [base price](#base-price) to get the Provider's quote. For example, `0.1` means 10% of the vendor's price. It applies equally to input, output and cached tokens.
+
+### Relay
+
+The part of Hive that carries the TEE's encrypted connections to the right Bee over Bee's WebSocket connection. It only moves encrypted bytes.
+
+### Request
+
+One call a Consumer makes to the TokHive API for a given model. It may involve more than one [execution attempt](#execution-attempt).
+
+### Sealed credential
+
+A subscription access token encrypted by Bee so that only the TEE can open it. Bee sends Hive only the sealed envelope; the refresh token never leaves the official client's store.
+
+### Settlement
+
+Recording what the Consumer pays, what the Provider earns and the platform commission for a request. Only requests that completed successfully with full usage are settled, as soon as the TEE receipt is verified.
+
+### Sticky session
+
+Hive's preference for sending the requests of one conversation to the same Provider, so that upstream conversation state can be reused.
+
+### Subscription account
+
+The account a Provider holds with an upstream AI vendor, for example a ChatGPT Plus or Claude Max account, whose quota it supplies. A Bee supplies at most one subscription account per platform.
+
+### Supply
+
+A Provider's subscription made available to the market. An account is "taking work" when Hive may send it requests; when it isn't, Hive gives a [supply reason](./provider/troubleshooting.mdx#why-an-account-is-not-taking-work).
+
+### Targets
+
+The allowlist in the egress configuration of upstream `host:port` addresses Bee may connect to, such as `chatgpt.com:443` and `api.anthropic.com:443`. Bee refuses any other address.
+
+### TEE
+
+Trusted Execution Environment: an isolated, attested environment that runs each request. It opens the Provider's sealed credential, opens a TLS session to the upstream vendor that ends inside the enclave, and signs an [execution receipt](#execution-receipt). Neither Hive nor Bee can read what happens inside it. See [TEE zkTLS](./web-proof/tee-zktls-technical-principles.mdx).
+
+### USDT0
+
+The stablecoin TokHive accepts for deposits on Conflux eSpace. 1 USDT0 is credited as 1 US dollar.
+
+### Web Proof
+
+Techniques, also called zkTLS, that prove a piece of web data really came from a given server and was not altered. TokHive uses them to make it verifiable that a request was served by the claimed upstream model. See [Web Proof](./web-proof/web-proof.mdx).

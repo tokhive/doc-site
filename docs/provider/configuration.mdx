@@ -1,0 +1,126 @@
+---
+sidebar_position: 4
+title: Configuration
+---
+
+# Configuration
+
+Bee keeps two files: the **device configuration**, which holds the pairing, and the **egress configuration**, which says which subscriptions to supply. `bee start` writes both for you; this page explains what is in them and how to change them.
+
+## Device configuration
+
+`bee login` (or the pairing step of `bee start`) creates it. The default location is `tokhive/bee.json` under the user configuration directory:
+
+| System | Path |
+| --- | --- |
+| macOS | `~/Library/Application Support/tokhive/bee.json` |
+| Linux | `~/.config/tokhive/bee.json`, or `$XDG_CONFIG_HOME/tokhive/bee.json` if set |
+
+It holds the Hive address and the device secret, which is the only proof of the pairing.
+
+- Bee writes it with mode `0600` using atomic replacement, and refuses symbolic links and files that other users can read or write.
+- **Do not delete it to retry a failed pairing.** Run `bee login` (or `bee start`) again with the same file, and Bee resumes where it stopped.
+- Keep it out of version control, logs, screenshots and backups that others can read.
+- One file belongs to one Hive. To connect the same machine to a different Hive, use a separate file with `--config PATH` on every command.
+
+While `bee start`, `bee login` or `bee run` is running, Bee holds a lock file next to the configuration, so two processes can't use the same configuration at once.
+
+## Egress configuration
+
+`bee setup` (or the second step of `bee start`) writes `egress.json` next to the device configuration. It lists the subscriptions to supply and the upstream hosts Bee may connect to for the TEE.
+
+`bee run`, `bee start` and `bee doctor` use this file unless you pass `--egress-config PATH`. If there is neither, Bee stays online but supplies nothing and prints `BEE-SETUP-NEEDED`.
+
+:::tip
+You rarely need to edit this file. Running `bee setup` again is safe: it rewrites the file with the platforms you choose this time, and keeps your `connect_proxy`, `claude.refresh` and `claude.config_dir` settings.
+:::
+
+### Example
+
+A file supplying both platforms, as `bee setup` writes it on macOS:
+
+```json
+{
+  "targets": ["chatgpt.com:443", "api.anthropic.com:443"],
+  "codex": {"home": "/Users/you/.codex", "store": "file"},
+  "capabilities": {},
+  "claude": {"store": "keychain", "capabilities": true, "refresh": false}
+}
+```
+
+On Linux, `claude.store` is `"file"` instead.
+
+If you write the file by hand, it must have mode `0600` (`chmod 600 egress.json`), contain exactly one JSON object, and be smaller than 64 KiB. Bee rejects unknown fields, so a misspelled field is reported instead of silently ignored.
+
+### Fields
+
+#### `targets`
+
+The allowlist of upstream addresses, as `host:port`, that Bee will open connections to on behalf of the TEE. At most 16 entries.
+
+| Platform | Required target |
+| --- | --- |
+| OpenAI | `chatgpt.com:443` |
+| Claude | `api.anthropic.com:443` |
+
+Every configured platform must have its target, or Bee refuses to start with `BEE-CONFIG-TARGET-MISSING`.
+
+#### `codex`
+
+Where to read the Codex login, for an OpenAI subscription.
+
+| Field | Meaning |
+| --- | --- |
+| `home` | The Codex directory. `bee setup` takes it from `--codex-home`, else `$CODEX_HOME`, else `~/.codex`. |
+| `store` | `file` reads `auth.json` in `home`. `keyring` reads the macOS Keychain, for a Codex configured to keep its login there. `auto` tries the Keychain first, then `auth.json`. `bee setup` writes `file`, and on macOS `keyring` when there is no `auth.json`. |
+
+#### `capabilities`
+
+The top-level `capabilities` object enables model and quota reports for OpenAI. Keep it as `{}`. Reports are required for taking work. It requires `codex`.
+
+#### `claude`
+
+Where to read the Claude Code login, for a Claude subscription.
+
+| Field | Meaning |
+| --- | --- |
+| `store` | `keychain` reads the macOS Keychain. `file` reads `.credentials.json` in the Claude Code configuration directory, which is what Claude Code uses on Linux. `bee setup` picks the one Claude Code uses on your system; Bee never falls back from one to the other. |
+| `config_dir` | A non-default Claude Code configuration directory. Without it, Bee uses `$CLAUDE_CONFIG_DIR` if set, else `~/.claude`. `bee setup --claude-config-dir` sets it. |
+| `capabilities` | `true` enables model and quota reports, which are required for taking work. |
+| `refresh` | `false` (default): Bee only re-seals tokens that Claude Code has refreshed itself. `true`: Hive may also schedule token refreshes, and Bee writes the refreshed token back to Claude Code's store. A running Bee picks up a change to this field automatically. |
+
+#### `connect_proxy`
+
+Optional. Sends Bee's outbound connections to the upstream platforms through a local HTTP proxy, for example `http://127.0.0.1:7890`. It must be an unauthenticated HTTP proxy on a loopback address that allows `CONNECT`. Set or remove it with:
+
+```sh
+bee setup --connect-proxy http://127.0.0.1:7890
+bee setup --connect-proxy ""
+```
+
+The standard `HTTPS_PROXY` environment variable also works and takes precedence over `connect_proxy`.
+
+### Supplying only one platform
+
+Run `bee setup` and answer no for the platform you don't want, or use:
+
+```sh
+bee setup --platform openai --yes
+```
+
+By hand, remove the other platform's object (`codex` and the top-level `capabilities`, or `claude`) and its target.
+
+## Environment variables
+
+| Variable | Effect |
+| --- | --- |
+| `TOKHIVE_LOG_LEVEL` | `debug`, `info` (default), `warn` or `error`. |
+| `TOKHIVE_LOG_MODULES` | Comma-separated list of log modules to keep, for example `sync,connect`. |
+| `TOKHIVE_LOG_FORMAT` | `logfmt` keeps the structured `time=… level=…` lines in a terminal too. |
+| `BEE_DEBUG` | Any value turns on debug logging. |
+| `BEE_METRICS_ADDR` | Serve Prometheus metrics on this address, for example `127.0.0.1:9464`. |
+| `HTTPS_PROXY` | Standard proxy setting for upstream connections. Takes precedence over `connect_proxy`. |
+| `CODEX_HOME` | Where `bee setup` looks for the Codex login. |
+| `CLAUDE_CONFIG_DIR` | Where Bee looks for the Claude Code login, as Claude Code itself does. |
+
+In an interactive terminal, `bee start` and `bee run` print short readable status lines and hide routine process logs. Under a service manager, in a pipe or a file, or when any log variable is set, the output is always structured.

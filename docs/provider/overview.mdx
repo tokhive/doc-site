@@ -1,0 +1,41 @@
+---
+sidebar_position: 1
+title: Bee Overview
+---
+
+# Bee Overview
+
+Bee is the provider agent of TokHive. If your ChatGPT or Claude subscription has quota you don't use, Bee lets you supply it to the TokHive market. Buyers get first-party model access at a lower price, and you earn from capacity that would otherwise go to waste.
+
+Bee runs on your own machine and keeps a connection open to a **Hive**, the marketplace service that matches buyers with providers.
+
+## What Bee does
+
+- **Device identity.** You pair Bee once with your Hive account. After that it keeps an authenticated connection open and reports that it is online.
+- **Authorization upkeep.** Bee reads the login of the official client you already use: Codex for an OpenAI subscription, Claude Code for a Claude subscription. It never sends your tokens to Hive in plaintext. Instead it seals your access token to a Trusted Execution Environment (TEE) and reports only the sealed envelope plus account metadata: account fingerprint, expiry, model list and quota windows.
+- **Encrypted egress.** Buyer requests run inside the TEE, which opens its own TLS session to the upstream platform. Bee only relays that already-encrypted traffic to an allowlisted set of hosts.
+
+## What Bee can and cannot see
+
+| | Bee | Hive | TEE |
+| --- | --- | --- | --- |
+| Your access token | Reads it locally, sends it only sealed | Sealed envelope only | Plaintext, inside the enclave |
+| Your refresh token | Stays in the official client's local store | Never | Never |
+| Buyer prompts and model responses | Encrypted TLS traffic only | Plaintext: Hive receives each buyer request, passes it to the TEE, and returns the response to the buyer | Plaintext, inside the enclave |
+
+Bee only reads the official client's login. It doesn't sign you in, sign you out or change the login, unless you explicitly turn on token refresh for Claude (see [Configuration](./configuration.mdx#claude)).
+
+Every execution produces a receipt signed by the TEE. You can view and download receipts on the **Execution Receipts** page of the console. See [Trust Model](../trust/trust-model.mdx) and [Execution Receipts](../trust/execution-receipts.mdx) for the full picture.
+
+## Requirements
+
+- **Operating system:** macOS or Linux, on Intel/AMD (`amd64`) or ARM (`arm64`). Linux machines without a desktop or a browser work too.
+- **Subscriptions:** OpenAI (via Codex) and Claude (via Claude Code) are both supported on macOS and on Linux. Sign in to the official client as the same system user that runs Bee.
+- **Network:** the machine must reach your Hive over HTTPS, and reach `chatgpt.com:443` (OpenAI) or `api.anthropic.com:443` (Claude), directly or through a local proxy.
+- **Account:** a TokHive account on the Hive you supply to. You confirm the pairing in its web console.
+
+## How to start
+
+1. [Install Bee](./install.mdx).
+2. [Run it for the first time](./first-run.mdx) with `bee start`.
+3. If something doesn't work, see [Troubleshooting](./troubleshooting.mdx).

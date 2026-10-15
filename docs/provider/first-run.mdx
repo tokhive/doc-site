@@ -1,0 +1,125 @@
+---
+sidebar_position: 3
+title: First Run
+---
+
+# First Run
+
+Getting from a fresh install to supplying takes one command, `bee start`. You never have to edit a configuration file.
+
+:::tip
+The **Bee Device** page of the TokHive console shows the same steps, with the install command and a start command that already contains your Hive's address. Copy them from there.
+:::
+
+## 1. Sign in to the official client
+
+Sign in on this machine, **as the same system user that will run Bee**, to the client of each subscription you want to supply:
+
+| Subscription | Official client | Sign in with |
+| --- | --- | --- |
+| ChatGPT (OpenAI) | Codex CLI | `codex login` |
+| Claude | Claude Code | `claude`, then sign in with your subscription account |
+
+On a Linux server without a browser, both clients offer a sign-in flow you can complete from another device.
+
+## 2. Start Bee
+
+```sh
+bee start --hive https://dev.tokhive.ai
+```
+
+`https://dev.tokhive.ai` is the TokHive Hive; you can also copy the full command from the **Bee Device** page of the console. `bee start` runs three steps and skips any that are already done.
+
+### Pairing
+
+Bee prints a pairing link and a short code:
+
+```text
+https://dev.tokhive.ai/devices/pair?code=ABCD-EFGH
+```
+
+Open the link in any browser where you are signed in to TokHive; it doesn't have to be on this machine. Check the device name, then confirm. The code is valid for 10 minutes and can be used once. You can also open `/devices/pair` in the console and type the code by hand.
+
+The device name defaults to the host name. Set your own with `--name`:
+
+```sh
+bee start --hive https://dev.tokhive.ai --name "My MacBook"
+```
+
+### Choosing the subscriptions
+
+Bee looks for the official sign-ins on this machine, only reading them, and lists each account it finds: platform, account fingerprint prefix, plan and expiry. It asks for each one whether to supply it. Add `--yes` to supply every account found without asking.
+
+Your choice is saved in `egress.json` next to the device configuration (see [Configuration](./configuration.mdx#egress-configuration)). If a platform isn't found, Bee prints an error code and how to fix it; see [Troubleshooting](./troubleshooting.mdx#setup).
+
+### Running
+
+Bee connects to Hive and synchronizes each account. When a platform is ready, it prints:
+
+```text
+openai ready: taking new work
+```
+
+If an account can't take work yet, Bee prints one line per reason, each with an error code and a fix.
+
+## 3. Keep it running
+
+Bee runs in the foreground. Leave the terminal open; Ctrl-C stops it. If the network drops, Bee reconnects by itself, with a backoff of 1 to 30 seconds.
+
+To start Bee again later, run `bee start` with no options. The Hive address is remembered.
+
+## Check the status
+
+In another terminal:
+
+```sh
+bee status
+```
+
+It shows on one screen the Bee version, the Hive, the device and the account it is paired to, the platforms you chose, and whether each one is taking work:
+
+```text
+Bee:     bee v0.1.0 darwin/arm64
+Hive:    https://dev.tokhive.ai
+Device:  My MacBook, paired to you@example.com
+Supply:  openai, claude (egress.json)
+  openai  taking new work
+  claude  not taking work: account quota exhausted
+```
+
+The reasons are explained in [Troubleshooting](./troubleshooting.mdx#why-an-account-is-not-taking-work).
+
+:::note[Online is not the same as taking work]
+The console shows the device as online as soon as Bee is connected. Whether an account takes work also depends on its authorization, models, quota and the plan settings in Hive. `bee status` tells you which.
+:::
+
+## Everyday tasks
+
+| Task | Command |
+| --- | --- |
+| Start Bee | `bee start` |
+| Stop Bee | Ctrl-C |
+| Pause one platform without stopping Bee | `bee pause --platform openai` (or `claude`) |
+| Resume a paused platform | `bee resume --platform openai` |
+| Add or remove a platform | Stop Bee, run `bee setup`, then `bee start` |
+| Check everything | `bee doctor` |
+
+## Running the steps one by one
+
+`bee start` runs these commands for you. Use them directly to redo one step:
+
+```sh
+bee login --hive https://dev.tokhive.ai --name "My MacBook"  # pair, or resume an interrupted pairing
+bee setup                                                   # choose the subscriptions to supply
+bee run                                                     # stay connected and serve work
+```
+
+See [Command Reference](./commands.mdx) for all options.
+
+## Moving to another machine
+
+Each TokHive account can have one active Bee. To move to a new machine, install Bee there and run `bee start`. When you confirm the pairing, the console asks you to confirm that the new device replaces the old one. The old Bee finishes the work it already has and then exits; the new one takes over after that.
+
+## Earnings
+
+Supply is settled at your quote. You can start with the platform default, or set your own multiplier on the **My Quote** page of the console; it applies to all models. On the **Balances and Ledger** page you can transfer earnings (**Transfer earnings**) to your buyer balance and spend them on your own calls.

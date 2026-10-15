@@ -1,55 +1,93 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
+title: Install Bee
 ---
 
-# Install
+# Install Bee
 
-Docusaurus can manage multiple versions of your docs.
+Bee is a single executable. Prebuilt binaries are published on the [releases page](https://github.com/tokhive/bee/releases) for macOS and Linux, on `amd64` and `arm64`.
 
-## Create a docs version
+## Install script (recommended)
 
-Release a version 1.0 of your project:
-
-```bash
-npm run docusaurus docs:version 1.0
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
 ```
 
-The `docs` folder is copied into `versioned_docs/version-1.0` and `versions.json` is created.
+The script picks the build for your operating system and CPU, verifies it against the release's `checksums.txt` and installs `bee` to `~/.local/bin`.
 
-Your docs now have 2 versions:
+| Variable | Effect |
+| --- | --- |
+| `BEE_VERSION` | Install a specific release, for example `BEE_VERSION=v0.1.0`. Defaults to the latest release. |
+| `BEE_INSTALL_DIR` | Install somewhere other than `~/.local/bin`. |
 
-- `1.0` at `http://localhost:3000/docs/` for the version 1.0 docs
-- `current` at `http://localhost:3000/docs/next/` for the **upcoming, unreleased docs**
+For example:
 
-## Add a Version Dropdown
-
-To navigate seamlessly across versions, add a version dropdown.
-
-Modify the `docusaurus.config.js` file:
-
-```js title="docusaurus.config.js"
-export default {
-  themeConfig: {
-    navbar: {
-      items: [
-        // highlight-start
-        {
-          type: 'docsVersionDropdown',
-        },
-        // highlight-end
-      ],
-    },
-  },
-};
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_VERSION=v0.1.0 sh
 ```
 
-The docs version dropdown appears in your navbar:
+If `~/.local/bin` is not on your `PATH`, add it to your shell profile, or call Bee by its full path.
 
-![Docs Version Dropdown](./img/docsVersionDropdown.png)
+Check the installation:
 
-## Update an existing version
+```sh
+bee version
+```
 
-It is possible to edit versioned docs in their respective folder:
+## Manual download
 
-- `versioned_docs/version-1.0/hello.md` updates `http://localhost:3000/docs/hello`
-- `docs/hello.md` updates `http://localhost:3000/docs/next/hello`
+1. Download `bee_<os>_<arch>.tar.gz` for your machine and `checksums.txt` from the [releases page](https://github.com/tokhive/bee/releases). `<os>` is `darwin` or `linux`, `<arch>` is `amd64` or `arm64`.
+2. Verify the archive:
+
+   ```sh
+   shasum -a 256 -c checksums.txt --ignore-missing
+   ```
+
+3. Extract it and move `bee` onto your `PATH`:
+
+   ```sh
+   tar -xzf bee_linux_amd64.tar.gz
+   mv bee ~/.local/bin/
+   ```
+
+:::note[macOS: "cannot be opened" or "developer cannot be verified"]
+A file downloaded through a browser is quarantined, and Gatekeeper refuses to run the unsigned binary. Clear the flag:
+
+```sh
+xattr -d com.apple.quarantine bee
+```
+
+The install script downloads with `curl` and is not affected.
+:::
+
+## Build from source
+
+You need Go 1.27 or newer, plus `git` and `bash`.
+
+```sh
+git clone https://github.com/tokhive/bee.git
+cd bee
+make build        # fetches the pinned TEE client library, then builds bin/bee
+```
+
+`make build` first runs `scripts/prepare-tee.sh`, which downloads the TEE client library at the commit pinned in `TEE_REVISION` into `.cache/reclaim-tee`. That library can't be fetched through the Go module proxy, so `go.mod` points to the local copy. After the first run you can also build with `go build -o bin/bee ./cmd/bee`.
+
+Put `bin/bee` on your `PATH`, or call it as `./bin/bee`. A source build reports its version as `dev`, followed by the commit when built inside the repository, for example `dev+3f82e19a1b2c`.
+
+## Upgrade
+
+Run the install script again. It replaces `bee` in place. Then restart Bee: stop it with Ctrl-C and run `bee start` again.
+
+Bee tells Hive which version is connecting, and the console shows it on the **Bee Device** page, so you can check that the upgrade took effect.
+
+## Uninstall
+
+1. Stop Bee.
+2. Delete the binary, for example `rm ~/.local/bin/bee`.
+3. Optionally delete Bee's configuration directory (see [Configuration](./configuration.mdx#device-configuration)). This removes the device pairing; the machine has to be paired again to supply.
+
+Bee never signs you out of the official clients, so Codex and Claude Code keep working as before.
+
+## Next step
+
+[Run Bee for the first time](./first-run.mdx).

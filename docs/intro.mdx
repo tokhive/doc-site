@@ -50,16 +50,13 @@ At the same time, TokHive uses techniques such as security isolation, trusted ex
 
 ## Monetizing idle tokens
 
-Users with idle AI subscription quota can install the TokHive Provider client and connect their AI accounts to the TokHive network.
+Users with idle AI subscription quota can install **Bee**, the TokHive Provider client, and connect their AI accounts to the TokHive network.
 
 When AI requests arise in the network, TokHive automatically schedules them based on factors such as Provider status, model capability, remaining quota, network quality, and price.
 
 Once a request is completed, the platform settles payment based on the actual number of tokens contributed.
 
-The income a Provider earns can be:
-
-* Cashed out directly; or
-* Kept within TokHive to purchase other AI token services in the future.
+The income a Provider earns can be transferred to their TokHive balance and spent on AI calls. Cashing out earnings directly is planned.
 
 One important design principle of TokHive is:
 
@@ -67,7 +64,7 @@ One important design principle of TokHive is:
 
 AI requests are, as much as possible, sent out through the Provider's own PC, server, or VPC, preserving the Provider's original network environment and reducing the account risk that could arise from sharing a service.
 
-For sensitive credentials such as access tokens, OAuth tokens, or API keys, TokHive protects them through encryption, permission isolation, and trusted execution environments. Sensitive information is never directly exposed to Consumers or ordinary Hub services, and is only used within a verified, trusted environment.
+For sensitive credentials such as access tokens, OAuth tokens, or API keys, TokHive protects them through encryption, permission isolation, and trusted execution environments. Sensitive information is never directly exposed to Consumers or ordinary Hive services, and is only used within a verified, trusted environment.
 
 TokHive's Provider client and key TEE components will remain open source, so that anyone can review the critical code and security mechanisms.
 
@@ -137,25 +134,25 @@ A decentralized supply network inherently faces the challenge of a fluctuating n
 
 For example, there may be fewer Providers online during certain time windows, or a particular model may temporarily lack sufficient shared quota.
 
-For this reason, TokHive does not rely entirely on the Provider network, and instead adopts a **multi-source liquidity** design.
+For this reason, TokHive is designed not to rely entirely on the Provider network, and plans a **multi-source liquidity** design. Today, all requests are served by the Provider network.
 
-Service sources can include:
+Planned service sources include:
 
 * The TokHive Provider network;
 * Official API services;
 * Other verified original-vendor service sources.
 
-When the Provider network has ample supply, the system prioritizes lower-cost shared tokens; when shared supply is insufficient, it can automatically switch to original-vendor service sources.
+When the Provider network has ample supply, the system will prioritize lower-cost shared tokens; when shared supply is insufficient, it will automatically switch to original-vendor service sources.
 
-This approach maintains the low-cost advantage while improving the overall stability and availability of the service.
+This approach will maintain the low-cost advantage while improving the overall stability and availability of the service.
 
 ---
 
 ## System architecture
 
-![TokHive Architecture](./img/tokenhive_architecture_en_v3.png)
+![TokHive Architecture](./img/tokenhive_architecture_en_v4.png)
 
-TokHive is made up of three main roles:
+TokHive is made up of three main roles, plus a Trusted Execution Environment (TEE) that runs each request:
 
 ### Consumer
 
@@ -163,7 +160,7 @@ The user of AI tokens.
 
 Consumers connect to TokHive through standard AI APIs, without needing to know which Provider actually executes the underlying request.
 
-### Hub
+### Hive
 
 TokHive's central scheduling service.
 
@@ -177,13 +174,19 @@ Its main responsibilities include:
 * Billing and settlement;
 * Connection management between Providers and Consumers.
 
-The Hub coordinates the network, but under TokHive's security design, **it should never have plaintext access to a Provider's sensitive credentials**.
+The Hive coordinates the network, but under TokHive's security design, **it should never have plaintext access to a Provider's sensitive credentials**.
 
 ### Provider
 
 The contributor of AI quota.
 
-A Provider runs the TokHive client, executes assigned requests using their own AI subscription account, and earns income based on their actual contribution.
+A Provider runs **Bee**, the TokHive client, on their own machine. Bee keeps the Provider's subscription available to the network and sends each request's traffic to the upstream AI vendor from the Provider's own IP. The Provider earns income based on their actual contribution. See the [Provider guide](./provider/overview.mdx).
+
+### TEE
+
+The Trusted Execution Environment that executes each request.
+
+Bee seals the Provider's access token so that only the TEE can open it. Hive hands each request to the TEE, which opens a TLS session to the upstream AI vendor that ends inside the enclave; the encrypted bytes are relayed through Hive and Bee, so neither can read the credential or the upstream traffic. The TEE signs a receipt for every execution.
 
 ---
 
@@ -222,11 +225,11 @@ TokHive will, through:
 * Remote Attestation;
 * Open-source client and critical trusted code;
 
-minimize opportunities for Consumers, the Hub, or other third parties to access Provider credentials, reducing the risk of account leakage and misuse at the architectural level.
+minimize opportunities for Consumers, the Hive, or other third parties to access Provider credentials, reducing the risk of account leakage and misuse at the architectural level.
 
 ### 4. User data privacy
 
-An optional end-to-end encryption scheme ensures the privacy and security of user request data during transmission and processing. Even the Hive platform itself cannot see users' prompt data.
+A planned optional end-to-end encryption scheme will protect user request data during transmission and processing, so that even the Hive platform itself cannot see users' prompt data. Today, Hive handles buyer requests in plaintext to route them to the TEE.
 
 ---
 
@@ -236,7 +239,7 @@ An optional end-to-end encryption scheme ensures the privacy and security of use
 
 Build TokHive's foundational network, including:
 
-* The Hub central scheduling service;
+* The Hive central scheduling service;
 * The Provider client;
 * Provider connection pool;
 * AI request routing;
@@ -244,7 +247,7 @@ Build TokHive's foundational network, including:
 * Token usage metering;
 * Billing and settlement system.
 
-Complete the basic service loop of Provider → Hub → Consumer.
+Complete the basic service loop of Provider → Hive → Consumer.
 
 ### Phase 2: Security and verifiable services
 

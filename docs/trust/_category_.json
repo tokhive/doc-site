@@ -1,0 +1,8 @@
+{
+  "label": "Trust & Security",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Who can see what in TokHive, what the TEE guarantees, and how execution receipts work."
+  }
+}

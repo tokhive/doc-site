@@ -1,0 +1,69 @@
+---
+sidebar_position: 2
+title: Execution Receipts
+---
+
+# Execution Receipts
+
+Every time the TEE executes a request against an upstream AI vendor, it produces an **execution receipt**: a signed record of what was sent where, and what came back. Hive verifies the receipt before a request is settled, so no Consumer is charged and no Provider is paid for an execution without one.
+
+## What a receipt records
+
+| Field | Meaning |
+| --- | --- |
+| Target host and path | Where the request was sent, for example `chatgpt.com` and the Codex responses path. |
+| Job digest | A digest of the job Hive gave the TEE, binding the receipt to that exact request. |
+| Provider | Which Provider's Bee carried the connection. |
+| Policy digest | The allowlist of upstream hosts and paths built into the TEE image. |
+| Request bytes | How many bytes were sent upstream. |
+| HTTP status and response header digest | The upstream's response status and a digest of its relevant headers. |
+| Response bytes and response digest | How many bytes came back and a digest of them. |
+| Completion state | `complete`, `failed` or `truncated`: whether the response stream was transferred in full. |
+| Started at / finished at | Timestamps from the TEE's clock. |
+| ProviderSeq | A per-Provider sequence number. |
+| Signing key ID and attestation | The key that signed the receipt, and the SEV-SNP attestation report proving that key belongs to a genuine enclave running the expected image. |
+
+The receipt doesn't contain the prompt or the response, only their sizes and digests.
+
+## How Hive verifies a receipt
+
+Before a request succeeds and is settled, Hive checks that:
+
+1. The receipt's structure and signature are valid, and its timestamps are within the allowed window.
+2. Its attestation report is genuine and shows the expected TEE image, and the signing key is bound to that report.
+3. It matches the job Hive sent: job ID and digest, Provider, method, host, path, policy digest and request size.
+4. Its response size and digest match the bytes Hive actually received and passed to the Consumer.
+5. Its status code and response header digest match the response.
+
+If any check fails, the attempt fails with `invalid_evidence` and is not charged.
+
+Only executions that completed successfully with full usage are settled. A `complete` receipt means the transfer was complete; it is not by itself proof that the request succeeded or how many tokens it used.
+
+## Where to find receipts
+
+### As a Consumer
+
+Open a call on the **Call Records** page. Each execution attempt shows its **Receipt SHA-256**, the digest of the archived signed receipt. Quote it when you ask about a specific call. Consumers can't download the raw receipt.
+
+### As a Provider
+
+The **Execution Receipts** page lists the receipts of every execution your Bee carried, with target host, path, status, byte counts, timing, ProviderSeq, response digest and signing key ID. It doesn't show the buyer, the model or the token usage.
+
+Click **View receipt**, then the download button, to save the raw signed receipt as `receipt-<id>.cbor`. The console checks the file's SHA-256 against the recorded digest before saving it. You can check it again yourself:
+
+```sh
+shasum -a 256 receipt-<id>.cbor
+```
+
+The output must equal the **Receipt SHA-256** shown in the console.
+
+## Retention
+
+Receipts are kept permanently and stored as the original signed bytes. They are never edited, because changing any signed field would make them fail verification.
+
+## Limitations
+
+- There is no standalone tool yet to verify a receipt's signature and attestation outside Hive. Consumers rely on Hive's verification before settlement.
+- A receipt proves where a request went and which bytes came back; it doesn't prove which model produced them. Proving model provenance to Consumers directly is the goal of [Web Proof](../web-proof/web-proof.mdx).
+
+See also: [Trust Model](./trust-model.mdx), [Glossary](../glossary.mdx#execution-receipt).

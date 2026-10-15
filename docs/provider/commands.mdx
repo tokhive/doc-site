@@ -1,0 +1,99 @@
+---
+sidebar_position: 6
+title: Command Reference
+---
+
+# Command Reference
+
+`bee help` lists the commands, and `bee <command> -h` shows a command's options.
+
+Every command accepts `--config PATH` to use a device configuration other than the default (see [Configuration](./configuration.mdx#device-configuration)). `PLATFORM` is `openai` or `claude`.
+
+## Getting started
+
+### `bee start`
+
+Pairs this machine, chooses the subscriptions to supply, and runs, skipping the steps already done. It is the way to start Bee, the first time and every time after.
+
+| Option | Meaning |
+| --- | --- |
+| `--hive URL` | Hive address. Needed only the first time; it is then remembered. |
+| `--name NAME` | Device name shown in the console. Defaults to the host name. |
+| `--yes` | Supply every account found without asking. |
+
+A remote Hive must use HTTPS; plain HTTP is accepted only for `localhost` and loopback addresses.
+
+## Everyday
+
+### `bee status`
+
+Shows the build, the Hive, the device and the account it is paired to, the platforms chosen, and whether each one is taking work.
+
+### `bee pause --platform PLATFORM` / `bee resume --platform PLATFORM`
+
+Stops or restarts new work for one platform while Bee keeps running. Work already in progress finishes normally.
+
+### `bee doctor`
+
+Runs every check in order and reports `ok`, `WARN`, `FAIL` or `skip`, each with a fix. Read-only, so it is safe to run while Bee is running. See [Troubleshooting](./troubleshooting.mdx).
+
+| Option | Meaning |
+| --- | --- |
+| `--egress-config PATH` | Check this egress configuration instead of the default `egress.json`. |
+| `--json` | Print the report as JSON. |
+
+### `bee version`
+
+Prints the version and platform of this build, for example `bee v0.1.0 darwin/arm64`.
+
+## The steps `bee start` runs
+
+### `bee login`
+
+Pairs this machine with a TokHive account, or resumes a pairing that was interrupted.
+
+| Option | Meaning |
+| --- | --- |
+| `--hive URL` | Hive address. Defaults to the one already in the configuration. |
+| `--name NAME` | Device name. Defaults to the host name; at most 80 characters. |
+
+### `bee setup`
+
+Detects the official sign-ins on this machine, only reading them, asks which to supply, and writes the egress configuration. Running it again is safe and is how you add or remove a platform.
+
+| Option | Meaning |
+| --- | --- |
+| `--platform openai,claude` | Only these platforms. A named platform that has no sign-in is an error. Default: every account found. |
+| `--yes` | Supply the selected accounts without asking. |
+| `--codex-home DIR` | Codex directory. Default: `$CODEX_HOME`, else `~/.codex`. |
+| `--claude-config-dir DIR` | Claude Code configuration directory. Default: `$CLAUDE_CONFIG_DIR`, else `~/.claude`. |
+| `--connect-proxy URL` | Local HTTP proxy for upstream connections, `http://127.0.0.1:PORT`. An empty value removes it. |
+| `--egress-config PATH` | Write to this file instead of `egress.json` next to the device configuration. |
+
+In a script, use `bee setup --platform openai,claude --yes`.
+
+### `bee run`
+
+Stays connected and serves work in the foreground. Stops on Ctrl-C (SIGINT) or SIGTERM.
+
+| Option | Meaning |
+| --- | --- |
+| `--egress-config PATH` | Use this egress configuration instead of the default `egress.json`. |
+
+## Accounts and supply
+
+### `bee supply-status --platform PLATFORM`
+
+Shows whether Hive is currently sending work to the account on this platform, and the reasons if not.
+
+### `bee account-status --platform PLATFORM`
+
+Shows the account Hive has confirmed for this platform and any account change waiting for confirmation.
+
+### `bee confirm-account --platform PLATFORM --account-fingerprint FP`
+
+Accepts a new account after you switched accounts in the official client. Take the full fingerprint from `bee account-status`.
+
+### `bee codex-status` / `bee claude-status`
+
+Inspect the local official login without contacting Hive: account, plan, expiry and where the login was read from.

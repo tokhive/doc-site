@@ -2,6 +2,7 @@
   "label": "Provider",
   "position": 3,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "description": "Supply your ChatGPT or Claude subscription to TokHive with Bee: install it, run it, configure it and fix common problems."
   }
 }

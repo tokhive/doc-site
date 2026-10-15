@@ -1,0 +1,70 @@
+---
+sidebar_position: 7
+title: FAQ
+---
+
+# FAQ
+
+## Security and privacy
+
+### Can Bee read the buyers' traffic?
+
+No. Buyer requests run inside a Trusted Execution Environment (TEE), which opens its own TLS session to OpenAI or Anthropic. Bee only relays that encrypted traffic, so neither you nor anyone with access to your machine can read the prompts or responses. Hive, the marketplace service, does handle buyer requests in plaintext: it receives each request from the buyer, passes it to the TEE, and returns the response to the buyer. See [Trust Model](../trust/trust-model.mdx).
+
+### Does my login leave my machine?
+
+Your access token leaves only sealed to the TEE; neither Bee's network traffic nor Hive can read it. Your refresh token stays in the official client's local store.
+
+### Which hosts does Bee connect to?
+
+Your Hive, and the upstream hosts in the `targets` allowlist of the egress configuration: `chatgpt.com:443` and `api.anthropic.com:443`. Bee refuses any other address.
+
+### Is Bee open source?
+
+Yes. Bee is published at [github.com/tokhive/bee](https://github.com/tokhive/bee) under the MIT license. You can review it and build it yourself (see [Install](./install.mdx#build-from-source)).
+
+## Using your subscription
+
+### Can I keep using Codex or Claude Code while Bee supplies the same account?
+
+Yes. The only known limitation: if Bee and the official client refresh the login at the same moment, the official client may, rarely, ask you to sign in again. Signing in once fixes it, and work already settled is not affected.
+
+### Will supplying use up my own quota?
+
+Supplied work counts against the same subscription quota you use yourself. When the quota is used up, Bee stops taking work until the window resets (`quota_exhausted`). To keep quota for yourself, pause supply while you work: `bee pause --platform PLATFORM`, then `bee resume --platform PLATFORM`.
+
+### Can I supply both a ChatGPT and a Claude subscription?
+
+Yes, from the same Bee. Sign in to both Codex and Claude Code, and choose both during `bee start` or `bee setup`.
+
+### Can I run Bee on several machines?
+
+Each TokHive account has one active Bee. Pairing a new machine replaces the old one after it finishes its work in progress. See [Moving to another machine](./first-run.mdx#moving-to-another-machine).
+
+### What happens if I switch accounts in the official client?
+
+Bee pauses new work for that platform until you confirm the new account. See [I switched accounts](./troubleshooting.mdx#i-switched-accounts-in-the-official-client).
+
+## Running Bee
+
+### Does Bee need to run all the time?
+
+Bee only takes work while it is running. When it stops, Hive stops sending it work; there is no penalty. Stopping is the simplest way to pause supply.
+
+### Does my computer need to stay awake?
+
+Yes, while you want to supply. A sleeping machine disconnects, and Bee reconnects on its own when it wakes.
+
+### Can I run Bee on a server without a desktop?
+
+Yes. Bee needs no browser on the machine: open the pairing link on any other device. Sign in to Codex and Claude Code on the server first.
+
+## Earnings
+
+### How much do I earn?
+
+Supply is settled at your quote. You can start with the platform's default multiplier, or set your own on the **My Quote** page of the console; it applies to all models. Each execution has a TEE-signed receipt on the **Execution Receipts** page.
+
+### How do I use my earnings?
+
+On the **Balances and Ledger** page, click **Transfer earnings** to move earnings to your buyer balance. The transfer is one-way and immediate, and the balance can pay for your own calls.

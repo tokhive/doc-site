@@ -4,3 +4,132 @@ slug: /quickstart
 ---
 
 # QuickStart
+
+This page gets you from zero to your first call through TokHive in a few minutes. If you have an idle ChatGPT or Claude subscription, [Supply your subscription](#supply-your-subscription) shows how to earn from it.
+
+TokHive's console and API are at `https://dev.tokhive.ai`.
+
+## Use TokHive
+
+You can use any machine that runs an OpenAI or Anthropic client.
+
+### 1. Create an account
+
+Register at [dev.tokhive.ai/register](https://dev.tokhive.ai/register) with an email address and a password of at least 10 characters.
+
+### 2. Create an API key
+
+In the console, open **API Keys** and click **Create key**. The key starts with `hive_` and is **shown only once**, so copy it right away. You can revoke a key and create a new one at any time.
+
+```sh
+export TOKHIVE_API_KEY=hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 3. Add balance
+
+A new account has a balance of 0, and every inference request returns `402 insufficient_balance` until you add funds.
+
+Open **Balances and Ledger** and click **Deposit**. Choose a network and a stablecoin, and TokHive gives you a deposit address that is permanently yours on that network. Send the stablecoin to that address from your wallet; it is credited automatically after the network's confirmations, usually within a few minutes. The amount is credited as US dollars, and your deposits are listed under **Deposits** in the ledger.
+
+:::note[Test network]
+`dev.tokhive.ai` accepts the test stablecoin **USDT0** on **Conflux eSpace Testnet** (chain ID `71`, RPC `https://evmtestnet.confluxrpc.com`). You need a little test CFX for gas, from the faucet linked in the [Conflux documentation](https://doc.confluxnetwork.org/docs/espace/UserGuide).
+:::
+
+### 4. Point your client at TokHive
+
+TokHive speaks both the OpenAI and the Anthropic API. You only change the base URL and the API key.
+
+| API | Base URL |
+| --- | --- |
+| OpenAI compatible (Responses, Chat Completions, Models) | `https://dev.tokhive.ai/v1` |
+| Anthropic compatible (Messages) | `https://dev.tokhive.ai/anthropic` |
+
+Both accept `Authorization: Bearer hive_...`. The Anthropic API also accepts `x-api-key: hive_...`, which the Anthropic SDKs and Claude Code use by default. The **API Keys** page has copy buttons for both URLs.
+
+#### Codex CLI
+
+Add to `~/.codex/config.toml`:
+
+```toml
+model_provider = "tokhive"
+
+[model_providers.tokhive]
+name = "TokHive"
+base_url = "https://dev.tokhive.ai/v1"
+env_key = "TOKHIVE_API_KEY"
+wire_api = "responses"
+```
+
+Then run `codex` as usual, with `TOKHIVE_API_KEY` set.
+
+#### Claude Code
+
+```sh
+export ANTHROPIC_BASE_URL=https://dev.tokhive.ai/anthropic
+export ANTHROPIC_API_KEY=$TOKHIVE_API_KEY
+claude
+```
+
+#### SDKs
+
+- **OpenAI SDK:** set `OPENAI_BASE_URL=https://dev.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
+- **Anthropic SDK:** pass `base_url="https://dev.tokhive.ai/anthropic"` and `api_key` set to your key.
+
+### 5. Make your first call
+
+```sh
+curl https://dev.tokhive.ai/v1/chat/completions \
+  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+
+curl https://dev.tokhive.ai/anthropic/v1/messages \
+  -H "x-api-key: $TOKHIVE_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"claude-haiku-4-5-20251001","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+```
+
+To see which models you can use right now:
+
+```sh
+curl https://dev.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
+```
+
+The list only includes models that currently have supply online, so it can get shorter when providers go offline.
+
+Every call and its cost appear on the **Call Records** page.
+
+### Common errors
+
+| Error | Meaning and what to do |
+| --- | --- |
+| `401 invalid_api_key` | The key is wrong or revoked. Create a new one. |
+| `402 insufficient_balance` | Your balance is 0 or below. [Add balance](#3-add-balance). |
+| `429 concurrency_limit` | This key has too many requests in flight. Wait for the time in `Retry-After` and retry. |
+| `503 no_supply` | No supply can take the request right now. Retry shortly. |
+
+:::note[Balance is an entry check, not a spending cap]
+A request only needs a balance above 0 to start. It is charged for its actual usage when it finishes, so a long request can take your balance below 0.
+:::
+
+## Supply your subscription
+
+If your ChatGPT or Claude subscription has quota you don't use, you can supply it to TokHive with **Bee**, the provider agent, and earn from every request it serves. Bee runs on your own macOS or Linux machine.
+
+1. Sign in to the official client on that machine: `codex login` for ChatGPT, `claude` for Claude.
+2. Install Bee:
+
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
+   ```
+
+3. Start it, then confirm the pairing link it prints in your browser and choose the subscriptions to supply:
+
+   ```sh
+   bee start --hive https://dev.tokhive.ai
+   ```
+
+When Bee prints `ready: taking new work`, you are supplying. Your earnings show up in **Balances and Ledger**, where you can also transfer them to your balance and spend them on your own calls.
+
+See the [Provider guide](./provider/overview.mdx) for details, configuration and troubleshooting.
