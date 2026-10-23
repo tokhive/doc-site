@@ -7,7 +7,18 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'TokHive',
   tagline: 'A decentralized marketplace for AI Inference',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/app-icon-dark.svg',
+
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap',
+      type: 'text/css',
+    },
+  ],
+  headTags: [
+    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'}},
+    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'}},
+  ],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -74,7 +85,10 @@ const config: Config = {
       title: 'TokHive',
       logo: {
         alt: 'TokHive Logo',
-        src: 'img/tokenhive-mark.svg',
+        src: 'img/mark-graphite-volt.svg',
+        srcDark: 'img/mark-volt.svg',
+        width: 28,
+        height: 28,
       },
       items: [
         {
@@ -121,7 +135,7 @@ const config: Config = {
     },
     prism: {
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.vsDark,
     },
   } satisfies Preset.ThemeConfig,
 };

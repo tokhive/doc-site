@@ -1,30 +1,191 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * TokHive docs theme. Tokens follow the brand guide (../logos) and the
+ * marketing site (../websites): Volt #C8F031 on Graphite, Sora + JetBrains Mono.
  */
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --th-volt: #c8f031;
+  --th-ink: #0a0b0c;
+  --th-graphite: #141517;
+  --th-paper: #f2f2ee;
+
+  /* Volt is too light for text on white, so light mode uses a deep olive from the same hue. */
+  --ifm-color-primary: #5a7500;
+  --ifm-color-primary-dark: #516900;
+  --ifm-color-primary-darker: #4c6300;
+  --ifm-color-primary-darkest: #3f5200;
+  --ifm-color-primary-light: #638100;
+  --ifm-color-primary-lighter: #688700;
+  --ifm-color-primary-lightest: #779a00;
+
+  --ifm-font-family-base: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ifm-heading-font-weight: 600;
+  --ifm-font-weight-bold: 600;
+  --ifm-line-height-base: 1.65;
+  --ifm-code-font-size: 88%;
+  --ifm-code-border-radius: 6px;
+  --ifm-pre-border-radius: 14px;
+  --ifm-card-border-radius: 20px;
+  --ifm-button-border-radius: 999px;
+  --ifm-global-radius: 10px;
+
+  --ifm-background-color: #fbfbf8;
+  --ifm-navbar-background-color: rgba(251, 251, 248, 0.85);
+  --ifm-navbar-shadow: none;
+  --ifm-toc-border-color: rgba(20, 21, 23, 0.08);
+  --ifm-hr-border-color: rgba(20, 21, 23, 0.1);
+  --ifm-menu-color-background-active: rgba(156, 203, 0, 0.14);
+  --ifm-menu-color-background-hover: rgba(20, 21, 23, 0.05);
+
+  --th-line: rgba(20, 21, 23, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(156, 203, 0, 0.16);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #c8f031;
+  --ifm-color-primary-dark: #c0ed1a;
+  --ifm-color-primary-darker: #b6e311;
+  --ifm-color-primary-darkest: #96bb0e;
+  --ifm-color-primary-light: #d0f251;
+  --ifm-color-primary-lighter: #d4f35d;
+  --ifm-color-primary-lightest: #dff684;
+  /* Text on volt is always ink, never paper. */
+  --ifm-color-primary-contrast-foreground: #0a0b0c;
+  --ifm-button-color: #0a0b0c;
+
+  --ifm-background-color: #0a0b0c;
+  --ifm-background-surface-color: #141517;
+  --ifm-navbar-background-color: rgba(10, 11, 12, 0.82);
+  --ifm-font-color-base: #e6e7e2;
+  --ifm-heading-color: #f2f2ee;
+  --ifm-color-content-secondary: #b4b6b0;
+  --ifm-code-background: #1c1e20;
+  --ifm-toc-border-color: rgba(242, 242, 238, 0.08);
+  --ifm-hr-border-color: rgba(242, 242, 238, 0.12);
+  --ifm-table-border-color: rgba(242, 242, 238, 0.12);
+  --ifm-table-stripe-background: rgba(242, 242, 238, 0.03);
+  --ifm-menu-color: #b4b6b0;
+  --ifm-menu-color-background-active: rgba(200, 240, 49, 0.1);
+  --ifm-menu-color-background-hover: rgba(242, 242, 238, 0.06);
+  --ifm-card-background-color: #141517;
+
+  --th-line: rgba(242, 242, 238, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(200, 240, 49, 0.12);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.025em;
+}
+
+.markdown h1:first-child {
+  --ifm-h1-font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+/* Navbar: translucent bar with a hairline instead of a shadow. */
+.navbar {
+  backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--th-line);
+}
+
+.navbar__title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.navbar__link {
+  font-size: 0.9rem;
+}
+
+/* Sidebar */
+.menu__link {
+  font-size: 0.92rem;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  font-weight: 600;
+}
+
+/* Code */
+code {
+  border: none;
+}
+
+.theme-code-block {
+  border: 1px solid var(--th-line);
+  box-shadow: none;
+}
+
+[data-theme='dark'] .theme-code-block,
+[data-theme='dark'] .theme-code-block pre {
+  background-color: #141517 !important;
+}
+
+/* Tables */
+.markdown table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.markdown table th {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Admonitions: flatter cards with a brand-tinted "tip". */
+.theme-admonition {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.alert--success {
+  --ifm-alert-background-color: rgba(156, 203, 0, 0.12);
+  --ifm-alert-border-color: #9ccb00;
+}
+
+/* Pagination & cards */
+.pagination-nav__link {
+  border-radius: 14px;
+  border-color: var(--th-line);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+/* Footer: always graphite, like the marketing site. */
+.footer--dark {
+  --ifm-footer-background-color: #0a0b0c;
+  --ifm-footer-link-color: #d6d8d2;
+  --ifm-footer-title-color: #9a9d97;
+  border-top: 1px solid rgba(242, 242, 238, 0.12);
+}
+
+.footer__title {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.footer__link-item:hover {
+  color: #c8f031;
+}
+
+.footer__copyright {
+  color: #7e817b;
+  font-size: 0.85rem;
 }

@@ -1,0 +1,49 @@
+.lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  margin: 1.5rem 0 2.5rem;
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.mark {
+  width: 1.3em;
+  height: 1.3em;
+  flex: none;
+}
+
+.hex {
+  fill: #141517;
+}
+
+.stripes {
+  fill: #c8f031;
+}
+
+[data-theme='dark'] .hex {
+  fill: #c8f031;
+}
+
+[data-theme='dark'] .stripes {
+  fill: var(--ifm-background-color);
+}
+
+.wordmark {
+  letter-spacing: -0.035em;
+}
+
+.tok {
+  font-weight: 300;
+}
+
+.hive {
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .lockup {
+    font-size: 2.75rem;
+  }
+}
