@@ -79,7 +79,8 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     colorMode: {
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: 'TokHive',
