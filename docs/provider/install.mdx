@@ -15,16 +15,54 @@ curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
 
 The script picks the build for your operating system and CPU, verifies it against the release's `checksums.txt` and installs `bee` to `~/.local/bin`.
 
+On Linux, it also registers and enables the system-level `tokhive-bee` service, so Bee starts after a reboot without anyone logging in over SSH. Run the installer as the user who will pair Bee; do not put the whole command under `sudo`. Only service management requests administrator access.
+
+In an interactive terminal, the installer asks **Set up and start Bee now?** (default yes). Sign in to your official clients first (`codex login` or `claude`), then follow the prompts:
+
+1. Enter your Hive address and confirm the pairing link in Hive's web console. An existing device configuration is validated or its unfinished pairing resumed.
+2. Choose which signed-in accounts to supply. Existing account configuration is kept, so you do not have to choose again.
+3. The installer starts the background service and checks that systemd reports it as active. Use `bee status` to check Hive connectivity and whether accounts can take work.
+
+You can decline or set `BEE_INSTALL_INTERACTIVE=0`. Without an interactive terminal, the wizard is skipped automatically. Automatic startup is still enabled, and the installer prints manual commands with your actual paths. With the default configuration paths:
+
+```sh
+bee login --hive https://hive.example.com  # existing pairing: bee login
+bee setup                              # only if egress.json is missing
+sudo systemctl start tokhive-bee
+sudo systemctl status tokhive-bee
+sudo journalctl -u tokhive-bee -f
+```
+
+If a step fails, the wizard stops and preserves the installed binary and any configuration already written; follow the original error and retry or use the manual commands. If a foreground Bee holds the same configuration, stop it first. The service runs as the installing user and skips startup until both pairing and account configuration files exist. Linux service installation requires a running systemd manager (version 243 or newer for configuration checks) and administrator access. macOS installation remains binary-only; follow [first-run setup](./first-run.mdx).
+
 | Variable | Effect |
 | --- | --- |
 | `BEE_VERSION` | Install a specific release, for example `BEE_VERSION=v0.1.0`. Defaults to the latest release. |
 | `BEE_INSTALL_DIR` | Install somewhere other than `~/.local/bin`. |
+| `BEE_INSTALL_SERVICE` | Linux defaults to `1`, enabling the system service. Set `0` for binary-only installation, including systems without systemd or administrator access. |
+| `BEE_INSTALL_INTERACTIVE` | Defaults to `1`. Set `0` to skip setup/start prompts, for example in unattended installation. |
 
 For example:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_VERSION=v0.1.0 sh
 ```
+
+To install only the binary:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_INSTALL_SERVICE=0 sh
+```
+
+To enable the Linux service without entering the wizard:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_INSTALL_INTERACTIVE=0 sh
+```
+
+The service records the installation's binary path, home, configuration directory, executable search path and official-client directory variables. Use the same environment when installing and pairing. Use `sudo systemctl edit tokhive-bee` for other required environment variables or non-default device/egress paths. Credentials must be accessible without an interactive login; starting a service does not unlock a login-locked keyring.
+
+If you used the old user-level service, first run `systemctl --user disable --now tokhive-bee`. The installer refuses to overwrite a hand-written or linked system unit; use `BEE_INSTALL_SERVICE=0` to keep that service, or migrate it explicitly.
 
 If `~/.local/bin` is not on your `PATH`, add it to your shell profile, or call Bee by its full path.
 
@@ -76,13 +114,20 @@ Put `bin/bee` on your `PATH`, or call it as `./bin/bee`. A source build reports 
 
 ## Upgrade
 
-Run the install script again. It replaces `bee` in place. Then restart Bee: stop it with Ctrl-C and run `bee start` again.
+Run the install script again. It replaces `bee` in place and updates its managed Linux service. If the service is active, the wizard asks whether to restart it; the default is **no**, preserving current work. It does not repeat pairing or account selection. A service in a transitional state is left in place. Without a terminal or with the wizard disabled, no restart is attempted. When current work can be interrupted, apply the upgrade with `sudo systemctl restart tokhive-bee`. For a foreground process, stop it with Ctrl-C and run `bee start` again.
 
 Bee tells Hive which version is connecting, and the console shows it on the **Bee Device** page, so you can check that the upgrade took effect.
 
 ## Uninstall
 
-1. Stop Bee.
+1. Stop Bee. If using the installed Linux service, disable and remove it first:
+
+   ```sh
+   sudo systemctl disable --now tokhive-bee
+   sudo rm /etc/systemd/system/tokhive-bee.service
+   sudo systemctl daemon-reload
+   ```
+
 2. Delete the binary, for example `rm ~/.local/bin/bee`.
 3. Optionally delete Bee's configuration directory (see [Configuration](./configuration.mdx#device-configuration)). This removes the device pairing; the machine has to be paired again to supply.
 
@@ -90,4 +135,4 @@ Bee never signs you out of the official clients, so Codex and Claude Code keep w
 
 ## Next step
 
-[Run Bee for the first time](./first-run.mdx).
+If the installer started your Linux service, check it with `bee status`. For macOS, binary-only installation or foreground use, [run Bee for the first time](./first-run.mdx).
