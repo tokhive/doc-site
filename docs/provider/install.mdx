@@ -17,11 +17,15 @@ The script picks the build for your operating system and CPU, verifies it agains
 
 On Linux, it also registers and enables the system-level `tokhive-bee` service, so Bee starts after a reboot without anyone logging in over SSH. Run the installer as the user who will pair Bee; do not put the whole command under `sudo`. Only service management requests administrator access.
 
-In an interactive terminal, the installer asks **Set up and start Bee now?** (default yes). Sign in to your official clients first (`codex login` or `claude`), then follow the prompts:
+In an interactive terminal, first choose **简体中文 / English**. After installing the program, the installer asks **Set up and start Bee now?** (default yes). Sign in to your official clients first (`codex login` or `claude`), then follow the three setup steps:
 
 1. Enter your Hive address and confirm the pairing link in Hive's web console. An existing device configuration is validated or its unfinished pairing resumed.
 2. Choose which signed-in accounts to supply. Existing account configuration is kept, so you do not have to choose again.
 3. The installer starts the background service and checks that systemd reports it as active. Use `bee status` to check Hive connectivity and whether accounts can take work.
+
+The steps are labeled **1/3 device pairing**, **2/3 supplied accounts**, and **3/3 background startup**. Existing configuration reduces the questions you need to answer, while the completed flow still reaches step 3/3 and shows the final service state. Separators, icons and colors make each stage visible. Redirected output or `TERM=dumb` uses plain text; `NO_COLOR=1` disables colors.
+
+Set `BEE_LANG=zh` or `BEE_LANG=en` to skip the language menu. Without a terminal, the default follows the first nonempty `LC_ALL`, `LC_MESSAGES`, or `LANG`: `zh` locales use Chinese, all others use English. `bee login` and `bee setup` also recognize `BEE_LANG`. Full bilingual pairing and account selection require a Bee release containing this support; older releases retain their original command output. The choice applies to the current installation and is not stored in the service configuration.
 
 You can decline or set `BEE_INSTALL_INTERACTIVE=0`. Without an interactive terminal, the wizard is skipped automatically. Automatic startup is still enabled, and the installer prints manual commands with your actual paths. With the default configuration paths:
 
@@ -41,6 +45,8 @@ If a step fails, the wizard stops and preserves the installed binary and any con
 | `BEE_INSTALL_DIR` | Install somewhere other than `~/.local/bin`. |
 | `BEE_INSTALL_SERVICE` | Linux defaults to `1`, enabling the system service. Set `0` for binary-only installation, including systems without systemd or administrator access. |
 | `BEE_INSTALL_INTERACTIVE` | Defaults to `1`. Set `0` to skip setup/start prompts, for example in unattended installation. |
+| `BEE_LANG` | Set `zh` for Simplified Chinese or `en` for English and skip the language menu. |
+| `NO_COLOR` | Set to a nonempty value to disable terminal colors. |
 
 For example:
 
@@ -58,6 +64,12 @@ To enable the Linux service without entering the wizard:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_INSTALL_INTERACTIVE=0 sh
+```
+
+To use Chinese without the language menu:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | BEE_LANG=zh sh
 ```
 
 The service records the installation's binary path, home, configuration directory, executable search path and official-client directory variables. Use the same environment when installing and pairing. Use `sudo systemctl edit tokhive-bee` for other required environment variables or non-default device/egress paths. Credentials must be accessible without an interactive login; starting a service does not unlock a login-locked keyring.
