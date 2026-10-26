@@ -134,9 +134,9 @@ Run `bee` without arguments in a terminal:
 bee
 ```
 
-Choose **简体中文 / English**, then enter a number to view status, pair or re-pair the device, manage supplied accounts, control the background service, or read logs and diagnostics. Account management includes selecting official sign-ins, pausing/resuming new work, and confirming a changed account. Use `0` to return or exit. Exiting the menu leaves the background service running.
+Choose **简体中文 / English**, then enter a number to view status, pair or re-pair the device, manage supplied accounts, control the background service, or read logs and diagnostics. Account management includes selecting official sign-ins, pausing/resuming new work, and confirming a changed account. Use `0` to return directly from a submenu, or to exit from the main menu. Exiting the menu leaves the background service running.
 
-`BEE_LANG=zh` or `BEE_LANG=en` skips the initial language question. Language can also be changed inside the menu and only affects that session. Confirmations use **1) Confirm / 0) Cancel**, with cancellation as the default. Raw service logs and error details retain their original language.
+`BEE_LANG=zh` or `BEE_LANG=en` skips the initial language question. Language can also be changed inside the menu and only affects that session. Confirmations use **1) Confirm / 0) Cancel**, with cancellation as the default. Known errors and recovery steps follow the selected language. HTTP statuses and error codes stay visible; unfamiliar external errors and service logs are labeled as original technical details. Compact pages use status icons and colors; `NO_COLOR=1` disables colors, and `TERM=dumb` uses plain text.
 
 Linux service controls apply only to the installer's system service for the same user, executable and configuration. Custom units, drop-ins, or a different binary/configuration path require manual management. **Start/stop** controls Bee now; **enable/disable boot startup** controls the next reboot. Saving account choices is separate from applying them: a running service loads the changes only after you confirm a restart. The status view distinguishes service activity, account authorization and readiness to take work.
 
