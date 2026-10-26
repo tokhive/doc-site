@@ -114,17 +114,35 @@ The install script downloads with `curl` and is not affected.
 
 ## Build from source
 
-You need Go 1.27 or newer, plus `git` and `bash`.
+You need Go 1.27.3 or newer, plus `git` and `bash`.
 
 ```sh
 git clone https://github.com/tokhive/bee.git
 cd bee
-make build        # fetches the pinned TEE client library, then builds bin/bee
+make build        # builds bin/bee
 ```
 
-`make build` first runs `scripts/prepare-tee.sh`, which downloads the TEE client library at the commit pinned in `TEE_REVISION` into `.cache/reclaim-tee`. That library can't be fetched through the Go module proxy, so `go.mod` points to the local copy. After the first run you can also build with `go build -o bin/bee ./cmd/bee`.
+Bee depends on the TEE client library `github.com/tokhive/tee` as an ordinary Go module pinned in `go.mod`. You can also build with `go build -o bin/bee ./cmd/bee`.
 
 Put `bin/bee` on your `PATH`, or call it as `./bin/bee`. A source build reports its version as `dev`, followed by the commit when built inside the repository, for example `dev+3f82e19a1b2c`.
+
+## Manage Bee from the terminal
+
+Run `bee` without arguments in a terminal:
+
+```sh
+bee
+```
+
+Choose **简体中文 / English**, then enter a number to view status, pair or re-pair the device, manage supplied accounts, control the background service, or read logs and diagnostics. Account management includes selecting official sign-ins, pausing/resuming new work, and confirming a changed account. Use `0` to return or exit. Exiting the menu leaves the background service running.
+
+`BEE_LANG=zh` or `BEE_LANG=en` skips the initial language question. Language can also be changed inside the menu and only affects that session. Confirmations use **1) Confirm / 0) Cancel**, with cancellation as the default. Raw service logs and error details retain their original language.
+
+Linux service controls apply only to the installer's system service for the same user, executable and configuration. Custom units, drop-ins, or a different binary/configuration path require manual management. **Start/stop** controls Bee now; **enable/disable boot startup** controls the next reboot. Saving account choices is separate from applying them: a running service loads the changes only after you confirm a restart. The status view distinguishes service activity, account authorization and readiness to take work.
+
+The other menu actions work on macOS; background service controls are unavailable there, so use `bee start` for foreground operation. All existing subcommands remain available. Bare `bee` prints help without waiting for input when either input or output is not a terminal.
+
+The menu requires a new Bee binary containing this feature. Updating `install.sh` alone does not add it to an older release. Before release, build the menu branch with `make build` and run `./bin/bee`.
 
 ## Upgrade
 
