@@ -1,0 +1,38 @@
+---
+slug: tokhive-launch
+title: TokHive Is Live
+date: 2026-11-03
+authors: [tokhive]
+tags: [announcements]
+description: Introducing TokHive, an open marketplace that connects idle AI subscription quota with developers who need affordable model access.
+---
+
+Today, we're launching **TokHive**, an open AI token marketplace that connects people with idle AI subscription quota to developers and users who need model access. Our goal is simple: let unused tokens create value and make original-vendor AI services more affordable.
+
+{/* truncate */}
+
+## Use AI through familiar APIs
+
+TokHive supports OpenAI-compatible **Chat Completions and Responses APIs**, as well as the Anthropic-compatible **Messages API**. Connect your existing applications, SDKs, and coding tools by changing the base URL and API key.
+
+The console lets you create and revoke API keys, manage your balance, and review each call's model, token usage, status, and cost. The Models API lists models with supply currently online, so you can see what is available before making a request.
+
+## Earn from idle subscription quota
+
+If you have unused ChatGPT or Claude subscription quota, you can contribute it through **Bee**, TokHive's open-source provider client for macOS and Linux.
+
+Bee connects to the official client login on your machine and pairs with your TokHive account. Hive, the marketplace service, matches incoming requests with available providers and settles successful calls based on actual token usage. Provider earnings can be transferred to your TokHive balance and used for your own AI calls.
+
+## Protect credentials and record each execution
+
+Bee seals your access token to a **Trusted Execution Environment (TEE)**, so Hive receives an encrypted envelope rather than the plaintext credential. Requests execute inside the TEE, while Bee relays encrypted upstream traffic through the provider's own network connection.
+
+Each execution produces a signed receipt that Hive verifies before settlement. Providers can view and download their execution receipts, and consumers can find receipt digests in their call records.
+
+Today's trust boundary is documented: Hive handles consumer prompts and responses in plaintext. End-to-end encryption and independent consumer verification through Web Proof are planned. Read the [trust model](/trust/trust-model) for details.
+
+## Get started
+
+Follow the [QuickStart guide](/quickstart) to create an account, fund your balance, and make your first API call. To contribute your unused subscription quota, start with the [Bee Provider guide](/provider/overview).
+
+Welcome to TokHive. We're building a marketplace where idle AI capacity becomes useful, accessible supply.
