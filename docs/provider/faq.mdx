@@ -29,6 +29,14 @@ Yes. Bee is published at [github.com/tokhive/bee](https://github.com/tokhive/bee
 
 Yes. The only known limitation: if Bee and the official client refresh the login at the same moment, the official client may, rarely, ask you to sign in again. Signing in once fixes it, and work already settled is not affected.
 
+### Will buyers' conversations appear in my ChatGPT or Claude history?
+
+No. OpenAI requests are sent with `store: false`, and Claude requests go through Claude Code's API rather than claude.ai, so nothing is added to your conversation history. The usage does count in what your vendor reports for the account.
+
+### Can I supply my work account (Team, Business, Enterprise, Edu)?
+
+Only if you are entitled to. A workspace seat belongs to the organization, whose rules may forbid sharing it, and workspace administrators can usually see usage, on some plans content too. See [Workspace accounts](./before-you-supply.mdx#which-subscriptions-can-be-supplied).
+
 ### Will supplying use up my own quota?
 
 Supplied work counts against the same subscription quota you use yourself, and no part of it is reserved for you. Bee keeps taking work until a quota window is 100% used, then stops until the window resets (`quota_exhausted`). To keep quota for yourself, pause supply while you work: `bee pause --platform PLATFORM`, then `bee resume --platform PLATFORM`.

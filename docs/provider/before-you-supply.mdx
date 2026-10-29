@@ -16,6 +16,10 @@ This page collects what you should know before you decide to supply a subscripti
 
 A plan takes work only when the marketplace has set a concurrency limit for it. Otherwise the account shows `plan_not_configured`. Bee reads the plan from the official client's login. You can't choose it.
 
+:::caution[Workspace accounts]
+A Team, Business, Enterprise or Edu seat belongs to the organization that pays for it. Supplying it may break that organization's own rules as well as the vendor's terms. Workspace administrators can usually see usage, and on some plans also content, so work you supply may show up in the organization's usage or compliance records. Supply a workspace seat only if you are entitled to.
+:::
+
 ## Account risk
 
 OpenAI's and Anthropic's consumer terms don't allow an account to be shared with others. A vendor may restrict or suspend an account it considers shared. **TokHive offers no compensation if that happens to an account you supply.**
@@ -47,6 +51,7 @@ Weigh the risk against the return. For an account that supplies regularly, earni
 
 - Supplied work counts against the **same subscription quota** you use yourself. No part of it is reserved for you.
 - Bee keeps taking work until any of your quota windows (for example the five-hour or weekly window) is **100% used**. Then the account shows `quota_exhausted`, and supply resumes after the window resets.
+- Supplied work is not added to your ChatGPT or Claude conversation history. OpenAI requests are sent with `store: false`, and Claude requests go through Claude Code's API, not claude.ai. It does show in the usage your vendor reports for the account.
 - To keep quota for yourself, pause supply while you work: `bee pause --platform openai` (or `claude`), then `bee resume` when you are done. Work already running finishes; no new work starts.
 - Each account runs at most a fixed number of requests at once, a limit the marketplace sets per plan. When it is reached, new requests wait or go to other providers (`concurrency_full`).
 
