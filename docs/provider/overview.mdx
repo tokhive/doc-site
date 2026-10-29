@@ -5,15 +5,15 @@ title: Bee Overview
 
 # Bee Overview
 
-Bee is the provider agent of TokHive. If your ChatGPT or Claude subscription has quota you don't use, Bee lets you supply it to the TokHive market. Buyers get first-party model access at a lower price, and you earn from capacity that would otherwise go to waste.
+Bee is the provider agent of TokHive. If your ChatGPT or Claude subscription has quota you don't use, Bee lets you supply it to the TokHive market. Consumers get first-party model access at a lower price, and you earn from capacity that would otherwise go to waste.
 
-Bee runs on your own machine and keeps a connection open to a **Hive**, the marketplace service that matches buyers with providers.
+Bee runs on your own machine and keeps a connection open to a **Hive**, the marketplace service that matches Consumers with Providers.
 
 ## What Bee does
 
 - **Device identity.** You pair Bee once with your Hive account. After that it keeps an authenticated connection open and reports that it is online.
 - **Authorization upkeep.** Bee reads the login of the official client you already use: Codex for an OpenAI subscription, Claude Code for a Claude subscription. It never sends your tokens to Hive in plaintext. Instead it seals your access token to a Trusted Execution Environment (TEE) and reports only the sealed envelope plus account metadata: account fingerprint, expiry, model list and quota windows.
-- **Encrypted egress.** Buyer requests run inside the TEE, which opens its own TLS session to the upstream platform. Bee only relays that already-encrypted traffic to an allowlisted set of hosts.
+- **Encrypted egress.** Consumer requests run inside the TEE, which opens its own TLS session to the upstream platform. Bee only relays that already-encrypted traffic to an allowlisted set of hosts.
 
 ## What Bee can and cannot see
 
@@ -21,7 +21,7 @@ Bee runs on your own machine and keeps a connection open to a **Hive**, the mark
 | --- | --- | --- | --- |
 | Your access token | Reads it locally, sends it only sealed | Sealed envelope only | Plaintext, inside the enclave |
 | Your refresh token | Stays in the official client's local store | Never | Never |
-| Buyer prompts and model responses | Encrypted TLS traffic only | Plaintext: Hive receives each buyer request, passes it to the TEE, and returns the response to the buyer | Plaintext, inside the enclave |
+| Consumer prompts and model responses | Encrypted TLS traffic only | Plaintext: Hive receives each Consumer request, passes it to the TEE, and returns the response to the Consumer | Plaintext, inside the enclave |
 
 Bee only reads the official client's login. It doesn't sign you in, sign you out or change the login, unless you explicitly turn on token refresh for Claude (see [Configuration](./configuration.mdx#claude)).
 

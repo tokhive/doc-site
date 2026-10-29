@@ -7,9 +7,9 @@ title: FAQ
 
 ## Security and privacy
 
-### Can Bee read the buyers' traffic?
+### Can Bee read the Consumers' traffic?
 
-No. Buyer requests run inside a Trusted Execution Environment (TEE), which opens its own TLS session to OpenAI or Anthropic. Bee only relays that encrypted traffic, so neither you nor anyone with access to your machine can read the prompts or responses. Hive, the marketplace service, does handle buyer requests in plaintext: it receives each request from the buyer, passes it to the TEE, and returns the response to the buyer. See [Trust Model](../trust/trust-model.mdx).
+No. Consumer requests run inside a Trusted Execution Environment (TEE), which opens its own TLS session to OpenAI or Anthropic. Bee only relays that encrypted traffic, so neither you nor anyone with access to your machine can read the prompts or responses. Hive, the marketplace service, does handle Consumer requests in plaintext: it receives each request from the Consumer, passes it to the TEE, and returns the response to the Consumer. See [Trust Model](../trust/trust-model.mdx).
 
 ### Does my login leave my machine?
 
@@ -29,7 +29,7 @@ Yes. Bee is published at [github.com/tokhive/bee](https://github.com/tokhive/bee
 
 Yes. The only known limitation: if Bee and the official client refresh the login at the same moment, the official client may, rarely, ask you to sign in again. Signing in once fixes it, and work already settled is not affected.
 
-### Will buyers' conversations appear in my ChatGPT or Claude history?
+### Will Consumers' conversations appear in my ChatGPT or Claude history?
 
 No. OpenAI requests are sent with `store: false`, and Claude requests go through Claude Code's API rather than claude.ai, so nothing is added to your conversation history. The usage does count in what your vendor reports for the account.
 
@@ -45,7 +45,7 @@ Supplied work counts against the same subscription quota you use yourself, and n
 
 It can. The vendors' consumer terms don't allow sharing an account, and TokHive offers no compensation if an account is restricted. TokHive keeps the risk as low as it can: work leaves from your own IP in the official client's format, stays within your plan's concurrency limit, stops at quota and rate limits, and keeps each conversation on one account. See [Account risk](./before-you-supply.mdx#account-risk).
 
-### Does TokHive review what buyers send through my account?
+### Does TokHive review what Consumers send through my account?
 
 Not yet. The vendor's own safety systems apply to every request, as they do to your own use. A check that refuses requests for illegal content is planned.
 
@@ -103,11 +103,11 @@ Your price is the model's official price times your quote multiplier. The platfo
 
 ### How is my price set, and does it affect how much work I get?
 
-Your price is the model's official price times your multiplier. When several accounts can serve a request, the lowest multiplier is usually picked first, so a lower multiplier brings more work. The platform's commission is charged to the buyer on top of your price, not taken from it. See [What you earn](./before-you-supply.mdx#what-you-earn).
+Your price is the model's official price times your multiplier. When several accounts can serve a request, the lowest multiplier is usually picked first, so a lower multiplier brings more work. The platform's commission is charged to the Consumer on top of your price, not taken from it. See [What you earn](./before-you-supply.mdx#what-you-earn).
 
 ### Where do I see what my account served?
 
-Every settled execution is listed in the **Earnings** ledger on the **Balances and Ledger** page, and its TEE-signed receipt, with target host, status and byte counts, is on the **Execution Receipts** page. You never see the buyer's prompts or responses.
+Every settled execution is listed in the **Earnings** ledger on the **Balances and Ledger** page, and its TEE-signed receipt, with target host, status and byte counts, is on the **Execution Receipts** page. You never see the Consumer's prompts or responses.
 
 ### Can I cash out?
 

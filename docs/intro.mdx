@@ -233,51 +233,33 @@ minimize opportunities for Consumers, the Hive, or other third parties to access
 
 ### 4. User data privacy
 
-A planned optional end-to-end encryption scheme will protect user request data during transmission and processing, so that even the Hive platform itself cannot see users' prompt data. Today, Hive handles buyer requests in plaintext to route them to the TEE.
+A planned optional end-to-end encryption scheme will protect user request data during transmission and processing, so that even the Hive platform itself cannot see users' prompt data. Today, Hive handles Consumer requests in plaintext to route them to the TEE.
 
 ---
 
 ## Roadmap
 
-### Phase 1: Infrastructure
+### Available today
 
-Build TokHive's foundational network, including:
+* **The marketplace.** Hive matches each request with a Provider by account health, conversation affinity and price, enforces per-plan concurrency, meters token usage and settles every call.
+* **Bee**, the open-source Provider client for macOS and Linux, supplying ChatGPT subscriptions through Codex and Claude subscriptions through Claude Code.
+* **Compatible APIs:** OpenAI Responses and Chat Completions, Anthropic Messages and token counting. They work with Codex, Claude Code and the official SDKs.
+* **Trusted execution.** Provider credentials are sealed to an AMD SEV-SNP TEE, Hive checks the TEE by remote attestation, and every execution has a signed receipt that Hive verifies before settlement.
+* **Fallback supply.** When no Provider can serve a request, vetted premium API services can take it, and Consumers can turn this off.
+* **Payments.** Stablecoin deposits (USDT0 on Conflux eSpace, USDT on Ethereum). Providers set their own quotes and can spend their earnings on TokHive.
 
-* The Hive central scheduling service;
-* The Provider client;
-* Provider connection pool;
-* AI request routing;
-* API authentication;
-* Token usage metering;
-* Billing and settlement system.
+### Coming next
 
-Complete the basic service loop of Provider → Hive → Consumer.
+* **Cash-out:** withdrawing Provider earnings to a stablecoin wallet.
+* **Content safeguards:** refusing requests for illegal content before they reach a Provider's account.
 
-### Phase 2: Security and verifiable services
+### Planned
 
-Introduce security mechanisms such as Web Proof, TEE, and Remote Attestation.
-
-Key focus areas:
-
-* Protecting Provider credentials;
-* Verifying the authenticity of upstream AI services;
-* Detecting model substitution;
-* Detecting request tampering;
-* Making service results verifiable for Consumers.
-
-Gradually realize a **Verifiable AI Token Service**.
-
-### Phase 3: Multiple models and multiple service sources
-
-Expand the AI service ecosystem TokHive supports, for example:
-
-* OpenAI
-* Anthropic
-* Google
-* Kimi
-* Other mainstream AI vendors
-
-At the same time, build multiple sources of token liquidity, such as the Provider Network and official APIs, to improve the platform's overall model coverage, stability, and availability.
+* **Web Proof:** independent verification by Consumers that a request reached the claimed vendor and wasn't altered.
+* **End-to-end encryption,** so that Hive itself can't read prompts and responses.
+* **Image models,** served from subscriptions' image generation quota.
+* **More vendors,** such as Google and Kimi.
+* **More service sources,** such as official APIs, for coverage and availability.
 
 Ultimately, TokHive aims to build an open, efficient, low-cost, and **verifiable AI Token marketplace**:
 

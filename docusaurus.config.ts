@@ -76,6 +76,18 @@ const config: Config = {
     ],
   ],
 
+  themes: [
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        docsRouteBasePath: '/',
+        indexBlog: true,
+        highlightSearchTermsOnTargetPage: true,
+      },
+    ],
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     colorMode: {
@@ -98,7 +110,13 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
+        {to: '/category/api', label: 'API', position: 'left'},
         {to: '/blog', label: 'Blog', position: 'left'},
+        {
+          href: 'https://console.tokhive.ai',
+          label: 'Console',
+          position: 'right',
+        },
         {
           href: 'https://github.com/tokhive',
           label: 'GitHub',
@@ -112,23 +130,33 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {
-              label: 'Intro',
-              to: '/',
-            },
+            {label: 'QuickStart', to: '/quickstart'},
+            {label: 'API', to: '/category/api'},
+            {label: 'Provider guide', to: '/provider/overview'},
+            {label: 'Trust model', to: '/trust/trust-model'},
+          ],
+        },
+        {
+          title: 'Legal',
+          items: [
+            {label: 'Terms of Service', href: 'https://tokhive.ai/terms'},
+            {label: 'Privacy Policy', href: 'https://tokhive.ai/privacy'},
+          ],
+        },
+        {
+          title: 'Contact',
+          items: [
+            {label: 'hello@tokhive.ai', href: 'mailto:hello@tokhive.ai'},
+            {label: 'security@tokhive.ai', href: 'mailto:security@tokhive.ai'},
           ],
         },
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/tokhive',
-            },
+            {label: 'Website', href: 'https://tokhive.ai'},
+            {label: 'Console', href: 'https://console.tokhive.ai'},
+            {label: 'Blog', to: '/blog'},
+            {label: 'GitHub', href: 'https://github.com/tokhive'},
           ],
         },
       ],

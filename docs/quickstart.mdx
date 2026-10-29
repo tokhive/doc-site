@@ -29,7 +29,18 @@ export TOKHIVE_API_KEY=hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 A new account has a balance of 0, and every inference request returns `402 insufficient_balance` until you add funds.
 
+TokHive accepts two stablecoins:
+
+| Network | Stablecoin |
+| --- | --- |
+| Conflux eSpace (chain ID `1030`) | USDT0 |
+| Ethereum (chain ID `1`) | USDT |
+
 Open **Balances and Ledger** and click **Deposit**. Choose a network and a stablecoin, and TokHive gives you a deposit address that is permanently yours on that network. Send the stablecoin to that address from your wallet; it is credited automatically after the network's confirmations, usually within a few minutes. The amount is credited as US dollars, and your deposits are listed under **Deposits** in the ledger.
+
+:::caution[Check the network and the token]
+The deposit dialog shows the network, its chain ID, the token contract and how many confirmations a deposit needs. Send only that token, on that network, to that address. A transfer of another token or on another network may not be recoverable.
+:::
 
 ### 4. Point your client at TokHive
 
@@ -77,13 +88,13 @@ claude
 curl https://api.tokhive.ai/v1/chat/completions \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+  -d '{"model":"gpt-6-sol","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 
 curl https://api.tokhive.ai/anthropic/v1/messages \
   -H "x-api-key: $TOKHIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
-  -d '{"model":"claude-haiku-4-5-20251001","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+  -d '{"model":"claude-opus-5-5","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 ```
 
 To see which models you can use right now:
@@ -109,23 +120,15 @@ Every call and its cost appear on the **Call Records** page.
 A request only needs a balance above 0 to start. It is charged for its actual usage when it finishes, so a long request can take your balance below 0.
 :::
 
+## Need help?
+
+- [Consumer FAQ](./consumer-faq.mdx): pricing, billing, fallback supply and your data.
+- [API reference](./api/overview.mdx): every endpoint, request field and error.
+- Email [hello@tokhive.ai](mailto:hello@tokhive.ai), with the `X-Request-Id` of the request you are asking about.
+
 ## Supply your subscription
 
-If your ChatGPT or Claude subscription has quota you don't use, you can supply it to TokHive with **Bee**, the provider agent, and earn from every request it serves. Bee runs on your own macOS or Linux machine.
+If your ChatGPT or Claude subscription has quota you don't use, you can supply it to TokHive with **Bee**, the Provider agent, and earn from every request it serves.
 
-1. Sign in to the official client on that machine: `codex login` for ChatGPT, `claude` for Claude.
-2. Install Bee:
-
-   ```sh
-   curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
-   ```
-
-3. Start it, then confirm the pairing link it prints in your browser and choose the subscriptions to supply:
-
-   ```sh
-   bee start --hive https://console.tokhive.ai
-   ```
-
-When Bee prints `ready: taking new work`, you are supplying. Your earnings show up in **Balances and Ledger**, where you can also transfer them to your balance and spend them on your own calls.
-
-See the [Provider guide](./provider/overview.mdx) for details, configuration and troubleshooting.
+1. Read [Before You Supply](./provider/before-you-supply.mdx): the account risk, what you earn, and what supplying does to your quota.
+2. Follow the [Provider Quickstart](./provider/quickstart.mdx) to install Bee and start supplying, in about ten minutes.

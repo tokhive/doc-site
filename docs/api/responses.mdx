@@ -24,7 +24,7 @@ curl https://api.tokhive.ai/v1/responses \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5.5",
+    "model": "gpt-6-sol",
     "input": "Reply with exactly OK."
   }'
 ```
@@ -36,7 +36,7 @@ curl https://api.tokhive.ai/v1/responses \
 from openai import OpenAI
 
 client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
-response = client.responses.create(model="gpt-5.5", input="Reply with exactly OK.")
+response = client.responses.create(model="gpt-6-sol", input="Reply with exactly OK.")
 print(response.output_text)
 ```
 
@@ -47,7 +47,7 @@ print(response.output_text)
 import OpenAI from "openai";
 
 const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
-const response = await client.responses.create({ model: "gpt-5.5", input: "Reply with exactly OK." });
+const response = await client.responses.create({ model: "gpt-6-sol", input: "Reply with exactly OK." });
 console.log(response.output_text);
 ```
 
@@ -61,7 +61,7 @@ The response is OpenAI's `response` object (IDs shortened):
   "id": "resp_...",
   "object": "response",
   "status": "completed",
-  "model": "gpt-5.5",
+  "model": "gpt-6-sol",
   "output": [
     {
       "type": "message",
