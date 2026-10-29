@@ -7,7 +7,7 @@ slug: /quickstart
 
 This page gets you from zero to your first call through TokHive in a few minutes. If you have an idle ChatGPT or Claude subscription, [Supply your subscription](#supply-your-subscription) shows how to earn from it.
 
-TokHive's console and API are at `https://dev.tokhive.ai`.
+TokHive's console is at `https://dev.tokhive.ai`, and its API at `https://api.tokhive.ai`.
 
 ## Use TokHive
 
@@ -41,8 +41,8 @@ TokHive speaks both the OpenAI and the Anthropic API. You only change the base U
 
 | API | Base URL |
 | --- | --- |
-| OpenAI compatible (Responses, Chat Completions, Models) | `https://dev.tokhive.ai/v1` |
-| Anthropic compatible (Messages) | `https://dev.tokhive.ai/anthropic` |
+| OpenAI compatible (Responses, Chat Completions, Models) | `https://api.tokhive.ai/v1` |
+| Anthropic compatible (Messages) | `https://api.tokhive.ai/anthropic` |
 
 Both accept `Authorization: Bearer hive_...`. The Anthropic API also accepts `x-api-key: hive_...`, which the Anthropic SDKs and Claude Code use by default. The **API Keys** page has copy buttons for both URLs.
 
@@ -55,7 +55,7 @@ model_provider = "tokhive"
 
 [model_providers.tokhive]
 name = "TokHive"
-base_url = "https://dev.tokhive.ai/v1"
+base_url = "https://api.tokhive.ai/v1"
 env_key = "TOKHIVE_API_KEY"
 wire_api = "responses"
 ```
@@ -65,25 +65,25 @@ Then run `codex` as usual, with `TOKHIVE_API_KEY` set.
 #### Claude Code
 
 ```sh
-export ANTHROPIC_BASE_URL=https://dev.tokhive.ai/anthropic
+export ANTHROPIC_BASE_URL=https://api.tokhive.ai/anthropic
 export ANTHROPIC_AUTH_TOKEN=$TOKHIVE_API_KEY
 claude
 ```
 
 #### SDKs
 
-- **OpenAI SDK:** set `OPENAI_BASE_URL=https://dev.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
-- **Anthropic SDK:** pass `base_url="https://dev.tokhive.ai/anthropic"` and `api_key` set to your key.
+- **OpenAI SDK:** set `OPENAI_BASE_URL=https://api.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
+- **Anthropic SDK:** pass `base_url="https://api.tokhive.ai/anthropic"` and `api_key` set to your key.
 
 ### 5. Make your first call
 
 ```sh
-curl https://dev.tokhive.ai/v1/chat/completions \
+curl https://api.tokhive.ai/v1/chat/completions \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 
-curl https://dev.tokhive.ai/anthropic/v1/messages \
+curl https://api.tokhive.ai/anthropic/v1/messages \
   -H "x-api-key: $TOKHIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
@@ -93,7 +93,7 @@ curl https://dev.tokhive.ai/anthropic/v1/messages \
 To see which models you can use right now:
 
 ```sh
-curl https://dev.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
+curl https://api.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
 ```
 
 The list only includes models that currently have supply online, so it can get shorter when providers go offline.
