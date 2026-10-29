@@ -24,7 +24,7 @@ curl https://api.tokhive.ai/v1/chat/completions \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5.5",
+    "model": "gpt-6-sol",
     "messages": [{"role": "user", "content": "Reply with exactly OK."}]
   }'
 ```
@@ -37,7 +37,7 @@ from openai import OpenAI
 
 client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
 completion = client.chat.completions.create(
-    model="gpt-5.5",
+    model="gpt-6-sol",
     messages=[{"role": "user", "content": "Reply with exactly OK."}],
 )
 print(completion.choices[0].message.content)
@@ -51,7 +51,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
 const completion = await client.chat.completions.create({
-  model: "gpt-5.5",
+  model: "gpt-6-sol",
   messages: [{ role: "user", content: "Reply with exactly OK." }],
 });
 console.log(completion.choices[0].message.content);

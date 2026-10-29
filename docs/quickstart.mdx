@@ -77,13 +77,13 @@ claude
 curl https://api.tokhive.ai/v1/chat/completions \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+  -d '{"model":"gpt-6-sol","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 
 curl https://api.tokhive.ai/anthropic/v1/messages \
   -H "x-api-key: $TOKHIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
-  -d '{"model":"claude-haiku-4-5-20251001","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+  -d '{"model":"claude-opus-5-5","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 ```
 
 To see which models you can use right now:
