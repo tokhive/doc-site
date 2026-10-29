@@ -64,7 +64,7 @@ If an account can't take work yet, Bee prints one line per reason, each with an 
 
 ## 3. Keep it running
 
-Bee runs in the foreground. Leave the terminal open; Ctrl-C stops it. If the network drops, Bee reconnects by itself, with a backoff of 1 to 30 seconds.
+Bee runs in the foreground. Leave the terminal open; Ctrl-C stops it. If the network drops, Bee reconnects by itself, with a backoff of 1 to 30 seconds. To run Bee in the background instead, with a LaunchAgent on macOS or the system service on Linux, see [Operations](./operations.mdx#keep-bee-online).
 
 To start Bee again later, run `bee start` with no options. The Hive address is remembered.
 
@@ -79,7 +79,7 @@ bee status
 It shows on one screen the Bee version, the Hive, the device and the account it is paired to, the platforms you chose, and whether each one is taking work:
 
 ```text
-Bee:     bee v0.1.0 darwin/arm64
+Bee:     bee v0.0.7 darwin/arm64
 Hive:    https://console.tokhive.ai
 Device:  My MacBook, paired to you@example.com
 Supply:  openai, claude (egress.json)
