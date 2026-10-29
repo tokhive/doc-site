@@ -115,8 +115,8 @@ These are the reasons Hive gives. `bee status` shows the description; `bee suppl
 | `codex_confirmation_required` | OpenAI account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
 | `claude_confirmation_required` | Claude account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
 | `device_draining` | device being replaced; finishing in-flight execution and settlement | Run the new Bee; it takes over once the old one has drained. |
-| `plan_not_configured` | no concurrency limit configured for this plan | **Administrator.** |
-| `banned` | banned by administrator | **Administrator.** |
+| `plan_not_configured` | no concurrency limit configured for this plan | **Administrator.** Email [hello@tokhive.ai](mailto:hello@tokhive.ai). |
+| `banned` | banned by administrator | **Administrator.** Email [hello@tokhive.ai](mailto:hello@tokhive.ai). |
 
 ## Error code reference
 
@@ -200,3 +200,5 @@ bee doctor --json                      # machine-readable report
 ```
 
 Logs never contain your tokens, buyer prompts or model responses, but they do contain account fingerprints and your Hive address. Review them before sharing.
+
+Still stuck? Email [hello@tokhive.ai](mailto:hello@tokhive.ai) with the output of `bee doctor` and `bee status`.
