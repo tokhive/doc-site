@@ -19,6 +19,10 @@ Different Providers can charge different prices for the same model. A request go
 
 Only for a response that completed and whose [execution receipt](./trust/execution-receipts.mdx) verified, by the tokens it actually used. A request that fails or is interrupted costs nothing, even if it had started to stream.
 
+### How do I add funds?
+
+Deposit a stablecoin: USDT0 on Conflux eSpace, or USDT on Ethereum. Your deposit address is yours permanently, and a deposit is credited in US dollars automatically after the network's confirmations. See [Add balance](./quickstart.mdx#3-add-balance).
+
 ### Why did my balance go below zero?
 
 A request only needs a balance above zero to start, and it is charged when it finishes. A long request can therefore take the balance below zero. New requests are refused with `402 insufficient_balance` until you add funds.

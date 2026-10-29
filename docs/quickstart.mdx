@@ -29,7 +29,18 @@ export TOKHIVE_API_KEY=hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 A new account has a balance of 0, and every inference request returns `402 insufficient_balance` until you add funds.
 
+TokHive accepts two stablecoins:
+
+| Network | Stablecoin |
+| --- | --- |
+| Conflux eSpace (chain ID `1030`) | USDT0 |
+| Ethereum (chain ID `1`) | USDT |
+
 Open **Balances and Ledger** and click **Deposit**. Choose a network and a stablecoin, and TokHive gives you a deposit address that is permanently yours on that network. Send the stablecoin to that address from your wallet; it is credited automatically after the network's confirmations, usually within a few minutes. The amount is credited as US dollars, and your deposits are listed under **Deposits** in the ledger.
+
+:::caution[Check the network and the token]
+The deposit dialog shows the network, its chain ID, the token contract and how many confirmations a deposit needs. Send only that token, on that network, to that address. A transfer of another token or on another network may not be recoverable.
+:::
 
 ### 4. Point your client at TokHive
 
