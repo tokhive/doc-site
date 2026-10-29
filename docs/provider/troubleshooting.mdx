@@ -14,7 +14,7 @@ title: Troubleshooting
 `bee doctor` checks the device configuration, the egress configuration, each platform's local login, the connection to Hive and the device identity, and finally each account and its supply state on the Hive side. Each line is `ok`, `WARN`, `FAIL` or `skip`:
 
 ```text
-ok    device                  "My MacBook" paired with you@example.com on https://dev.tokhive.ai
+ok    device                  "My MacBook" paired with you@example.com on https://console.tokhive.ai
 ok    egress                  /home/you/.config/tokhive/egress.json supplies openai and claude
 ok    authorization (openai)  ...
 FAIL  supply (claude)         [quota_exhausted] ...
@@ -40,7 +40,7 @@ A binary downloaded through a browser is quarantined. Run `xattr -d com.apple.qu
 - The code is valid for 10 minutes and can be used once. If it expired, run `bee start` again; it resumes the pairing with a new code.
 - Open the link in a browser where you are signed in to TokHive **with the account that should own this device**.
 - Don't delete `bee.json` to start over; the same file resumes where it stopped.
-- `BEE-START-HIVE`: the machine is not paired and Bee doesn't know your Hive. Pass `--hive https://dev.tokhive.ai`, or copy the command from the **Bee Device** page.
+- `BEE-START-HIVE`: the machine is not paired and Bee doesn't know your Hive. Pass `--hive https://console.tokhive.ai`, or copy the command from the **Bee Device** page.
 - "this machine is paired with … ; use a separate --config path for another Hive": the configuration already belongs to another Hive. See [Configuration](./configuration.mdx#device-configuration).
 
 ### Bee doesn't find my subscription

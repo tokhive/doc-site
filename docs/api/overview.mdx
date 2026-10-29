@@ -1,0 +1,106 @@
+---
+sidebar_position: 1
+title: Overview
+---
+
+# Overview
+
+TokHive serves first-party OpenAI and Claude models through two compatible APIs. Each one imitates its vendor's API, including the request format, the response format and the error shape, so the official SDKs and tools work after you change only the base URL and the API key.
+
+| API | URL | SDK base URL | Models |
+| --- | --- | --- | --- |
+| OpenAI compatible | `https://api.tokhive.ai/v1` | `https://api.tokhive.ai/v1` | OpenAI |
+| Anthropic compatible | `https://api.tokhive.ai/anthropic/v1` | `https://api.tokhive.ai/anthropic` | Claude |
+
+The Anthropic SDKs and Claude Code add `/v1` themselves, so their base URL stops at `/anthropic`.
+
+TokHive does not convert between the two APIs. OpenAI models are called through the OpenAI-compatible API, and Claude models through the Anthropic-compatible one. Sending a model to the other API returns `400 wrong_protocol`, and the error message names the right path.
+
+## Endpoints
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | [`/v1/models`](models.mdx#openai-models) | List OpenAI models |
+| `GET` | [`/v1/models/{id}`](models.mdx#openai-models) | Retrieve one OpenAI model |
+| `POST` | [`/v1/responses`](responses.mdx) | Generate a response (OpenAI Responses) |
+| `POST` | [`/v1/chat/completions`](chat-completions.mdx) | Generate a chat completion, converted to Responses |
+| `GET` | [`/v1/codex/models`](models.mdx#codex-model-catalog) | Model catalog for Codex |
+| `POST` | [`/v1/codex/responses`](responses.mdx#codex) | Responses in Codex's own request format |
+| `GET` | [`/anthropic/v1/models`](models.mdx#claude-models) | List Claude models |
+| `GET` | [`/anthropic/v1/models/{id}`](models.mdx#claude-models) | Retrieve one Claude model |
+| `POST` | [`/anthropic/v1/messages`](messages.mdx) | Create a message (Anthropic Messages) |
+| `POST` | [`/anthropic/v1/messages/count_tokens`](messages.mdx#token-counting) | Count input tokens, free |
+
+Any other path returns `404` in the error format of its API.
+
+## Authentication
+
+Create an API key in the console under **API Keys**. The full key is shown only once, when you create it, so store it right away. Send it with every request:
+
+| API | Header |
+| --- | --- |
+| OpenAI compatible | `Authorization: Bearer <your key>` |
+| Anthropic compatible | `x-api-key: <your key>`, or `Authorization: Bearer <your key>`. If you send both, they must be the same key. |
+
+Revoking a key refuses new requests immediately; requests it already started still finish and are charged. A console login cannot stand in for an API key.
+
+## Billing
+
+- **A positive balance is required.** When your balance is zero or negative, new requests get `402 insufficient_balance`. Funds are not reserved, so a running request is not stopped if your balance drops below zero while it runs.
+- **You pay per token**, at the price of the provider that served the request. Input, output, cache reads and cache writes each have their own price. The current prices are in the console.
+- **Only verified, completed responses are charged.** You pay only when a response completed and its [execution receipt](../trust/execution-receipts.mdx) verified. A failed or interrupted request costs nothing.
+- [Token counting](messages.mdx#token-counting) is free.
+
+## Limits
+
+| Limit | Value |
+| --- | --- |
+| Request body | 8 MiB. Compressed request bodies are refused. |
+| Concurrent requests per API key | 20. More return `429 concurrency_limit`. |
+| Provider fallback | A request that fails before any output is retried on another provider. Once output has started, it is never continued by a different provider. |
+
+## Errors
+
+Each API returns errors in its vendor's shape.
+
+**OpenAI compatible**: `code` is TokHive's error code, and `param` names the offending field when there is one.
+
+```json
+{
+  "error": {
+    "code": "no_supply",
+    "message": "no provider is offering this model right now",
+    "type": "server_error",
+    "param": null
+  }
+}
+```
+
+**Anthropic compatible**: as in Anthropic's API, there is a `type` and a `message` but no TokHive code.
+
+```json
+{
+  "type": "error",
+  "error": {
+    "type": "overloaded_error",
+    "message": "no provider is offering this model right now"
+  },
+  "request_id": "..."
+}
+```
+
+Every response carries an `X-Request-Id` header. Include it when you ask for help with a request.
+
+| Status | Code | Meaning | Retry? |
+| --- | --- | --- | --- |
+| `400` | `model_not_found` | The model is not in TokHive's catalog. Pick one from the [models list](models.mdx). | No |
+| `400` | `wrong_protocol` | The model belongs to the other API. The message names the right path. | No |
+| `400` | `invalid_request` | The body is not a valid request for this endpoint. | No |
+| `401` | `invalid_api_key` | The key is missing, malformed or revoked, or two different keys were sent. | No |
+| `402` | `insufficient_balance` | Your balance is zero or negative. | After adding funds |
+| `409` | `session_context_unavailable` | The conversation can only continue on the account that served it, and that account is unavailable. | Yes if `Retry-After` is set; otherwise start a new conversation |
+| `429` | `concurrency_limit` | This key already runs as many requests as it may. | Yes, after `Retry-After` |
+| `502` | various | The request failed upstream, or its result could not be verified. You are not charged. | Yes |
+| `503` | `no_supply` | No provider can serve this model right now. | Yes; when accounts are only busy or briefly rate limited, `Retry-After` says when |
+
+When the upstream rejects your request itself, for example with `prompt is too long`, its error type and message are passed through, so clients can react, for instance by compacting the context. Other upstream error details are not passed on.

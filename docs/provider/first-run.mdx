@@ -25,17 +25,17 @@ On a Linux server without a browser, both clients offer a sign-in flow you can c
 ## 2. Start Bee
 
 ```sh
-bee start --hive https://dev.tokhive.ai
+bee start --hive https://console.tokhive.ai
 ```
 
-`https://dev.tokhive.ai` is the TokHive Hive; you can also copy the full command from the **Bee Device** page of the console. `bee start` runs three steps and skips any that are already done.
+`https://console.tokhive.ai` is the TokHive Hive; you can also copy the full command from the **Bee Device** page of the console. `bee start` runs three steps and skips any that are already done.
 
 ### Pairing
 
 Bee prints a pairing link and a short code:
 
 ```text
-https://dev.tokhive.ai/devices/pair?code=ABCD-EFGH
+https://console.tokhive.ai/devices/pair?code=ABCD-EFGH
 ```
 
 Open the link in any browser where you are signed in to TokHive; it doesn't have to be on this machine. Check the device name, then confirm. The code is valid for 10 minutes and can be used once. You can also open `/devices/pair` in the console and type the code by hand.
@@ -43,7 +43,7 @@ Open the link in any browser where you are signed in to TokHive; it doesn't have
 The device name defaults to the host name. Set your own with `--name`:
 
 ```sh
-bee start --hive https://dev.tokhive.ai --name "My MacBook"
+bee start --hive https://console.tokhive.ai --name "My MacBook"
 ```
 
 ### Choosing the subscriptions
@@ -80,7 +80,7 @@ It shows on one screen the Bee version, the Hive, the device and the account it 
 
 ```text
 Bee:     bee v0.1.0 darwin/arm64
-Hive:    https://dev.tokhive.ai
+Hive:    https://console.tokhive.ai
 Device:  My MacBook, paired to you@example.com
 Supply:  openai, claude (egress.json)
   openai  taking new work
@@ -109,7 +109,7 @@ The console shows the device as online as soon as Bee is connected. Whether an a
 `bee start` runs these commands for you. Use them directly to redo one step:
 
 ```sh
-bee login --hive https://dev.tokhive.ai --name "My MacBook"  # pair, or resume an interrupted pairing
+bee login --hive https://console.tokhive.ai --name "My MacBook"  # pair, or resume an interrupted pairing
 bee setup                                                   # choose the subscriptions to supply
 bee run                                                     # stay connected and serve work
 ```

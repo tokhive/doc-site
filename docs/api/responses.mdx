@@ -1,0 +1,124 @@
+---
+sidebar_position: 3
+title: Responses
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Responses
+
+```http
+POST /v1/responses
+```
+
+OpenAI's Responses API, served by ChatGPT subscriptions. This is the recommended endpoint for OpenAI models. Point an official OpenAI SDK at `https://api.tokhive.ai/v1` and call it as usual.
+
+## Example
+
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
+
+```sh
+curl https://api.tokhive.ai/v1/responses \
+  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-5.5",
+    "input": "Reply with exactly OK."
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
+response = client.responses.create(model="gpt-5.5", input="Reply with exactly OK.")
+print(response.output_text)
+```
+
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
+const response = await client.responses.create({ model: "gpt-5.5", input: "Reply with exactly OK." });
+console.log(response.output_text);
+```
+
+</TabItem>
+</Tabs>
+
+The response is OpenAI's `response` object (IDs shortened):
+
+```json
+{
+  "id": "resp_...",
+  "object": "response",
+  "status": "completed",
+  "model": "gpt-5.5",
+  "output": [
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [{ "type": "output_text", "text": "OK" }]
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "input_tokens_details": { "cached_tokens": 0 },
+    "output_tokens": 5,
+    "output_tokens_details": { "reasoning_tokens": 0 },
+    "total_tokens": 17
+  }
+}
+```
+
+## Request
+
+| Field | Notes |
+| --- | --- |
+| `model` | Required. An ID from [`/v1/models`](models.mdx#openai-models). |
+| `input` | A string, or a list of input items. A string becomes one user message. It may be omitted when `instructions` is given. |
+| `instructions` | System-level instructions. |
+| `stream` | `true` for server-sent events. Defaults to `false`. |
+| `tools`, `tool_choice`, `parallel_tool_calls` | Function tools and built-in tools, passed through. |
+| `reasoning`, `text`, `include`, `service_tier`, `prompt_cache_key` | Passed through. |
+| `store` | Must be `false` or absent. TokHive does not keep responses, so `true` is refused. |
+
+### What the subscription upstream does not accept
+
+Subscriptions accept fewer fields than OpenAI's public API. So that common SDK calls work unchanged, TokHive adapts a request as follows:
+
+- **Removed fields.** `temperature`, `top_p`, `top_logprobs`, `max_output_tokens`, `max_tool_calls`, `truncation`, `metadata`, `user`, `safety_identifier`, `prompt_cache_retention` and `background` are dropped, and the dropped names are listed in the `X-Hive-Ignored-Params` response header. They have no effect: for example, `max_output_tokens` does **not** cap the output length. `"background": true` is refused with `400`.
+- **Refused fields.** `previous_response_id`, like any other unsupported top-level field, returns `400` with `Unsupported parameter: '<field>'`, and the error's `param` names it. To continue a conversation, send its history in `input`.
+- **Roles.** A `system` message in `input` is sent as a `developer` message.
+
+A request that needs none of this is forwarded byte for byte, as the official Codex client's requests are.
+
+## Streaming
+
+With `"stream": true`, events arrive as OpenAI sends them: `response.created`, then deltas such as `response.output_text.delta`, then `response.completed`. TokHive holds back the final `response.completed` event until the result is verified and settled, so the last event can arrive a moment after the final text. A non-streaming call runs as a stream upstream, and TokHive returns the assembled object at the end.
+
+If a stream fails after output has started, it ends with an `error` event, and nothing is charged.
+
+## Usage and billing
+
+`input_tokens` includes the cached part. TokHive bills `cached_tokens` at the cache-read price, the remaining input at the input price, and `output_tokens`, including reasoning tokens, at the output price.
+
+## Conversations
+
+A conversation that carries Codex's session headers stays on the provider account that served it, which keeps the upstream prompt cache warm. When the history can move, for example after that account becomes unavailable, it continues on another account. When it cannot, the call returns `409 session_context_unavailable`.
+
+## Codex
+
+```http
+POST /v1/codex/responses
+```
+
+The same pipeline as `/v1/responses`, but the body must already be in the subscription upstream's own format. TokHive forwards it without the adaptations above and without checking field names. The console's Codex setup guide points Codex here, together with the [Codex model catalog](models.mdx#codex-model-catalog). Use `/v1/responses` for your own code.

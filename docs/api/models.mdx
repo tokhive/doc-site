@@ -1,0 +1,125 @@
+---
+sidebar_position: 2
+title: Models
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Models
+
+Each API lists the models you can call through it. A model is listed when it is enabled, fully priced, and at least one online provider offers it. Momentary conditions, such as a busy account or a short rate limit, do not remove a model from the list, so a listed model can still occasionally return `503 no_supply`.
+
+## OpenAI models
+
+```http
+GET /v1/models
+GET /v1/models/{id}
+```
+
+Lists the OpenAI models you can call through [Responses](responses.mdx) and [Chat Completions](chat-completions.mdx), in OpenAI's format.
+
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
+
+```sh
+curl https://api.tokhive.ai/v1/models \
+  -H "Authorization: Bearer $TOKHIVE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
+for model in client.models.list():
+    print(model.id)
+```
+
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
+for await (const model of client.models.list()) {
+  console.log(model.id);
+}
+```
+
+</TabItem>
+</Tabs>
+
+Retrieving a model that is not in the list, including a Claude model, returns `404 model_not_found`.
+
+## Claude models
+
+```http
+GET /anthropic/v1/models
+GET /anthropic/v1/models/{id}
+```
+
+Lists the Claude models you can call through [Messages](messages.mdx), in Anthropic's format.
+
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
+
+```sh
+curl https://api.tokhive.ai/anthropic/v1/models \
+  -H "x-api-key: $TOKHIVE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import anthropic
+
+client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=TOKHIVE_API_KEY)
+for model in client.models.list():
+    print(model.id)
+```
+
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.TOKHIVE_API_KEY });
+for await (const model of client.models.list()) {
+  console.log(model.id);
+}
+```
+
+</TabItem>
+</Tabs>
+
+```json
+{
+  "data": [
+    {
+      "type": "model",
+      "id": "claude-opus-5-5",
+      "display_name": "Claude Opus 5.5",
+      "created_at": "2026-09-01T00:00:00Z"
+    }
+  ],
+  "has_more": false,
+  "first_id": "claude-opus-5-5",
+  "last_id": "claude-opus-5-5"
+}
+```
+
+The whole list always fits on one page, so `has_more` is always `false`. Retrieving a model that is not in the list returns `404`.
+
+## Codex model catalog
+
+```http
+GET /v1/codex/models
+```
+
+The model catalog Codex reads through `model_catalog_url` in its config. TokHive fetches it from the upstream for your Codex version and keeps only the models in `/v1/models`. It returns `404 codex_catalog_unavailable` when no catalog is available yet. The console's Codex setup guide fills in this URL for you, so you rarely call it yourself.

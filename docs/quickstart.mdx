@@ -7,7 +7,7 @@ slug: /quickstart
 
 This page gets you from zero to your first call through TokHive in a few minutes. If you have an idle ChatGPT or Claude subscription, [Supply your subscription](#supply-your-subscription) shows how to earn from it.
 
-TokHive's console and API are at `https://dev.tokhive.ai`.
+TokHive's console is at `https://console.tokhive.ai`, and its API at `https://api.tokhive.ai`.
 
 ## Use TokHive
 
@@ -15,7 +15,7 @@ You can use any machine that runs an OpenAI or Anthropic client.
 
 ### 1. Create an account
 
-Register at [dev.tokhive.ai/register](https://dev.tokhive.ai/register) with an email address and a password of at least 10 characters.
+Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) with an email address and a password of at least 10 characters.
 
 ### 2. Create an API key
 
@@ -31,18 +31,14 @@ A new account has a balance of 0, and every inference request returns `402 insuf
 
 Open **Balances and Ledger** and click **Deposit**. Choose a network and a stablecoin, and TokHive gives you a deposit address that is permanently yours on that network. Send the stablecoin to that address from your wallet; it is credited automatically after the network's confirmations, usually within a few minutes. The amount is credited as US dollars, and your deposits are listed under **Deposits** in the ledger.
 
-:::note[Test network]
-`dev.tokhive.ai` accepts the test stablecoin **USDT0** on **Conflux eSpace Testnet** (chain ID `71`, RPC `https://evmtestnet.confluxrpc.com`). You need a little test CFX for gas, from the faucet linked in the [Conflux documentation](https://doc.confluxnetwork.org/docs/espace/UserGuide).
-:::
-
 ### 4. Point your client at TokHive
 
 TokHive speaks both the OpenAI and the Anthropic API. You only change the base URL and the API key.
 
 | API | Base URL |
 | --- | --- |
-| OpenAI compatible (Responses, Chat Completions, Models) | `https://dev.tokhive.ai/v1` |
-| Anthropic compatible (Messages) | `https://dev.tokhive.ai/anthropic` |
+| OpenAI compatible (Responses, Chat Completions, Models) | `https://api.tokhive.ai/v1` |
+| Anthropic compatible (Messages) | `https://api.tokhive.ai/anthropic` |
 
 Both accept `Authorization: Bearer hive_...`. The Anthropic API also accepts `x-api-key: hive_...`, which the Anthropic SDKs and Claude Code use by default. The **API Keys** page has copy buttons for both URLs.
 
@@ -55,7 +51,7 @@ model_provider = "tokhive"
 
 [model_providers.tokhive]
 name = "TokHive"
-base_url = "https://dev.tokhive.ai/v1"
+base_url = "https://api.tokhive.ai/v1"
 env_key = "TOKHIVE_API_KEY"
 wire_api = "responses"
 ```
@@ -65,25 +61,25 @@ Then run `codex` as usual, with `TOKHIVE_API_KEY` set.
 #### Claude Code
 
 ```sh
-export ANTHROPIC_BASE_URL=https://dev.tokhive.ai/anthropic
+export ANTHROPIC_BASE_URL=https://api.tokhive.ai/anthropic
 export ANTHROPIC_AUTH_TOKEN=$TOKHIVE_API_KEY
 claude
 ```
 
 #### SDKs
 
-- **OpenAI SDK:** set `OPENAI_BASE_URL=https://dev.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
-- **Anthropic SDK:** pass `base_url="https://dev.tokhive.ai/anthropic"` and `api_key` set to your key.
+- **OpenAI SDK:** set `OPENAI_BASE_URL=https://api.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
+- **Anthropic SDK:** pass `base_url="https://api.tokhive.ai/anthropic"` and `api_key` set to your key.
 
 ### 5. Make your first call
 
 ```sh
-curl https://dev.tokhive.ai/v1/chat/completions \
+curl https://api.tokhive.ai/v1/chat/completions \
   -H "Authorization: Bearer $TOKHIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 
-curl https://dev.tokhive.ai/anthropic/v1/messages \
+curl https://api.tokhive.ai/anthropic/v1/messages \
   -H "x-api-key: $TOKHIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
@@ -93,7 +89,7 @@ curl https://dev.tokhive.ai/anthropic/v1/messages \
 To see which models you can use right now:
 
 ```sh
-curl https://dev.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
+curl https://api.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
 ```
 
 The list only includes models that currently have supply online, so it can get shorter when providers go offline.
@@ -127,7 +123,7 @@ If your ChatGPT or Claude subscription has quota you don't use, you can supply i
 3. Start it, then confirm the pairing link it prints in your browser and choose the subscriptions to supply:
 
    ```sh
-   bee start --hive https://dev.tokhive.ai
+   bee start --hive https://console.tokhive.ai
    ```
 
 When Bee prints `ready: taking new work`, you are supplying. Your earnings show up in **Balances and Ledger**, where you can also transfer them to your balance and spend them on your own calls.
