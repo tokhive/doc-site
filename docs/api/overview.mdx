@@ -1,16 +1,16 @@
 ---
 sidebar_position: 1
-title: API Overview
+title: Overview
 ---
 
-# API Overview
+# Overview
 
 TokHive serves two API families from one host. Each prefix imitates one vendor's API, including its request format, response format and error shape:
 
-| Prefix | Imitates | Endpoints |
+| URL | Imitates | Endpoints |
 | --- | --- | --- |
-| `/v1` | OpenAI | [Models](models.mdx), [Responses](responses.mdx), [Chat Completions](chat-completions.mdx) |
-| `/anthropic/v1` | Anthropic | [Models](models.mdx), [Messages and token counting](messages.mdx) |
+| `https://api.tokhive.ai/v1` | OpenAI | [Models](models.mdx), [Responses](responses.mdx), [Chat Completions](chat-completions.mdx) |
+| `https://api.tokhive.ai/anthropic/v1` | Anthropic | [Models](models.mdx), [Messages and token counting](messages.mdx) |
 
 The base URL is `https://api.tokhive.ai`. Point an OpenAI client at `https://api.tokhive.ai/v1` and an Anthropic client at `https://api.tokhive.ai/anthropic`. Paths that TokHive does not serve return `404` in the error format of their prefix.
 
