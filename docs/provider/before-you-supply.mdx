@@ -5,7 +5,7 @@ title: Before You Supply
 
 # Before You Supply
 
-This page collects what you should know before you decide to supply a subscription: what you earn, what it does to your own quota, what it can cost you, and how you stay in control.
+This page collects what you should know before you decide to supply a subscription: the risk to your account, what you earn, what it does to your own quota, what it can cost you, and how you stay in control.
 
 ## Which subscriptions can be supplied
 
@@ -15,6 +15,21 @@ This page collects what you should know before you decide to supply a subscripti
 | Claude | Claude Code | Pro, Max, Team, Enterprise |
 
 A plan takes work only when the marketplace has set a concurrency limit for it. Otherwise the account shows `plan_not_configured`. Bee reads the plan from the official client's login. You can't choose it.
+
+## Account risk
+
+OpenAI's and Anthropic's consumer terms don't allow an account to be shared with others. A vendor may restrict or suspend an account it considers shared. **TokHive offers no compensation if that happens to an account you supply.**
+
+TokHive is designed to keep that likelihood as low as it can, by making supplied work look and behave like your own use of the official client:
+
+- **Your network.** Every upstream connection leaves from your own IP and your usual network, not from a shared server.
+- **The official client's identity.** Requests are sent in the official client's own format, with its headers and a current release. For OpenAI, that is the Codex version installed on your machine.
+- **Your plan's pace.** An account never runs more requests at once than the concurrency limit set for its plan.
+- **Stopping at limits.** Bee stops at a fully used quota window. When the upstream rate-limits the account, it stays out of rotation until the time the upstream gives.
+- **One account per conversation.** A conversation stays on the account that started it, rather than jumping between accounts.
+- **Your login untouched.** Bee doesn't sign in, sign out or refresh tokens unless you turn on Claude token refresh. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
+
+Weigh the risk against the return. For an account that supplies regularly, earnings are expected to cover the subscription fee quickly.
 
 ## What you earn
 

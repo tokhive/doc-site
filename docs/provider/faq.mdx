@@ -33,6 +33,10 @@ Yes. The only known limitation: if Bee and the official client refresh the login
 
 Supplied work counts against the same subscription quota you use yourself, and no part of it is reserved for you. Bee keeps taking work until a quota window is 100% used, then stops until the window resets (`quota_exhausted`). To keep quota for yourself, pause supply while you work: `bee pause --platform PLATFORM`, then `bee resume --platform PLATFORM`.
 
+### Can my account be banned for supplying?
+
+It can. The vendors' consumer terms don't allow sharing an account, and TokHive offers no compensation if an account is restricted. TokHive keeps the risk as low as it can: work leaves from your own IP in the official client's format, stays within your plan's concurrency limit, stops at quota and rate limits, and keeps each conversation on one account. See [Account risk](./before-you-supply.mdx#account-risk).
+
 ### Which plans can I supply?
 
 OpenAI Free, Go, Plus, Pro, Team, Business, Enterprise and Edu, through Codex; Claude Pro, Max, Team and Enterprise, through Claude Code. A plan takes work once the marketplace has set its concurrency limit. See [Before You Supply](./before-you-supply.mdx#which-subscriptions-can-be-supplied).
