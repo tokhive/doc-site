@@ -25,7 +25,7 @@ The upstream vendor's own per-token price for a model, with separate prices for 
 
 ### Bee
 
-The Provider client. Bee runs on the Provider's own macOS or Linux machine, keeps the Provider's subscriptions available to the network, and relays encrypted traffic between the [TEE](#tee) and the upstream AI vendor. It cannot read buyer requests or responses. Each Provider has one active Bee, which can supply one subscription account per platform. See the [Provider guide](./provider/overview.mdx).
+The Provider client. Bee runs on the Provider's own macOS or Linux machine, keeps the Provider's subscriptions available to the network, and relays encrypted traffic between the [TEE](#tee) and the upstream AI vendor. It cannot read Consumer requests or responses. Each Provider has one active Bee, which can supply one subscription account per platform. See the [Provider guide](./provider/overview.mdx).
 
 ### Buyer price
 
@@ -73,7 +73,7 @@ A record signed by the TEE for every execution, proving what was executed. Recei
 
 ### Hive
 
-TokHive's marketplace service. Hive authenticates Consumers, routes each request to a suitable Provider, hands it to the TEE, meters usage and settles payments. It keeps the connections to all Bees. Hive never sees Provider credentials in plaintext; it does handle buyer requests in plaintext.
+TokHive's marketplace service. Hive authenticates Consumers, routes each request to a suitable Provider, hands it to the TEE, meters usage and settles payments. It keeps the connections to all Bees. Hive never sees Provider credentials in plaintext; it does handle Consumer requests in plaintext.
 
 ### Locked price
 

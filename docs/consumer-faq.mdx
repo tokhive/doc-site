@@ -1,0 +1,79 @@
+---
+sidebar_position: 2.5
+title: Consumer FAQ
+---
+
+# Consumer FAQ
+
+Questions Consumers ask about pricing, billing, availability and data. For the endpoints themselves, see the [API reference](./api/overview.mdx).
+
+## Pricing and billing
+
+### How is the price of a request set?
+
+Every model has an official price: the vendor's own API price per million tokens, with separate prices for input, output, cache reads and cache writes. A Provider's price is that official price times the Provider's quote multiplier. You pay the Provider's price plus the platform commission: `official price × multiplier × (1 + commission rate)`.
+
+Different Providers can charge different prices for the same model. A request goes to an available account in good health: one that already holds your conversation, if there is one, and otherwise usually the cheapest. The price is fixed when the request is dispatched, and **Call Records** shows what each call cost.
+
+### When am I charged?
+
+Only for a response that completed and whose [execution receipt](./trust/execution-receipts.mdx) verified, by the tokens it actually used. A request that fails or is interrupted costs nothing, even if it had started to stream.
+
+### Why did my balance go below zero?
+
+A request only needs a balance above zero to start, and it is charged when it finishes. A long request can therefore take the balance below zero. New requests are refused with `402 insufficient_balance` until you add funds.
+
+### Can I withdraw or refund my balance?
+
+Balances can't be withdrawn from the console. For questions about your balance, including refunds, email [hello@tokhive.ai](mailto:hello@tokhive.ai).
+
+## Availability
+
+### Which models can I use?
+
+The ones listed by [`/v1/models` and `/anthropic/v1/models`](./api/models.mdx): enabled, priced, and offered by at least one online Provider. The list follows the Provider network, so a model can disappear while nobody offers it.
+
+### What happens when no Provider can take my request?
+
+The request may be served by a **vetted premium API service** instead, so that it still succeeds:
+
+- It is billed at that service's price, which can be higher than a Provider's.
+- Your request and the response pass through that service.
+- The execution receipt proves that the request reached that service, not which vendor account served it.
+
+Call Records shows which source served each attempt. This fallback is on by default. To turn it off, open **Account › Fallback Supply**. With it off, such a request returns `503 no_supply` instead.
+
+### Why do I get `503 no_supply`?
+
+No account can serve the model right now, and fallback supply is off or has nothing for the model. When accounts are only busy or briefly rate limited, the `Retry-After` header says when to retry. See [Errors](./api/overview.mdx#errors).
+
+### Is Claude fast mode available?
+
+No. Requests that ask for fast mode run at the standard speed and are billed at the standard price. See [Messages](./api/messages.mdx#fast-mode-is-not-offered).
+
+### How many requests can I run at once?
+
+Up to 20 at a time per API key. More return `429 concurrency_limit`.
+
+## Data and privacy
+
+### Who can see my prompts?
+
+- **Hive**, the marketplace service, handles your prompts and responses in plaintext to route them.
+- **The TEE** executes your request against the vendor.
+- **Providers** cannot see your prompts, your responses or who you are; their machine only relays encrypted bytes.
+- **The upstream vendor** (OpenAI or Anthropic) processes the request as it does any other.
+
+End-to-end encryption that would hide prompts from Hive too is planned. See [Trust Model](./trust/trust-model.mdx).
+
+### What does TokHive keep?
+
+Call records keep metadata only: endpoint, model, timing, status, usage, cost and receipt digests. When a call fails, Hive also keeps your request and the upstream's response in restricted diagnostic logs, to investigate the failure.
+
+### Can I check that my request really reached OpenAI or Anthropic?
+
+Every execution has a TEE-signed receipt naming the upstream host, and Hive verifies it before you are charged. **Call Records** shows the receipt digests. Independent verification by Consumers is part of the planned [Web Proof](./web-proof/web-proof.mdx) work.
+
+## Help
+
+Email [hello@tokhive.ai](mailto:hello@tokhive.ai). Include the `X-Request-Id` of the request you are asking about.

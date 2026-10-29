@@ -33,7 +33,7 @@ TokHive is designed to keep that likelihood as low as it can, by making supplied
 - **One account per conversation.** A conversation stays on the account that started it, rather than jumping between accounts.
 - **Your login untouched.** Bee doesn't sign in, sign out or refresh tokens unless you turn on Claude token refresh. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
 
-**Buyer content is not reviewed today.** Buyers' requests run on your account, and TokHive does not yet check what they ask. The vendor's own safety systems still apply to every request, as they do to your own use. A check that refuses requests for illegal content is planned.
+**Consumer content is not reviewed today.** Consumers' requests run on your account, and TokHive does not yet check what they ask. The vendor's own safety systems still apply to every request, as they do to your own use. A check that refuses requests for illegal content is planned.
 
 Weigh the risk against the return. For an account that supplies regularly, earnings are expected to cover the subscription fee quickly.
 
@@ -42,9 +42,9 @@ Weigh the risk against the return. For an account that supplies regularly, earni
 - **Your price.** Every model has an official price: the vendor's own API price per million tokens, with separate prices for input, output and cached tokens. Your price is that official price times your **quote multiplier**. The platform default is currently **0.1**, that is 10% of the official price. You can keep it, or set your own multiplier, between 0 and 10, on the **My Quote** page. Your multiplier applies to all models, and the page previews the resulting price of each one.
 
   For example, at the default 0.1, a model whose official prices are $5 per million input tokens and $25 per million output tokens pays you $0.50 per million input tokens and $2.50 per million output tokens.
-- **The commission is not taken from you.** The platform adds its commission on top of your price when it charges the buyer. You receive your full price.
+- **The commission is not taken from you.** The platform adds its commission on top of your price when it charges the Consumer. You receive your full price.
 - **When several accounts can serve a request, the cheaper one usually wins.** Accounts in good health come first, and a conversation stays on the account that started it. Among the rest, the lowest multiplier is picked first. A lower multiplier means more work, and a higher one means more per token.
-- **You are paid per verified execution.** An execution is settled only when it completed and its [execution receipt](../trust/execution-receipts.mdx) verified. Failed executions earn nothing and cost the buyer nothing. Rarely, one fails after the upstream has already done some of the work, which uses a little of your quota unpaid. Each settled execution appears in the **Earnings** ledger on the **Balances and Ledger** page.
+- **You are paid per verified execution.** An execution is settled only when it completed and its [execution receipt](../trust/execution-receipts.mdx) verified. Failed executions earn nothing and cost the Consumer nothing. Rarely, one fails after the upstream has already done some of the work, which uses a little of your quota unpaid. Each settled execution appears in the **Earnings** ledger on the **Balances and Ledger** page.
 - **Spending your earnings.** On the **Balances and Ledger** page, **Transfer earnings** moves them to your buyer balance, where they pay for your own API calls. The transfer is one-way.
 - **Cashing out.** Withdrawing earnings to a stablecoin wallet is coming soon. Once it is available, a withdrawal arrives in about 5 minutes. The [Terms of Service](https://tokhive.ai/terms) set out the withdrawal rules.
 
@@ -70,8 +70,8 @@ Claude's **fast mode** is billed to extra usage from the first token. TokHive ne
 ## What runs through your machine
 
 - **Every upstream connection leaves from your own IP**, as it would when you use Codex or Claude Code yourself. Bee connects only to your Hive and to `chatgpt.com:443` or `api.anthropic.com:443`.
-- **Bee relays encrypted bytes** and can't read them. The prompts and responses of buyers are not visible to you or to anything else on your machine. See [Trust Model](../trust/trust-model.mdx).
-- **Network use** is the size of the buyers' requests and responses. Requests from coding agents carry the whole conversation and are often several hundred kilobytes each, so expect noticeable upload traffic while you supply. CPU and memory use are small.
+- **Bee relays encrypted bytes** and can't read them. The prompts and responses of Consumers are not visible to you or to anything else on your machine. See [Trust Model](../trust/trust-model.mdx).
+- **Network use** is the size of the Consumers' requests and responses. Requests from coding agents carry the whole conversation and are often several hundred kilobytes each, so expect noticeable upload traffic while you supply. CPU and memory use are small.
 - The machine has to be awake and online while you want to supply.
 
 ## Your login

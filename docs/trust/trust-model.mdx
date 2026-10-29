@@ -24,7 +24,7 @@ TokHive connects three parties who don't trust each other: Consumers who send re
 | --- | --- | --- | --- | --- |
 | Provider's access token | No | Sealed envelope only | Yes, inside the enclave | Reads it locally from the official client |
 | Provider's refresh token | No | No | No | Stays in the official client's store |
-| Buyer prompts and model responses | Their own | **Yes, in plaintext** | Yes, inside the enclave | No, encrypted TLS bytes only |
+| Consumer prompts and model responses | Their own | **Yes, in plaintext** | Yes, inside the enclave | No, encrypted TLS bytes only |
 | Consumer's identity | Their own | Yes | No | No |
 | Provider's identity | No | Yes | A pseudonymous device ID only | Their own |
 | Model, token usage, cost | Their own calls | Yes | — | No; only target host, byte counts and timing in receipts |
@@ -32,7 +32,7 @@ TokHive connects three parties who don't trust each other: Consumers who send re
 Two points follow from this table:
 
 - **Provider credentials are protected from Hive.** Bee encrypts the access token to a public key that only the TEE holds. Hive stores and forwards the sealed envelope but can't open it.
-- **Buyer traffic is not hidden from Hive.** Hive receives each request from the Consumer over HTTPS, translates it where needed (for example from Chat Completions to Responses), and passes it to the TEE. An end-to-end encryption option that would hide prompts from Hive too is planned.
+- **Consumer traffic is not hidden from Hive.** Hive receives each request from the Consumer over HTTPS, translates it where needed (for example from Chat Completions to Responses), and passes it to the TEE. An end-to-end encryption option that would hide prompts from Hive too is planned.
 
 ## What each party trusts
 
@@ -71,6 +71,6 @@ Hive doesn't simply trust the TEE either:
 
 ## Current limitations
 
-- Hive handles buyer prompts and responses in plaintext. End-to-end encryption is planned.
+- Hive handles Consumer prompts and responses in plaintext. End-to-end encryption is planned.
 - Consumers see receipt digests but can't yet download a receipt or verify it themselves; Hive verifies every receipt before settlement. A way for Consumers to verify receipts independently is part of the [Web Proof](../web-proof/web-proof.mdx) work.
 - A receipt proves where a request was sent and what bytes came back. It does not by itself prove the token usage that was billed; Hive takes usage from the verified response.
