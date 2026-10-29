@@ -66,7 +66,7 @@ Hive doesn't simply trust the TEE either:
 
 - **Call records** keep metadata only: endpoint, model, timing, status, usage, cost and receipt digests. Prompts, responses, request headers and API keys are not written to them.
 - **Receipts** are kept permanently, unaltered.
-- **Failed executions:** when an upstream call fails, Hive keeps the upstream's response, with sensitive headers redacted, in restricted diagnostic logs to troubleshoot the failure.
+- **Failed calls:** when a call fails, Hive keeps the Consumer's request and the upstream's response in restricted diagnostic logs to troubleshoot the failure. API keys, credentials and other sensitive headers are redacted. These logs are deleted after **3 months**. Nothing is kept for successful calls.
 - **Bee** logs never contain tokens, prompts or responses.
 
 ## Current limitations

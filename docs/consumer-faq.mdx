@@ -72,7 +72,7 @@ End-to-end encryption that would hide prompts from Hive too is planned. See [Tru
 
 ### What does TokHive keep?
 
-Call records keep metadata only: endpoint, model, timing, status, usage, cost and receipt digests. When a call fails, Hive also keeps your request and the upstream's response in restricted diagnostic logs, to investigate the failure.
+Call records keep metadata only: endpoint, model, timing, status, usage, cost and receipt digests. When a call fails, Hive also keeps your request and the upstream's response in restricted diagnostic logs, to investigate the failure, and deletes them after 3 months. Nothing is kept for successful calls.
 
 ### Can I check that my request really reached OpenAI or Anthropic?
 
