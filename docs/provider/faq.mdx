@@ -31,7 +31,19 @@ Yes. The only known limitation: if Bee and the official client refresh the login
 
 ### Will supplying use up my own quota?
 
-Supplied work counts against the same subscription quota you use yourself. When the quota is used up, Bee stops taking work until the window resets (`quota_exhausted`). To keep quota for yourself, pause supply while you work: `bee pause --platform PLATFORM`, then `bee resume --platform PLATFORM`.
+Supplied work counts against the same subscription quota you use yourself, and no part of it is reserved for you. Bee keeps taking work until a quota window is 100% used, then stops until the window resets (`quota_exhausted`). To keep quota for yourself, pause supply while you work: `bee pause --platform PLATFORM`, then `bee resume --platform PLATFORM`.
+
+### Which plans can I supply?
+
+OpenAI Free, Go, Plus, Pro, Team, Business, Enterprise and Edu, through Codex; Claude Pro, Max, Team and Enterprise, through Claude Code. A plan takes work once the marketplace has set its concurrency limit. See [Before You Supply](./before-you-supply.mdx#which-subscriptions-can-be-supplied).
+
+### Can supplying cost me money beyond my subscription?
+
+It can, if the account has paid usage beyond the plan: OpenAI credits, or Claude extra usage. Bee stops at a fully used quota window, but requests running at that moment can spill over into paid usage. Turn off extra usage and keep no paid credits on the account you supply to avoid it. TokHive never sends Claude fast-mode requests, which would bill extra usage from the first token. See [Usage billed beyond your subscription](./before-you-supply.mdx#usage-that-is-billed-beyond-your-subscription).
+
+### How many requests run on my account at once?
+
+At most the concurrency limit the marketplace sets for your plan. When it is reached, new requests wait or go to other providers, and `bee status` shows `concurrency_full`.
 
 ### Can I supply both a ChatGPT and a Claude subscription?
 
@@ -51,6 +63,14 @@ Bee pauses new work for that platform until you confirm the new account. See [I 
 
 Bee only takes work while it is running. When it stops, Hive stops sending it work; there is no penalty. Stopping is the simplest way to pause supply.
 
+### How do I stop supplying for good?
+
+Stop Bee and [uninstall it](./install.mdx#uninstall). Without a running Bee, no request can run on your account, and the token Bee sealed lapses when the access token expires.
+
+### Can TokHive suspend my supply?
+
+Yes. The marketplace administrator can suspend a provider, or one of its platforms, and the account then shows `banned`. Work already running finishes and is paid, and your earnings stay yours to transfer and spend.
+
 ### Does my computer need to stay awake?
 
 Yes, while you want to supply. A sleeping machine disconnects, and Bee reconnects on its own when it wakes.
@@ -64,6 +84,18 @@ Yes. Bee needs no browser on the machine: open the pairing link on any other dev
 ### How much do I earn?
 
 Supply is settled at your quote. You can start with the platform's default multiplier, or set your own on the **My Quote** page of the console; it applies to all models. Each execution has a TEE-signed receipt on the **Execution Receipts** page.
+
+### How is my price set, and does it affect how much work I get?
+
+Your price is the model's official price times your multiplier. When several accounts can serve a request, the lowest multiplier is usually picked first, so a lower multiplier brings more work. The platform's commission is charged to the buyer on top of your price, not taken from it. See [What you earn](./before-you-supply.mdx#what-you-earn).
+
+### Where do I see what my account served?
+
+Every settled execution is listed in the **Earnings** ledger on the **Balances and Ledger** page, and its TEE-signed receipt, with target host, status and byte counts, is on the **Execution Receipts** page. You never see the buyer's prompts or responses.
+
+### Can I cash out?
+
+Not yet. Earnings can be moved to your buyer balance and spent on your own API calls. Cashing out directly is planned.
 
 ### How do I use my earnings?
 

@@ -1,0 +1,75 @@
+---
+sidebar_position: 1.5
+title: Before You Supply
+---
+
+# Before You Supply
+
+This page collects what you should know before you decide to supply a subscription: what you earn, what it does to your own quota, what it can cost you, and how you stay in control.
+
+## Which subscriptions can be supplied
+
+| Platform | Official client | Plans Bee recognizes |
+| --- | --- | --- |
+| OpenAI | Codex CLI | Free, Go, Plus, Pro (including the Pro Lite and Pro Max tiers), Team, Business, Enterprise, Edu |
+| Claude | Claude Code | Pro, Max, Team, Enterprise |
+
+A plan takes work only when the marketplace has set a concurrency limit for it. Otherwise the account shows `plan_not_configured`. Bee reads the plan from the official client's login. You can't choose it.
+
+## What you earn
+
+- **Your price.** Every model has an official price: the vendor's own API price per million tokens, with separate prices for input, output and cached tokens. Your price is that official price times your **quote multiplier**. Keep the platform default, or set your own multiplier, between 0 and 10, on the **My Quote** page. Your multiplier applies to all models, and the page previews the resulting price of each one.
+- **The commission is not taken from you.** The platform adds its commission on top of your price when it charges the buyer. You receive your full price.
+- **When several accounts can serve a request, the cheaper one usually wins.** Accounts in good health come first, and a conversation stays on the account that started it. Among the rest, the lowest multiplier is picked first. A lower multiplier means more work, and a higher one means more per token.
+- **You are paid per verified execution.** An execution is settled only when it completed and its [execution receipt](../trust/execution-receipts.mdx) verified. Failed executions earn nothing and cost the buyer nothing. Each settled execution appears in the **Earnings** ledger on the **Balances and Ledger** page.
+- **Spending your earnings.** On the **Balances and Ledger** page, **Transfer earnings** moves them to your buyer balance, where they pay for your own API calls. The transfer is one-way. Cashing out directly is planned but not available yet.
+
+## Your own quota
+
+- Supplied work counts against the **same subscription quota** you use yourself. No part of it is reserved for you.
+- Bee keeps taking work until any of your quota windows (for example the five-hour or weekly window) is **100% used**. Then the account shows `quota_exhausted`, and supply resumes after the window resets.
+- To keep quota for yourself, pause supply while you work: `bee pause --platform openai` (or `claude`), then `bee resume` when you are done. Work already running finishes; no new work starts.
+- Each account runs at most a fixed number of requests at once, a limit the marketplace sets per plan. When it is reached, new requests wait or go to other providers (`concurrency_full`).
+
+## Usage that is billed beyond your subscription
+
+Your subscription is prepaid, but both vendors can also charge for usage beyond it:
+
+- **OpenAI:** a ChatGPT account can hold paid **credits**, which can be spent once the plan's limits are reached.
+- **Claude:** a subscription can have **extra usage** turned on, a prepaid balance billed at API prices once the plan's limits are reached.
+
+Bee stops taking work when a quota window is fully used. Requests that are already running near that boundary can still spill over into paid usage. **If you don't want to risk paying anything beyond your subscription, turn off extra usage (Claude) and keep no paid credits (OpenAI) on the account you supply.**
+
+Claude's **fast mode** is billed to extra usage from the first token. TokHive never sends a fast-mode request to your account: it runs every Claude request at the standard speed.
+
+## What runs through your machine
+
+- **Every upstream connection leaves from your own IP**, as it would when you use Codex or Claude Code yourself. Bee connects only to your Hive and to `chatgpt.com:443` or `api.anthropic.com:443`.
+- **Bee relays encrypted bytes** and can't read them. The prompts and responses of buyers are not visible to you or to anything else on your machine. See [Trust Model](../trust/trust-model.mdx).
+- **Network use** is the size of the buyers' requests and responses. Requests from coding agents carry the whole conversation and are often several hundred kilobytes each, so expect noticeable upload traffic while you supply. CPU and memory use are small.
+- The machine has to be awake and online while you want to supply.
+
+## Your login
+
+- Bee only reads the official client's login. Your access token leaves your machine only sealed to the TEE, and your refresh token stays in the official client's store. The one exception is Claude token refresh, which is off by default.
+- Hive can't open the sealed token. The TEE can use it only through a connection that your running Bee relays: **when Bee is stopped, no request can run on your account.**
+- You can keep using Codex or Claude Code on the same account while Bee supplies it.
+
+## Staying in control, and leaving
+
+| You want to | Do this |
+| --- | --- |
+| Pause one platform | `bee pause --platform PLATFORM`; `bee resume --platform PLATFORM` to continue. |
+| Stop supplying for now | Stop Bee. Hive stops sending work immediately, and there is no penalty. |
+| Stop supplying for good | Stop Bee and [uninstall it](./install.mdx#uninstall). Without a running Bee, the token it sealed can't be used, and it lapses when the access token expires. |
+| Supply a different account | Sign in to it in the official client and confirm the change with `bee confirm-account`. See [I switched accounts](./troubleshooting.mdx#i-switched-accounts-in-the-official-client). |
+
+The pairing itself stays on your TokHive account after you stop. You don't need to remove it, and a paired Bee that is not running takes no work.
+
+## Suspension by the marketplace
+
+The marketplace administrator can suspend supply from a provider, or from one of its platforms. A suspended account shows `banned` in `bee status` and on the **Bee Device** page, and takes no work until the suspension is lifted. Work already running finishes and is paid. Your earnings are not frozen: you can still transfer and spend them, and still buy as a Consumer.
+
+## Ready?
+
+[Install Bee](./install.mdx), then [run it for the first time](./first-run.mdx).
