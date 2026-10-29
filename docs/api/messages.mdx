@@ -3,24 +3,36 @@ sidebar_position: 5
 title: Messages
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Messages
 
 ```http
 POST /anthropic/v1/messages
-x-api-key: <your key>
-anthropic-version: 2023-06-01
-Content-Type: application/json
 ```
 
-Anthropic's native Messages API, served by Claude subscriptions. TokHive does not convert it: request and response are Anthropic's own format, streaming and non-streaming. Official SDKs and Claude Code work by pointing their base URL at `https://api.tokhive.ai/anthropic`.
+Anthropic's native Messages API, served by Claude subscriptions. Requests and responses are Anthropic's own format, unconverted, streaming and non-streaming. Point an official Anthropic SDK at `https://api.tokhive.ai/anthropic` and call it as usual.
+
+## Example
+
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
 
 ```sh
 curl https://api.tokhive.ai/anthropic/v1/messages \
   -H "x-api-key: $TOKHIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
-  -d '{"model":"claude-opus-5-5","max_tokens":64,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+  -d '{
+    "model": "claude-opus-5-5",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Reply with exactly OK."}]
+  }'
 ```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 ```python
 import anthropic
@@ -28,28 +40,92 @@ import anthropic
 client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=TOKHIVE_API_KEY)
 message = client.messages.create(
     model="claude-opus-5-5",
-    max_tokens=64,
+    max_tokens=1024,
     messages=[{"role": "user", "content": "Reply with exactly OK."}],
 )
+print(message.content[0].text)
 ```
 
-For Claude Code, set `ANTHROPIC_BASE_URL` to `https://api.tokhive.ai/anthropic` and `ANTHROPIC_AUTH_TOKEN` to your key, as in the [Quickstart](../quickstart.mdx).
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.TOKHIVE_API_KEY });
+const message = await client.messages.create({
+  model: "claude-opus-5-5",
+  max_tokens: 1024,
+  messages: [{ role: "user", content: "Reply with exactly OK." }],
+});
+console.log(message.content);
+```
+
+</TabItem>
+<TabItem value="claude-code" label="Claude Code">
+
+```sh
+export ANTHROPIC_BASE_URL=https://api.tokhive.ai/anthropic
+export ANTHROPIC_AUTH_TOKEN=$TOKHIVE_API_KEY
+claude
+```
+
+</TabItem>
+</Tabs>
+
+The response is Anthropic's `message` object (IDs shortened):
+
+```json
+{
+  "id": "msg_...",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-opus-5-5",
+  "content": [{ "type": "text", "text": "OK" }],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 4,
+    "service_tier": "standard"
+  }
+}
+```
 
 ## Request
 
-- `model`, a positive `max_tokens` and a non-empty `messages` are required. `anthropic-version` must be `2023-06-01`.
-- Other fields, such as `system`, `tools`, `thinking`, `metadata`, `output_config`, `temperature` and `context_management`, are passed through unchanged, as are `anthropic-beta` features.
-- In a stream, the final `message_stop` event is held back until the result is verified and settled. A non-streaming response is likewise returned only after verification.
+| Header | Notes |
+| --- | --- |
+| `x-api-key` or `Authorization: Bearer` | Your TokHive API key. |
+| `anthropic-version` | Required, and must be `2023-06-01`. The SDKs send it for you. |
+| `anthropic-beta` | Optional beta features, passed through. |
+
+| Field | Notes |
+| --- | --- |
+| `model` | Required. An ID from [`/anthropic/v1/models`](models.mdx#claude-models). |
+| `max_tokens` | Required, a positive integer. |
+| `messages` | Required, non-empty. |
+| `stream` | `true` for server-sent events. |
+| `speed` | Always served as `"standard"`; see [Fast mode is not offered](#fast-mode-is-not-offered). |
+| `system`, `tools`, `tool_choice`, `thinking`, `metadata`, `temperature`, `output_config`, `context_management` and other fields | Passed through unchanged. |
 
 ## Fast mode is not offered
 
-TokHive serves every Messages request at the **standard speed**. A request that asks for fast mode (`"speed": "fast"`, or any value other than `"standard"`) is quietly changed to `"speed": "standard"` before it is sent. It runs at the standard speed and is billed at the standard price. There is no error and no extra marker in the response. A request without `speed` is sent as it is.
+TokHive serves every Messages request at the **standard speed**. A request that asks for fast mode, with `"speed": "fast"` or any value other than `"standard"`, is quietly changed to `"speed": "standard"` before it is sent. It runs at the standard speed and is billed at the standard price. There is no error and no extra marker in the response. A request without `speed` is sent as it is.
 
 This is because, on a Claude subscription, fast mode does not use the plan's quota. It is billed from the first token to the provider's prepaid extra usage, at the API's premium price, which TokHive does not price. If your client has fast mode switched on, for example with `/fast` in Claude Code, it keeps working, just at the standard speed.
 
+## Streaming
+
+With `"stream": true`, events arrive as Anthropic sends them: `message_start`, the content block events, `message_delta` and `message_stop`, with `ping` in between. TokHive holds back the final `message_stop` event until the result is verified and settled, so it can arrive a moment after the last content. A non-streaming response is likewise returned only after verification.
+
+If a stream fails after output has started, it ends with an `error` event, and nothing is charged.
+
 ## Usage and billing
 
-Claude's `input_tokens` counts uncached input only. TokHive bills each kind of token at its own price:
+Claude's `input_tokens` counts uncached input only. Each kind of token is billed at its own price:
 
 | Usage field | Billed as |
 | --- | --- |
@@ -57,13 +133,16 @@ Claude's `input_tokens` counts uncached input only. TokHive bills each kind of t
 | `cache_read_input_tokens` | Cache read |
 | `cache_creation.ephemeral_5m_input_tokens` | 5-minute cache write |
 | `cache_creation.ephemeral_1h_input_tokens` | 1-hour cache write |
-| `output_tokens` | Output |
+| `output_tokens` | Output, including thinking |
 
 ## Conversations
 
-A conversation keeps to the provider account that served it, which keeps the upstream prompt cache warm. TokHive recognizes the conversation from the `x-claude-code-session-id` header or from the session in `metadata.user_id`. If both are present, they must agree. Session identifiers are replaced with a digest scoped to you before they reach the upstream.
+A conversation keeps to the provider account that served it, which keeps the upstream prompt cache warm. TokHive recognizes the conversation from the `x-claude-code-session-id` header, or from the session in `metadata.user_id`. If both are present, they must agree. Session identifiers are replaced with a digest scoped to you before they reach the upstream.
 
-Plain text, client tool calls and their results, and inline base64 images can continue on another account when the original one is unavailable. Thinking signatures, file references, remote image URLs, containers and unknown content blocks only make sense on the original account. If that account is unavailable, such a call returns `409 session_context_unavailable`. With a `Retry-After` header, the same history can continue later. Without one, start a new conversation.
+When the original account is unavailable:
+
+- Plain text, client tool calls and their results, and inline base64 images can continue on another account.
+- Thinking signatures, file references, remote image URLs, containers and unknown content blocks only make sense on the original account, so the call returns `409 session_context_unavailable`. With a `Retry-After` header, the same history can continue later; without one, start a new conversation.
 
 ## Token counting
 
@@ -71,8 +150,51 @@ Plain text, client tool calls and their results, and inline base64 images can co
 POST /anthropic/v1/messages/count_tokens
 ```
 
-Returns `{"input_tokens": N}` as counted by the upstream itself, because Anthropic does not publish the tokenizer of current models. The body is the same as for Messages, but without `stream` and `max_tokens` is not required.
+Counts the input tokens of a Messages request, as the upstream counts them. Anthropic does not publish the tokenizer of current models, so TokHive does not estimate locally. The body is the same as for Messages, without `stream`; `max_tokens` is not required.
 
-- **Free.** Counting is never charged, but it does need a positive balance and counts toward your key's concurrency limit.
-- Counting does not affect which account later Messages calls use.
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
+
+```sh
+curl https://api.tokhive.ai/anthropic/v1/messages/count_tokens \
+  -H "x-api-key: $TOKHIVE_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-opus-5-5",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+count = client.messages.count_tokens(
+    model="claude-opus-5-5",
+    messages=[{"role": "user", "content": "Hello"}],
+)
+print(count.input_tokens)
+```
+
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+const count = await client.messages.countTokens({
+  model: "claude-opus-5-5",
+  messages: [{ role: "user", content: "Hello" }],
+});
+console.log(count.input_tokens);
+```
+
+</TabItem>
+</Tabs>
+
+```json
+{ "input_tokens": 8 }
+```
+
+- **Free.** Counting is never charged, but it needs a positive balance and counts toward your key's concurrency limit.
+- Counting does not influence which account later Messages calls use.
 - When the upstream rejects the request (`400`, `413` or `422`), its error is passed through. Other failures return `502`.
