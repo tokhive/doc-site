@@ -105,7 +105,7 @@ Bee supplies the login of the official client. When that login expires and nobod
 
 ## Keep the software current
 
-- **Official clients.** Bee asks for the models of the Codex version you have installed. An old Codex doesn't know newer models, so they are not supplied. Update it from time to time with `npm install -g @openai/codex@latest`, and run it once. Keep Claude Code current as well.
+- **Official clients.** Bee asks for the models of the Codex version you have installed. An old Codex doesn't know newer models, so they are not supplied. Update it from time to time, the way you installed it (`npm install -g @openai/codex@latest` or `brew upgrade --cask codex`), and run it once. Keep Claude Code current as well: the native installer updates itself, and `claude update` updates on demand.
 - **Bee.** Bee does not update itself. Check the [releases page](https://github.com/tokhive/bee/releases) or `bee version`; the **Bee Device** page shows which version is connected. To upgrade, run the install script again, then restart Bee: the service or LaunchAgent command above, or stop `bee start` with Ctrl-C and run it again. A Bee that Hive has outgrown reports `BEE-EGRESS-METADATA`; upgrade then.
 
 ## Routine checks

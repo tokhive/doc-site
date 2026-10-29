@@ -18,12 +18,23 @@ Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) w
 
 Bee supplies the subscription that the official client is signed in to, on the same machine and **as the same system user that will run Bee**. Install the client of each subscription you want to supply, and sign in with that subscription:
 
-| Subscription | Official client | Install | Sign in |
-| --- | --- | --- | --- |
-| ChatGPT (OpenAI) | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | `codex login` |
-| Claude | [Claude Code](https://github.com/anthropics/claude-code) | `npm install -g @anthropic-ai/claude-code` | `claude`, then sign in with your Claude subscription |
+**ChatGPT (OpenAI): [Codex CLI](https://github.com/openai/codex)**
 
-On a server without a browser, both clients offer a sign-in flow that you complete on another device. Check that it worked with a short request, for example `codex exec "say hi"`, or by asking Claude Code something.
+```sh
+npm install -g @openai/codex        # or: brew install --cask codex
+codex login                         # choose "Sign in with ChatGPT"
+```
+
+**Claude: [Claude Code](https://github.com/anthropics/claude-code)**
+
+```sh
+curl -fsSL https://claude.ai/install.sh | bash   # or: brew install --cask claude-code
+claude                                           # then sign in with your Claude subscription
+```
+
+Claude Code's npm package is deprecated; use the native installer or Homebrew.
+
+On a server without a browser, run `codex login --device-auth` and complete the sign-in on another device. Claude Code shows a sign-in link that you can open on another device. Check that it worked with a short request, for example `codex exec "say hi"`, or by asking Claude Code something.
 
 ## 3. Install Bee and start it
 
