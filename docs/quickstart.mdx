@@ -7,7 +7,7 @@ slug: /quickstart
 
 This page gets you from zero to your first call through TokHive in a few minutes. If you have an idle ChatGPT or Claude subscription, [Supply your subscription](#supply-your-subscription) shows how to earn from it.
 
-TokHive's console is at `https://dev.tokhive.ai`, and its API at `https://api.tokhive.ai`.
+TokHive's console is at `https://console.tokhive.ai`, and its API at `https://api.tokhive.ai`.
 
 ## Use TokHive
 
@@ -15,7 +15,7 @@ You can use any machine that runs an OpenAI or Anthropic client.
 
 ### 1. Create an account
 
-Register at [dev.tokhive.ai/register](https://dev.tokhive.ai/register) with an email address and a password of at least 10 characters.
+Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) with an email address and a password of at least 10 characters.
 
 ### 2. Create an API key
 
@@ -30,10 +30,6 @@ export TOKHIVE_API_KEY=hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 A new account has a balance of 0, and every inference request returns `402 insufficient_balance` until you add funds.
 
 Open **Balances and Ledger** and click **Deposit**. Choose a network and a stablecoin, and TokHive gives you a deposit address that is permanently yours on that network. Send the stablecoin to that address from your wallet; it is credited automatically after the network's confirmations, usually within a few minutes. The amount is credited as US dollars, and your deposits are listed under **Deposits** in the ledger.
-
-:::note[Test network]
-`dev.tokhive.ai` accepts the test stablecoin **USDT0** on **Conflux eSpace Testnet** (chain ID `71`, RPC `https://evmtestnet.confluxrpc.com`). You need a little test CFX for gas, from the faucet linked in the [Conflux documentation](https://doc.confluxnetwork.org/docs/espace/UserGuide).
-:::
 
 ### 4. Point your client at TokHive
 
@@ -127,7 +123,7 @@ If your ChatGPT or Claude subscription has quota you don't use, you can supply i
 3. Start it, then confirm the pairing link it prints in your browser and choose the subscriptions to supply:
 
    ```sh
-   bee start --hive https://dev.tokhive.ai
+   bee start --hive https://console.tokhive.ai
    ```
 
 When Bee prints `ready: taking new work`, you are supplying. Your earnings show up in **Balances and Ledger**, where you can also transfer them to your balance and spend them on your own calls.
