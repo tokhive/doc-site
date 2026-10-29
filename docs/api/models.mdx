@@ -1,0 +1,44 @@
+---
+sidebar_position: 2
+title: Models
+---
+
+# Models
+
+## OpenAI models
+
+```http
+GET /v1/models
+GET /v1/models/{id}
+Authorization: Bearer <your key>
+```
+
+Lists the OpenAI models you can call through [Responses](responses.mdx) and [Chat Completions](chat-completions.mdx), in OpenAI's list format. A model is listed when it is enabled, fully priced, and at least one online provider offers it. Momentary conditions, such as a full account or a short rate limit, do not remove a model from the list. Retrieving a model that is not in the list, including a Claude model, returns `404 model_not_found`.
+
+```sh
+curl https://api.tokhive.ai/v1/models \
+  -H "Authorization: Bearer $TOKHIVE_API_KEY"
+```
+
+### Codex model catalog
+
+```http
+GET /v1/codex/models
+```
+
+The model catalog Codex reads through `model_catalog_url` in its config. TokHive fetches it from the upstream for your Codex version and keeps only the models in `/v1/models`. It returns `404 codex_catalog_unavailable` when no catalog is available yet. The console's Codex setup guide fills this in for you.
+
+## Claude models
+
+```http
+GET /anthropic/v1/models
+GET /anthropic/v1/models/{id}
+x-api-key: <your key>
+```
+
+Lists the Claude models you can call through [Messages](messages.mdx), in Anthropic's list format. Each entry has `type`, `id`, `display_name` and `created_at`, and `has_more` is always `false`. The rules for being listed are the same as for `/v1/models`. Retrieving a model that is not in the list returns `404`.
+
+```sh
+curl https://api.tokhive.ai/anthropic/v1/models \
+  -H "x-api-key: $TOKHIVE_API_KEY"
+```

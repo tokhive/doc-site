@@ -1,0 +1,8 @@
+{
+  "label": "API",
+  "position": 5.5,
+  "link": {
+    "type": "generated-index",
+    "description": "The OpenAI- and Anthropic-compatible endpoints TokHive serves to buyers: authentication, models, Responses, Chat Completions and Messages."
+  }
+}

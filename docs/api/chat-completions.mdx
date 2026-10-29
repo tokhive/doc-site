@@ -1,0 +1,39 @@
+---
+sidebar_position: 4
+title: Chat Completions
+---
+
+# Chat Completions
+
+```http
+POST /v1/chat/completions
+Authorization: Bearer <your key>
+Content-Type: application/json
+```
+
+OpenAI's Chat Completions format, for clients that do not speak Responses yet. TokHive converts the request to [Responses](responses.mdx) and converts the result back into a `chat.completion` object or a stream of chunks. Supply, verification and billing are those of Responses.
+
+```sh
+curl https://api.tokhive.ai/v1/chat/completions \
+  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+```
+
+`model` and a non-empty `messages` are required. Only OpenAI models are accepted; a Claude model returns `400 wrong_protocol`. `"stream": true` returns chunks as server-sent events, and otherwise a single JSON object is returned.
+
+## What is converted
+
+| Chat input | Behavior |
+| --- | --- |
+| `system`, `developer`, `user`, `assistant` messages | Converted; text and inline user images are supported. `system` is sent as `developer`. |
+| `tool_calls` and `tool` results | Converted to function calls and their outputs. Keep each call with its result when continuing. |
+| `functions`, `function_call`, `function` messages | The legacy function format is converted too. |
+| `tools`, `tool_choice` | Function tools are supported; other tool types are refused. |
+| `response_format` | `json_object` and `json_schema` are supported. |
+| `reasoning_effort` | Sets the reasoning effort; the reasoning summary comes back in the extension field `reasoning_content`. |
+| `parallel_tool_calls`, `service_tier` | Passed through. |
+| Images | Inline base64 data URLs only (PNG, JPEG, GIF, WebP). Remote image URLs are refused. |
+| `temperature`, `top_p`, `max_tokens`, `stop`, `n`, `logprobs`, `user`, penalties, `metadata` and the like | Not supported, and silently dropped. Don't rely on them. |
+
+Chat requests carry no conversation identity, so TokHive does not keep history between calls: send the full conversation every time.

@@ -1,0 +1,67 @@
+---
+sidebar_position: 1
+title: API Overview
+---
+
+# API Overview
+
+TokHive serves two API families from one host. Each prefix imitates one vendor's API, including its request format, response format and error shape:
+
+| Prefix | Imitates | Endpoints |
+| --- | --- | --- |
+| `/v1` | OpenAI | [Models](models.mdx), [Responses](responses.mdx), [Chat Completions](chat-completions.mdx) |
+| `/anthropic/v1` | Anthropic | [Models](models.mdx), [Messages and token counting](messages.mdx) |
+
+The base URL is `https://api.tokhive.ai`. Point an OpenAI client at `https://api.tokhive.ai/v1` and an Anthropic client at `https://api.tokhive.ai/anthropic`. Paths that TokHive does not serve return `404` in the error format of their prefix.
+
+Which models each prefix offers depends on the model's native protocol. OpenAI models are served through Responses (`/v1`), and Claude models through Messages (`/anthropic/v1`). TokHive does not convert between the two. Sending a model to the other family's endpoint returns `400 wrong_protocol`, and the message names the right path.
+
+## Authentication
+
+Create an API key in the console under **API Keys**. The full key is shown only once, when you create it. Send it with every request:
+
+- `/v1` endpoints: `Authorization: Bearer <your key>`.
+- `/anthropic/v1` endpoints: `x-api-key: <your key>` or `Authorization: Bearer <your key>`. If you send both, they must be the same key.
+
+A revoked key is refused immediately. Requests it already started still finish and are charged. A browser session cannot stand in for an API key.
+
+## Billing
+
+- Every call needs a positive balance. TokHive does not reserve or freeze funds, so a request that is already running is not stopped if your balance drops below zero while it runs. When the balance is zero or negative, new requests get `402`.
+- You pay per token, at the price of the provider that served the request. The current prices are in the console.
+- You are charged only for a response that completed and whose [execution receipt](../trust/execution-receipts.mdx) verified. A failed or interrupted request costs nothing.
+- [Token counting](messages.mdx#token-counting) is free.
+
+## Limits
+
+- Request bodies are limited to 8 MiB. Compressed request bodies are refused.
+- Each API key may run 20 requests at the same time. More return `429 concurrency_limit` with `Retry-After: 1`.
+- A request may fall back to another provider if the first one fails before sending any output. Once output has started, it is never spliced with another provider's.
+
+## Errors
+
+Errors use the shape of the prefix:
+
+```json
+// /v1
+{"error": {"code": "no_supply", "message": "...", "type": "..."}}
+
+// /anthropic/v1
+{"type": "error", "error": {"type": "...", "message": "..."}}
+```
+
+Common cases:
+
+| Status | Code | Meaning |
+| --- | --- | --- |
+| `400` | `model_not_found` | The model is not in TokHive's catalog. Pick one from the models list. |
+| `400` | `wrong_protocol` | The model belongs to the other API family; the message names the right path. |
+| `400` | `invalid_request` | The body is not a valid request for this endpoint. |
+| `401` | `invalid_api_key` | The key is missing, malformed, revoked, or two different keys were sent. |
+| `402` | `insufficient_balance` | Your balance is zero or negative. |
+| `409` | `session_context_unavailable` | The conversation's history can only continue on the account that served it, and that account is unavailable. A `Retry-After` header means the same history can continue later. |
+| `429` | `concurrency_limit` | Too many requests at once on this key. Retry after the `Retry-After` header. |
+| `503` | `no_supply` | No provider can serve this model right now. When accounts are only busy or briefly rate limited, `Retry-After` says when to retry. |
+| `502` | various | The request failed upstream or its result could not be verified. You are not charged. |
+
+When the upstream rejects your own request, for example `prompt is too long`, its error type and message are passed through so clients can react, for instance by compacting the context. Other upstream error details are not passed on.
