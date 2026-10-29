@@ -1,0 +1,139 @@
+---
+sidebar_position: 3.5
+title: Operations
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Operations
+
+Once Bee is supplying, there are four things to look after: keeping it online, keeping your logins valid, keeping the software current, and the occasional check. Bee does not alert you when something stops, so the [routine checks](#routine-checks) matter.
+
+## Keep Bee online
+
+Bee only takes work while it runs on an awake, connected machine. It reconnects by itself after network drops, with a backoff of 1 to 30 seconds.
+
+<Tabs groupId="os">
+<TabItem value="macos" label="macOS">
+
+### macOS
+
+The simplest way is to keep `bee start` running in a terminal. To keep Bee running without a terminal, and to have it start again when you log in, install a LaunchAgent. Bee has no installer-managed service on macOS.
+
+1. Save the following as `~/Library/LaunchAgents/ai.tokhive.bee.plist`. Replace `/Users/you` with your home directory. `PATH` must include the directory of `codex`, because Bee asks it for its version (`which codex` shows it).
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+   <plist version="1.0">
+   <dict>
+     <key>Label</key>
+     <string>ai.tokhive.bee</string>
+     <key>ProgramArguments</key>
+     <array>
+       <string>/Users/you/.local/bin/bee</string>
+       <string>run</string>
+     </array>
+     <key>EnvironmentVariables</key>
+     <dict>
+       <key>PATH</key>
+       <string>/Users/you/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+     </dict>
+     <key>RunAtLoad</key>
+     <true/>
+     <key>KeepAlive</key>
+     <dict>
+       <key>SuccessfulExit</key>
+       <false/>
+     </dict>
+     <key>ThrottleInterval</key>
+     <integer>10</integer>
+     <key>StandardOutPath</key>
+     <string>/Users/you/Library/Logs/tokhive-bee.log</string>
+     <key>StandardErrorPath</key>
+     <string>/Users/you/Library/Logs/tokhive-bee.log</string>
+   </dict>
+   </plist>
+   ```
+
+   Bee is restarted if it fails, but not after a normal exit. A normal exit includes being replaced by a new device.
+
+2. Stop any `bee start` running in a terminal, because only one Bee can use the configuration at a time. Then load the agent:
+
+   ```sh
+   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.tokhive.bee.plist
+   ```
+
+| Task | Command |
+| --- | --- |
+| Restart (for example after an upgrade) | `launchctl kickstart -k gui/$(id -u)/ai.tokhive.bee` |
+| Stop and stop starting at login | `launchctl bootout gui/$(id -u)/ai.tokhive.bee` |
+| Logs | `tail -f ~/Library/Logs/tokhive-bee.log` |
+
+The agent runs only while you are logged in, which is also when the macOS Keychain, holding Claude Code's login, is unlocked.
+
+**Sleep.** A sleeping Mac takes no work. Keep it awake while supplying: on a power adapter, turn on **System Settings › Battery › Options › Prevent automatic sleeping on power adapter when the display is off**. Or run Bee under `caffeinate -i bee start`, which keeps the Mac awake while Bee runs. A laptop with its lid closed still sleeps unless it is connected to an external display and power.
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+
+### Linux
+
+The installer's `tokhive-bee` system service runs Bee in the background, as the installing user. It starts after a reboot and restarts after a failure.
+
+| Task | Command |
+| --- | --- |
+| Status | `sudo systemctl status tokhive-bee`, or `bee status` |
+| Restart (for example after an upgrade) | `sudo systemctl restart tokhive-bee` |
+| Stop / start | `sudo systemctl stop tokhive-bee` / `sudo systemctl start tokhive-bee` |
+| Don't start after reboot | `sudo systemctl disable tokhive-bee` |
+| Logs | `sudo journalctl -u tokhive-bee -f` |
+
+Environment variables the service needs, such as a proxy, go in `sudo systemctl edit tokhive-bee`. Without systemd, run `bee start` under a process supervisor, or in a `tmux` session.
+
+</TabItem>
+</Tabs>
+
+## Keep your logins valid
+
+Bee supplies the login of the official client. When that login expires and nobody renews it, the account stops taking work and shows `codex_source_unavailable` or `claude_source_unavailable`.
+
+- **Codex.** Codex keeps its login in `auth.json` by default, and Bee renews it there by itself. If you configured Codex to keep it in the macOS Keychain (`cli_auth_credentials_store = "keyring"`), Bee can read it but not renew it. Use Codex from time to time, or switch it back to `"file"` and sign in again.
+- **Claude.** By default, Bee only uses tokens that Claude Code has renewed itself. **If you don't use Claude Code regularly, the Claude account stops when its token expires.** On a machine that supplies around the clock, let Bee renew the token: set `"refresh": true` in the `claude` section of `egress.json` (see [Configuration](./configuration.mdx#claude)). A running Bee picks the change up. If Bee and Claude Code then renew at the same moment, Claude Code may, rarely, ask you to sign in once more.
+- **Sign-in rejected.** `codex_authorization_rejected` or `claude_authorization_rejected` means the vendor no longer accepts the login. Sign in again in the official client; a running Bee picks it up.
+
+## Keep the software current
+
+- **Official clients.** Bee asks for the models of the Codex version you have installed. An old Codex doesn't know newer models, so they are not supplied. Update it from time to time, the way you installed it (`npm install -g @openai/codex@latest` or `brew upgrade --cask codex`), and run it once. Keep Claude Code current as well: the native installer updates itself, and `claude update` updates on demand.
+- **Bee.** Bee does not update itself. Check the [releases page](https://github.com/tokhive/bee/releases) or `bee version`; the **Bee Device** page shows which version is connected. To upgrade, run the install script again, then restart Bee: the service or LaunchAgent command above, or stop `bee start` with Ctrl-C and run it again. A Bee that Hive has outgrown reports `BEE-EGRESS-METADATA`; upgrade then.
+
+## Routine checks
+
+Bee does not notify you when it goes offline or an account stops, so look in now and then:
+
+| How often | Check |
+| --- | --- |
+| Daily, or after a restart | `bee status`: each account should say **taking new work**. Or look at the **Bee Device** page. |
+| Weekly | The **Earnings** ledger on **Balances and Ledger**, and your price on **My Quote**. |
+| After an OS, client or network change | `bee doctor`, which checks everything in order and suggests fixes. |
+
+For your own monitoring, `BEE_METRICS_ADDR=127.0.0.1:9464` makes Bee serve Prometheus metrics on that address.
+
+## Everyday changes
+
+| You want to | Do this |
+| --- | --- |
+| Use your quota yourself for a while | `bee pause --platform openai` (or `claude`), later `bee resume --platform openai`. |
+| Add or remove a platform | Stop Bee, run `bee setup`, start Bee again. |
+| Supply a different account | Sign in to it in the official client, then `bee confirm-account`. See [I switched accounts](./troubleshooting.mdx#i-switched-accounts-in-the-official-client). |
+| Move to another machine | Install Bee there and run `bee start`; confirm that it replaces the old device. See [Moving to another machine](./first-run.mdx#moving-to-another-machine). |
+| Use a proxy | `bee setup --connect-proxy http://127.0.0.1:PORT`. See [Network and proxy](./troubleshooting.mdx#network-and-proxy). |
+
+## Things to watch out for
+
+- Run Bee as **the same system user** that is signed in to the official clients.
+- Run **one Bee per TokHive account**, and one process per configuration. A second `bee start` on the same configuration is refused.
+- **Don't delete `bee.json`** to fix a problem. It holds your pairing. Run `bee start` again instead.
+- Keep `bee.json` private. Logs contain no tokens or prompts, but they do contain account fingerprints and your Hive address, so review them before sharing.
+- Changing the official client's login (signing out, switching accounts, moving its directory) affects supply. Check `bee status` afterwards.

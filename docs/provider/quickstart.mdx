@@ -1,0 +1,98 @@
+---
+sidebar_position: 1.7
+title: Provider Quickstart
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Provider Quickstart
+
+From nothing to supplying, in four steps. It takes about ten minutes. If you haven't yet, read [Before You Supply](./before-you-supply.mdx) first.
+
+## 1. Create a TokHive account
+
+Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) with an email address and a password of at least 10 characters. The same account is used for supplying and for buying.
+
+## 2. Install and sign in to the official client
+
+Bee supplies the subscription that the official client is signed in to, on the same machine and **as the same system user that will run Bee**. Install the client of each subscription you want to supply, and sign in with that subscription:
+
+**ChatGPT (OpenAI): [Codex CLI](https://github.com/openai/codex)**
+
+```sh
+npm install -g @openai/codex        # or: brew install --cask codex
+codex login                         # choose "Sign in with ChatGPT"
+```
+
+**Claude: [Claude Code](https://github.com/anthropics/claude-code)**
+
+```sh
+curl -fsSL https://claude.ai/install.sh | bash   # or: brew install --cask claude-code
+claude                                           # then sign in with your Claude subscription
+```
+
+Claude Code's npm package is deprecated; use the native installer or Homebrew.
+
+On a server without a browser, run `codex login --device-auth` and complete the sign-in on another device. Claude Code shows a sign-in link that you can open on another device. Check that it worked with a short request, for example `codex exec "say hi"`, or by asking Claude Code something.
+
+## 3. Install Bee and start it
+
+The console's **Bee Device** page shows these commands with your Hive address filled in.
+
+<Tabs groupId="os">
+<TabItem value="macos" label="macOS">
+
+Install Bee:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
+```
+
+Then start it:
+
+```sh
+bee start --hive https://console.tokhive.ai
+```
+
+`bee start` pairs the machine, asks which signed-in accounts to supply, and then runs in the foreground. While it runs, leave the terminal open. To keep Bee running without a terminal, and across logouts and restarts, see [Keep Bee running on macOS](./operations.mdx#macos).
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+
+Run the installer as the user who signed in to the official clients. Don't put the whole command under `sudo`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tokhive/bee/main/install.sh | sh
+```
+
+Answer **yes** to **Set up and start Bee now?**, enter `https://console.tokhive.ai` as the Hive address, and follow the three steps. The installer pairs the machine, asks which accounts to supply, and starts the `tokhive-bee` system service, which also starts after a reboot. It asks for your password only to manage the service.
+
+Without systemd, install the binary only with `BEE_INSTALL_SERVICE=0`, then run `bee start --hive https://console.tokhive.ai` in the foreground.
+
+</TabItem>
+</Tabs>
+
+### Confirm the pairing
+
+Bee prints a pairing link and a short code. Open the link in any browser where you are signed in to TokHive, check the device name, and confirm. The code is valid for 10 minutes.
+
+## 4. Check that it takes work
+
+```sh
+bee status
+```
+
+```text
+Supply:  openai, claude (egress.json)
+  openai  taking new work
+  claude  taking new work
+```
+
+**taking new work** means you are supplying. If an account shows a reason instead, look it up in [Why an account is not taking work](./troubleshooting.mdx#why-an-account-is-not-taking-work). The console's **Bee Device** page shows the same status.
+
+## Next
+
+- [Operations](./operations.mdx): keep Bee online, keep your logins valid, update, and the routine checks.
+- [My Quote](./before-you-supply.mdx#what-you-earn): set your price, or keep the default.
+- [Troubleshooting](./troubleshooting.mdx), if something doesn't work.
