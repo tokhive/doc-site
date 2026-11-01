@@ -33,7 +33,7 @@ If `~/.local/bin` is not on your `PATH`, add it to your shell profile, or call B
 | `BEE_INSTALL_DIR` | Install somewhere other than `~/.local/bin`. |
 | `BEE_INSTALL_SERVICE` | Linux defaults to `1`, enabling the system service. Set `0` for binary-only installation, including systems without systemd or administrator access. |
 | `BEE_INSTALL_INTERACTIVE` | Defaults to `1`. Set `0` to skip the setup prompts, for example in unattended installation. |
-| `BEE_LANG` | `zh` for Simplified Chinese or `en` for English, skipping the language question. |
+| `BEE_LANG` | `zh` for Simplified Chinese or `en` for English. Unset uses English. |
 | `NO_COLOR` | Set to a nonempty value to disable terminal colors. |
 
 Pass them to `sh`, for example:
@@ -49,7 +49,7 @@ If Hive has deleted or replaced this device and rejects its previous pairing, th
 
 The steps are labeled **1/3 device pairing**, **2/3 supplied accounts**, and **3/3 background startup**. Existing configuration reduces the questions you need to answer, while the completed flow still reaches step 3/3 and shows the final service state. Separators, icons and colors make each stage visible. Redirected output or `TERM=dumb` uses plain text; `NO_COLOR=1` disables colors.
 
-Set `BEE_LANG=zh` or `BEE_LANG=en` to skip the language menu. Without a terminal, the default follows the first nonempty `LC_ALL`, `LC_MESSAGES`, or `LANG`: `zh` locales use Chinese, all others use English. `bee login` and `bee setup` also recognize `BEE_LANG`. Full bilingual pairing and account selection require a Bee release containing this support; older releases retain their original command output. The choice applies to the current installation and is not stored in the service configuration.
+Installation, `bee login`, `bee setup`, and the management menu use English when `BEE_LANG` is unset, including on a Chinese locale and without a terminal. Set `BEE_LANG=zh` for Chinese or `BEE_LANG=en` for English. Full bilingual pairing and account selection require a Bee release containing this support; older releases retain their original command output. The choice applies to the current run and is not stored in the service configuration.
 
 You can decline or set `BEE_INSTALL_INTERACTIVE=0`. Without an interactive terminal, the wizard is skipped automatically. Automatic startup is still enabled, and the installer prints manual commands with your actual paths. With the default configuration paths:
 
@@ -117,7 +117,7 @@ Run `bee` without arguments in a terminal:
 bee
 ```
 
-Choose **简体中文 / English**, then select **Start Bee**, **Status**, **Device pairing**, **Supplied accounts**, **Background service**, **Logs and diagnostics**, **Advanced options**, **Help and version**, or **Change language**. These groups cover all existing Bee command capabilities. Use `0` to return directly from a submenu, or to exit from the main menu. Exiting the menu leaves the background service running.
+The menu opens in **English** without a language-selection prompt, regardless of the system locale. Select **Start Bee**, **Status**, **Device pairing**, **Supplied accounts**, **Background service**, **Logs and diagnostics**, **Advanced options**, **Help and version**, or **Change language**. These groups cover all existing Bee command capabilities. Use `0` to return directly from a submenu, or to exit from the main menu. Exiting the menu leaves the background service running.
 
 **Start Bee** checks the configuration, opens pairing or account selection when something is missing, and then starts Bee: the installer's service on Linux, or in the foreground on macOS. Foreground operation occupies the terminal; closing it or pressing Ctrl-C stops Bee.
 
@@ -134,7 +134,7 @@ Under **Supplied accounts**, query registered accounts and supply status indepen
 
 **Advanced options** changes paths only for the current menu session. Changing the device file resets the associated supply path and service target. A custom supply file applies to account setup, direct foreground run and diagnostics. Start Bee and status always use `egress.json` beside the device file. These paths do not rewrite an installed service or bypass service matching. **Logs and diagnostics** can display the complete diagnostic JSON. **Help and version** works without pairing or networking and includes each command's original parameter reference.
 
-`BEE_LANG=zh` or `BEE_LANG=en` skips the initial language question. Language can also be changed inside the menu and only affects that session. Confirmations use **1) Confirm / 0) Cancel**, with cancellation as the default. Known errors and recovery steps follow the selected language. HTTP statuses and error codes stay visible; unfamiliar external errors and service logs are labeled as original technical details. Compact pages use status icons and colors; `NO_COLOR=1` disables colors, and `TERM=dumb` uses plain text.
+Set `BEE_LANG=zh` for Chinese or `BEE_LANG=en` for English. **Change language** affects only the current session. Confirmations use **1) Confirm / 0) Cancel**, with cancellation as the default. Known errors and recovery steps follow the selected language. HTTP statuses and error codes stay visible; unfamiliar external errors and service logs are labeled as original technical details. Compact pages use status icons and colors; `NO_COLOR=1` disables colors, and `TERM=dumb` uses plain text.
 
 Linux service controls apply only to the installer's system service for the same user, executable and configuration. Custom units, drop-ins, or a different binary/configuration path require manual management. **Start/stop** controls Bee now; **enable/disable boot startup** controls the next reboot. Saving account choices is separate from applying them: a running service loads the changes only after you confirm a restart. The status view distinguishes service activity, account authorization and readiness to take work.
 
