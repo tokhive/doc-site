@@ -2,3 +2,8 @@ announcements:
   label: Announcements
   permalink: /announcements
   description: Product launches and updates from TokHive.
+
+research:
+  label: Research
+  permalink: /research
+  description: Research perspectives on AI inference, verification, and trust from TokHive.
