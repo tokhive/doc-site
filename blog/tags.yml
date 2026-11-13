@@ -7,3 +7,8 @@ research:
   label: Research
   permalink: /research
   description: Research perspectives on AI inference, verification, and trust from TokHive.
+
+guides:
+  label: Guides
+  permalink: /guides
+  description: Practical explainers on AI subscriptions, quotas, and API access.

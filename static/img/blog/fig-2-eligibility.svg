@@ -1,0 +1,33 @@
+<svg viewBox="0 0 680 390" width="100%" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Sora, system-ui, -apple-system, Segoe UI, sans-serif">
+<title>Who actually gets credits</title>
+<desc>Eligible plans and monthly credit amounts for OpenAI and Claude, plus the plans that receive nothing.</desc>
+<rect x="0" y="0" width="680" height="390" rx="14" fill="#141517" stroke="#34373a" stroke-width="0.5"/>
+<text x="40" y="45" font-size="15" font-weight="500" fill="#f2f2ee">Who actually gets credits</text>
+<text x="40" y="68" font-size="12" fill="#b4b6b0">Both require an active paid plan at least 7 days old</text>
+<rect x="40" y="95" width="290" height="215" rx="12" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="60" y="123" font-size="14" font-weight="500" fill="#f2f2ee">OpenAI</text>
+<text x="60" y="145" font-size="12" fill="#b4b6b0">eligible</text>
+<text x="60" y="172" font-size="13" fill="#e6e7e2">Pro 100 / 200 / 500</text>
+<text x="310" y="172" font-size="13" text-anchor="end" fill="#c8f031">$100 / $200 / $500</text>
+<text x="60" y="196" font-size="13" fill="#e6e7e2">Business seats</text>
+<text x="310" y="196" font-size="13" text-anchor="end" fill="#c8f031">$20 / $100 per seat</text>
+<text x="60" y="220" font-size="13" fill="#e6e7e2">Workspace cap</text>
+<text x="310" y="220" font-size="13" text-anchor="end" fill="#c8f031">$500 per month</text>
+<line x1="60" y1="240" x2="310" y2="240" stroke="#34373a" stroke-width="0.5"/>
+<text x="60" y="262" font-size="12" fill="#b4b6b0">not eligible</text>
+<text x="60" y="286" font-size="12" fill="#b4b6b0">Plus, Go, Free, trials, Enterprise, Edu</text>
+<rect x="350" y="95" width="290" height="215" rx="12" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="370" y="123" font-size="14" font-weight="500" fill="#f2f2ee">Claude</text>
+<text x="370" y="145" font-size="12" fill="#b4b6b0">eligible</text>
+<text x="370" y="172" font-size="13" fill="#e6e7e2">Max</text>
+<text x="620" y="172" font-size="13" text-anchor="end" fill="#c8f031">$100</text>
+<text x="370" y="196" font-size="13" fill="#e6e7e2">Ultra</text>
+<text x="620" y="196" font-size="13" text-anchor="end" fill="#c8f031">$200</text>
+<text x="370" y="220" font-size="13" fill="#e6e7e2">Team seats (cap $500)</text>
+<text x="620" y="220" font-size="13" text-anchor="end" fill="#c8f031">$20 / $100 per seat</text>
+<line x1="370" y1="240" x2="620" y2="240" stroke="#34373a" stroke-width="0.5"/>
+<text x="370" y="262" font-size="12" fill="#b4b6b0">not eligible</text>
+<text x="370" y="286" font-size="12" fill="#b4b6b0">Free, Pro, Enterprise</text>
+<rect x="40" y="326" width="600" height="36" rx="8" fill="#1c1e20" stroke="#c8f031" stroke-width="0.5"/>
+<text x="60" y="349" font-size="13" font-weight="500" fill="#f2f2ee">Plus (OpenAI) and Pro (Claude) get no credits at all</text>
+</svg>
