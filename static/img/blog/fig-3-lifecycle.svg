@@ -1,0 +1,38 @@
+<svg viewBox="0 0 680 320" width="100%" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Sora, system-ui, -apple-system, Segoe UI, sans-serif">
+<title>How a month of credits plays out</title>
+<desc>From the seven day eligibility wait through claiming, automatic monthly grants, and expiry of unused credits at the end of each billing cycle.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect x="0" y="0" width="680" height="320" rx="14" fill="#141517" stroke="#34373a" stroke-width="0.5"/>
+<text x="40" y="45" font-size="15" font-weight="500" fill="#f2f2ee">How a month of credits plays out</text>
+<text x="40" y="68" font-size="12" fill="#b4b6b0">First grant is prorated against the remaining paid time</text>
+<rect x="40" y="110" width="105" height="56" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="92" y="132" font-size="13" font-weight="500" text-anchor="middle" dominant-baseline="central" fill="#f2f2ee">Day 0</text>
+<text x="92" y="151" font-size="12" text-anchor="middle" dominant-baseline="central" fill="#b4b6b0">subscribe</text>
+<rect x="205" y="110" width="105" height="56" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="257" y="132" font-size="13" font-weight="500" text-anchor="middle" dominant-baseline="central" fill="#f2f2ee">Day 7</text>
+<text x="257" y="151" font-size="12" text-anchor="middle" dominant-baseline="central" fill="#b4b6b0">claim once</text>
+<rect x="370" y="110" width="105" height="56" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="422" y="132" font-size="13" font-weight="500" text-anchor="middle" dominant-baseline="central" fill="#f2f2ee">Renewal</text>
+<text x="422" y="151" font-size="12" text-anchor="middle" dominant-baseline="central" fill="#b4b6b0">auto-granted</text>
+<rect x="535" y="110" width="105" height="56" rx="8" fill="#1c1e20" stroke="#c8f031" stroke-width="0.5"/>
+<text x="587" y="132" font-size="13" font-weight="500" text-anchor="middle" dominant-baseline="central" fill="#c8f031">Cycle end</text>
+<text x="587" y="151" font-size="12" text-anchor="middle" dominant-baseline="central" fill="#b4b6b0">credits expire</text>
+<path d="M145 138 L200 138" fill="none" stroke="#c8f031" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M310 138 L365 138" fill="none" stroke="#c8f031" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M475 138 L530 138" fill="none" stroke="#c8f031" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="40" y="196" width="190" height="50" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="56" y="217" font-size="12" fill="#e6e7e2">Spent before</text>
+<text x="56" y="235" font-size="12" fill="#b4b6b0">purchased credits</text>
+<rect x="245" y="196" width="190" height="50" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="261" y="217" font-size="12" fill="#e6e7e2">No rollover</text>
+<text x="261" y="235" font-size="12" fill="#b4b6b0">between cycles</text>
+<rect x="450" y="196" width="190" height="50" rx="8" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="466" y="217" font-size="12" fill="#e6e7e2">Never charged to</text>
+<text x="466" y="235" font-size="12" fill="#b4b6b0">your subscription</text>
+<line x1="40" y1="258" x2="640" y2="258" stroke="#34373a" stroke-width="0.5"/>
+<text x="40" y="278" font-size="12" fill="#b4b6b0">With no purchased credits, API requests stop until the next grant</text>
+</svg>

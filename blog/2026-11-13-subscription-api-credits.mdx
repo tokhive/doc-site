@@ -1,0 +1,135 @@
+---
+slug: subscription-api-credits
+title: "The API Credits Hiding in Your AI Subscription"
+date: 2026-11-13
+authors: [tokhive]
+tags: [guides]
+description: "OpenAI and Claude include monthly Platform API credits with higher-tier subscriptions. Here is who qualifies, how to claim them, and what the credits actually cover."
+---
+
+Most people assume an OpenAI or Claude subscription only buys them more usage in the chat app. It doesn't. Both companies now include **monthly Platform API credits with their higher-tier subscriptions** — credits you can spend on your own scripts, applications, and agents.
+
+Three things trip people up:
+
+- **Subscriptions and API platforms are billed separately.** A subscription is not API access, and subscription fees do not offset API bills.
+- **The credits are not granted automatically.** You have to claim them once.
+- **They expire at the end of each billing cycle.** Unused credits do not roll over, which makes them one of the most commonly wasted forms of AI quota.
+
+This guide explains who qualifies, how to claim, and what the credits actually cover.
+
+{/* truncate */}
+
+![Two separate systems, one link: subscriptions and API organizations, with monthly credits flowing into one linked organization](/img/blog/fig-1-two-systems.svg)
+
+*Figure 1 — A subscription and an API organization are separate; credits flow into one linked organization.*
+
+---
+
+## 1. Who can claim them
+
+![Eligible and excluded plans for OpenAI and Claude](/img/blog/fig-2-eligibility.svg)
+
+*Figure 2 — Neither vendor extends this benefit to its entry-level paid plan.*
+
+| Provider | Eligible plans | Monthly credit | Explicitly excluded |
+| --- | --- | --- | --- |
+| **OpenAI** | ChatGPT Pro 100 / Pro 200 / Pro 500 | $100 / $200 / $500 — equal to the plan price | Plus, Go, Free, free trials, Enterprise, Edu, legacy Codex seats |
+| | ChatGPT Business — paid Standard / Premium seats | $20 / paid Standard seat, $100 / paid Premium seat, pooled across the workspace, capped at **$500/month** | — |
+| **Claude** | Max | $100 | Free, Pro, Enterprise |
+| | Ultra | $200 | — |
+| | Team — Standard / Premium seats | $20 / Standard seat, $100 / Premium seat, pooled, capped at **$500/month** | — |
+
+Discounted Claude Team plans (nonprofits, scientists) are eligible at the same per-seat rates. For OpenAI Business workspaces billed annually upfront, the full year's credits are granted at once, capped at **$6,000 per annual billing cycle**.
+
+Both vendors share the same gate: the subscription must be **active, in good standing, and at least 7 days old** before you can claim. A freshly upgraded account has to wait a week.
+
+The detail most people get wrong: **ChatGPT Plus gets nothing, and Claude Pro gets nothing.** Neither vendor extends this benefit to its entry-level paid plan.
+
+---
+
+## 2. How to claim and use them
+
+The core action is the same on both sides: **link your subscription to one API organization.** Credits land in that organization's balance each month, not in your chat account.
+
+### OpenAI
+
+The prerequisites are stricter here:
+
+- The ChatGPT account and the API account must **use the same email address**.
+- On **Pro**, the claimer must be both the **subscription owner** and the **owner of the receiving API organization**.
+- On **Business**, the claimer must own **both the ChatGPT workspace and the API organization** — being a workspace member or admin is not enough — and must have billing management permissions. A custom billing role does not substitute for API organization ownership.
+
+Claim from either side:
+
+1. **From ChatGPT:** Settings → Billing → find the **API credits benefit** → verify the API organization that will receive the credits → confirm.
+2. **From the API platform:** sign in at `platform.openai.com` with the same email → select the API organization you own → Billing → find the API credits benefit → select your eligible subscription or Business workspace → confirm.
+
+Business owners can also start from the admin console's workspace billing settings.
+
+### Claude
+
+1. On the web at `claude.ai`, go to **Settings → Billing** (Team owners: **Organization settings → Billing**).
+2. In the **API credits** section, select **Link organization**.
+3. Pick an existing Claude Console organization, or create one during the flow.
+4. Review the Supplemental Credit Terms, then confirm the link.
+
+Console organization roles that qualify: **Owner, Admin, or Billing**. Claude subscriptions purchased on iOS or Android are eligible, but **the credits must be claimed in a web browser**.
+
+### One binding, one organization
+
+> **Both vendors allow only one link per subscription, and only one such link per API organization.** Neither lets you change the linked organization yourself — OpenAI and Claude both require contacting support, and OpenAI explicitly notes that a change request does not guarantee credits will be transferred. Choose the organization you intend to build in before you confirm.
+
+After the first claim, credits are issued automatically on each renewal while the benefit lasts; you don't need to claim again. Check balances at `platform.openai.com/settings/organization/billing/credit-grants` (credit grants) and `platform.claude.com/settings/billing` (Promotional credits).
+
+You do **not** need to add a payment method to the API platform to claim or use these credits.
+
+---
+
+## 3. What the credits are actually like
+
+![Lifecycle of a monthly credit grant](/img/blog/fig-3-lifecycle.svg)
+
+*Figure 3 — Claim once, receive credits each renewal, lose whatever is left at cycle end.*
+
+**Separate from your subscription usage.** Credits live in the API organization. They do not increase your ChatGPT/Claude usage limits, your signed-in Codex allowance, or any in-app credit balance. API usage and rate limits also stay on the API side.
+
+**Expire with the billing cycle.** Credits refresh when your plan payment clears (monthly for annual plans), unused amounts expire at cycle end, and there is no rollover. The **first grant is prorated** against the remaining paid time in the current cycle, so the amount you see mid-cycle will be lower than the headline figure.
+
+**Spent first, then stop.** Promotional credits are consumed before any credits you purchased. Once exhausted:
+
+- **OpenAI:** requests fail with HTTP 429 and error code `credit_balance_exhausted`, unless the organization still has purchased credits or auto-reload enabled.
+- **Claude:** API requests stop until the next monthly grant. Usage is **never charged to your Claude subscription**.
+
+All API keys and workspaces inside the linked organization draw from the same shared balance. Having a credit balance does not lift rate limits, token limits, model limits, or spend limits.
+
+### Coverage boundaries
+
+| | Covered | Not covered |
+| --- | --- | --- |
+| **OpenAI** | Responses API and Chat Completions, Agents API (incl. hosted sandbox charges), Decisions API, GPT-Live and Realtime, Images API, and built-in tools such as web search, file search and Code Interpreter — including their usage and storage fees | **Codex used through API keys**; ChatGPT and signed-in Codex usage limits are unaffected |
+| **Claude** | Claude API (Messages API, Message Batches API), Playground in the Claude Console, Claude Managed Agents, Claude Agent SDK | **Interactive Claude Code** in the terminal, IDE, desktop or web; extra usage in Claude, Claude Code or Claude Cowork; Claude on Amazon Bedrock, Google Cloud Vertex AI or Microsoft Foundry |
+
+One Claude nuance worth knowing: `claude -p` and the Agent SDK **are** covered when you run them yourself with an API key from the linked Console organization, because that usage bills as Agent SDK usage. If you run them while signed in with your Claude plan, they draw from plan limits instead. Runs initiated by the Claude Code GitHub Action, an IDE extension, or the desktop app count as Claude Code usage and are **not** covered, even with `-p`.
+
+### If your plan changes
+
+- **Cancel or downgrade:** future grants stop; credits already issued remain usable until the current cycle ends.
+- **OpenAI downgrade to Plus / Go / Free:** the API organization link is removed at the end of the billing cycle.
+- **Claude Max → Ultra:** a prorated top-up is granted immediately, then $200 each cycle.
+- **OpenAI Pro → Business, or Business → Enterprise:** the existing link ends; Enterprise is not eligible.
+- **OpenAI upgrade / added Business seats:** additional prorated credits may be issued, subject to the cap.
+
+OpenAI states in its help center that **this benefit may change or be withdrawn** in the future, so don't build long-term budgets on it as a permanent entitlement.
+
+---
+
+## Sources
+
+All eligibility rules, credit amounts, claim procedures, and coverage boundaries above are taken from first-party official documentation. No estimates or third-party figures are used. Verified **2026-11-12**.
+
+- [OpenAI Help Center — API credits benefit for eligible ChatGPT subscriptions](https://help.openai.com/en/articles/20001626-api-credits-benefit-for-eligible-chatgpt-subscriptions)
+- [OpenAI Help Center — Managing billing for ChatGPT and the API platform](https://help.openai.com/en/articles/9039756-managing-billing-for-chatgpt-and-the-api-platform)
+- [OpenAI Developers — API credits for ChatGPT subscribers](https://developers.openai.com/api/docs/guides/chatgpt-api-credits)
+- [Anthropic Help Center — Monthly API credits for Max, Ultra, and Team plans](https://support.claude.com/en/articles/17154008)
+- [Claude Platform — API credits for subscribers](https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers)
+- [Claude pricing](https://claude.com/pricing) · [ChatGPT pricing](https://openai.com/chatgpt/pricing/)
