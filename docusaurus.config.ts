@@ -147,7 +147,13 @@ const config: Config = {
           title: 'Contact',
           items: [
             {label: 'hello@tokhive.ai', href: 'mailto:hello@tokhive.ai'},
-            {label: 'security@tokhive.ai', href: 'mailto:security@tokhive.ai'},
+            {label: 'Telegram', href: 'https://t.me/tokhive'},
+            {label: 'Discord', href: 'https://discord.gg/nrVU4vSShw'},
+            {label: 'X', href: 'https://x.com/tokhive'},
+            {
+              label: 'Report a vulnerability',
+              href: 'https://github.com/tokhive/tee/security/advisories/new',
+            },
           ],
         },
         {
