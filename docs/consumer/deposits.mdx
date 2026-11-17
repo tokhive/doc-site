@@ -1,0 +1,129 @@
+---
+sidebar_position: 1
+title: Deposits
+---
+
+# Deposits
+
+Your balance pays for every call you make through TokHive. A new account starts at 0, and inference requests return `402 insufficient_balance` until you add funds. This page covers how to add funds, which tokens TokHive accepts, and how to get them onto the right network.
+
+## Ways to add funds
+
+Today the only way to add funds is a **stablecoin deposit** from a crypto wallet or an exchange. TokHive doesn't take credit cards, bank transfers or other fiat payments yet. If you don't hold stablecoins, see [Get USDT0 on Conflux eSpace](#get-usdt0-on-conflux-espace).
+
+Providers can also [transfer their earnings](../glossary.mdx#earnings-transfer) to their balance.
+
+## Supported networks and tokens
+
+| Network | Chain ID | Token | Token contract |
+| --- | --- | --- | --- |
+| Conflux eSpace | `1030` | USDT0 | `0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff` |
+
+- 1 USDT0 is credited as 1 US dollar.
+- TokHive charges no deposit fee and sets no minimum. You pay the network's gas, in CFX.
+- The deposit dialog in the console always shows the network, chain ID and token contract that TokHive is watching. If anything differs from this table, follow the dialog.
+
+:::caution[Only USDT0 on Conflux eSpace is credited]
+Send only USDT0, on Conflux eSpace, to your deposit address. Other tokens on Conflux eSpace (such as cUSDT or bridged USDT from other bridges), and tokens sent to the same address on any other network, are **not** credited automatically. If that happens, email [hello@tokhive.ai](mailto:hello@tokhive.ai) with the transaction hash.
+:::
+
+## Make a deposit
+
+1. In the console, open **Balances and Ledger** and click **Deposit**.
+2. Choose **Conflux eSpace** and **USDT0**. TokHive shows your deposit address and its QR code.
+3. Send USDT0 to that address on Conflux eSpace from your wallet or exchange.
+4. The deposit is credited after the number of block confirmations shown in the dialog, usually within a few minutes.
+
+Your deposit address is permanently yours; you can reuse it for every deposit. Each deposit appears under **Deposits** in the ledger:
+
+| Status | Meaning |
+| --- | --- |
+| Confirming | The transfer was seen and is waiting for confirmations. |
+| Credited | The amount was added to your balance. |
+| Removed by chain reorganization | The block holding the transfer was dropped by the network. Nothing was credited. |
+| Needs review | TokHive is checking the deposit by hand. Contact us if it stays here. |
+
+## Get USDT0 on Conflux eSpace
+
+USDT0 is the cross-chain version of USDT, not a different stablecoin. It is backed 1:1 by USDT and moves between networks through the official bridge at [usdt0.to](https://usdt0.to/transfer). On most networks, including Ethereum and Tron, what you hold is ordinary USDT, and the bridge takes it as is: you don't need to convert it to USDT0 first. Pick the route that matches what you hold.
+
+### Add Conflux eSpace to your wallet
+
+Conflux eSpace is an EVM network, so MetaMask, Rabby and other EVM wallets work with it. If your wallet doesn't list it, add it by hand:
+
+| Field | Value |
+| --- | --- |
+| Network name | Conflux eSpace |
+| RPC URL | `https://evm.confluxrpc.com` |
+| Chain ID | `1030` |
+| Currency symbol | `CFX` |
+| Block explorer | `https://evm.confluxscan.org` |
+
+To see your USDT0 in the wallet, import the token contract `0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff` (6 decimals).
+
+### You hold USDT or USDT0 on another network
+
+Bridge it to Conflux eSpace with the official USDT0 bridge:
+
+1. Open [usdt0.to/transfer](https://usdt0.to/transfer) and connect your wallet.
+2. Set **From** to the network your USDT or USDT0 is on, for example Ethereum or Arbitrum, and **To** to **Conflux**.
+3. Enter the amount.
+4. Optionally, under **Gas on destination**, click **Add** and choose an amount of CFX to receive with your USDT0. If your address has never received USDT0 before, you can skip this: see [Gas on Conflux eSpace](#gas-on-conflux-espace) below.
+5. Click **Transfer** and approve the two wallet prompts: the spending approval, then the transfer.
+6. When the USDT0 arrives on Conflux eSpace, [make a deposit](#make-a-deposit) from your wallet.
+
+Bridging between USDT0 networks has no bridge fee; you pay gas on the source network and on Conflux eSpace. Routes that start on Tron, TON, Solana or Celo go through USDT0's Legacy Mesh, which charges 0.03%. The bridge page shows the exact cost and estimated arrival time before you confirm.
+
+### Gas on Conflux eSpace
+
+Sending USDT0 to your deposit address costs a small amount of CFX, Conflux eSpace's gas token. You don't need to buy CFX separately. There are three ways to get it:
+
+1. **Automatic gas for first-time USDT0 receivers.** When an address on Conflux eSpace receives USDT0 for the first time and holds no CFX, Conflux eSpace automatically sends it 0.1 CFX. That is enough for a few deposits, so after your first bridge you can usually deposit straight away.
+2. **Gas on destination on usdt0.to.** When you bridge, the **Gas on destination** option delivers some CFX to your Conflux eSpace address along with the USDT0, paid for on the source network. Click **Add** under **Gas on destination** and choose an amount.
+3. **The Conflux faucet.** [conflux-faucets.com](https://conflux-faucets.com/) gives out a small amount of mainnet CFX for gas fees.
+
+### You hold USDT on an exchange
+
+Check whether your exchange offers **Conflux eSpace** (sometimes shown as "Conflux" or "CFX eSpace") as a withdrawal network for USDT or USDT0. [Kraken](https://www.kraken.com/), [MEXC](https://www.mexc.com/) and [KuCoin](https://www.kucoin.com/), for example, support withdrawing USDT0 to Conflux eSpace.
+
+- **If it does,** withdraw directly to your TokHive deposit address. No CFX is needed, because the exchange pays the gas.
+- **If it doesn't,** withdraw to your own wallet on a USDT0 network such as Arbitrum or Ethereum, then [bridge it](#you-hold-usdt-or-usdt0-on-another-network).
+
+:::caution[Withdrawing from an exchange]
+Make sure the exchange withdraws the official USDT0 token on Conflux eSpace (contract `0xaf37…47ff`). A different USDT token on Conflux eSpace won't be credited.
+:::
+
+### You don't hold any stablecoins
+
+Buy USDT with a credit card, debit card or bank transfer, then bring it to Conflux eSpace with one of the routes above. You don't need to buy USDT0 on Conflux eSpace directly: ordinary USDT on Ethereum, Arbitrum, Polygon or Tron works, because the [USDT0 bridge](#you-hold-usdt-or-usdt0-on-another-network) takes it as is. There are two common ways to buy.
+
+#### On an exchange
+
+Most large exchanges sell USDT for card payments or bank transfers, either themselves or through a payment partner. You need to complete the exchange's identity verification first.
+
+1. Sign up on an exchange available in your country and verify your identity.
+2. Buy USDT with a card, or deposit money by bank transfer and buy USDT with it.
+3. Withdraw the USDT:
+   - **If the exchange withdraws USDT0 to Conflux eSpace,** as Kraken, MEXC and KuCoin do, withdraw straight to your TokHive deposit address. This is the simplest route: no bridge and no gas needed.
+   - **Otherwise,** withdraw USDT to your own wallet on Arbitrum or Ethereum, then [bridge it](#you-hold-usdt-or-usdt0-on-another-network).
+
+A bank transfer usually costs less than a card. Exchanges charge a withdrawal fee that depends on the network, which is shown before you confirm.
+
+#### Through a wallet or an on-ramp service
+
+Fiat on-ramp services such as [MoonPay](https://www.moonpay.com/), [Transak](https://transak.com/), [Ramp](https://ramp.network/) and [Banxa](https://banxa.com/) sell USDT for a card or bank payment and send it straight to your wallet. Many wallets, MetaMask among them, have them built in under **Buy**.
+
+1. In your wallet's **Buy** screen, or on the service's website, choose USDT and the network to receive it on. Arbitrum or Polygon keeps the next step's gas cheap.
+2. Pay with your card or bank account. These services usually ask you to verify your identity too.
+3. When the USDT arrives in your wallet, [bridge it](#you-hold-usdt-or-usdt0-on-another-network) to Conflux eSpace.
+
+On-ramps are quick and need no exchange account, but cost more: card fees are typically a few percent, plus an exchange-rate spread. Compare the amount of USDT you will receive, not just the stated fee.
+
+:::note[Gas for the bridge]
+Bridging from your own wallet costs gas on the source network, paid in that network's native token: ETH on Ethereum and Arbitrum, POL on Polygon, TRX on Tron. Buy a little of it along with your USDT, or withdraw to Conflux eSpace directly from an exchange that supports it.
+:::
+
+## Related
+
+- [QuickStart](../quickstart.mdx): from sign-up to your first call.
+- [Consumer FAQ](./faq.mdx): pricing, billing and negative balances.
