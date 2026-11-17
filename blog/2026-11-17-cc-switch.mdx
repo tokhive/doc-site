@@ -1,0 +1,71 @@
+---
+slug: cc-switch
+title: "Meet CC Switch: One Click Between TokHive and Your Other Providers"
+date: 2026-11-17
+authors: [tokhive]
+tags: [guides]
+description: "CC Switch is a free, open-source desktop app that switches Claude Code and Codex between providers in one click. Here is what it does, why it pairs well with TokHive, and how to import TokHive from the console."
+---
+
+Many developers don't run Claude Code or Codex on a single provider. They sign in with their own Claude or ChatGPT subscription, and turn to TokHive when that plan hits its usage limit, or when they want a model their plan doesn't include. Switching usually means editing `~/.claude/settings.json` or `~/.codex/config.toml` by hand, then remembering what to change back.
+
+[CC Switch](https://github.com/farion1231/cc-switch) removes that chore. You add each provider once, and from then on you switch with one click, or from the menu bar or system tray. The TokHive console can now set it up for you: create a key, click **Import to CC Switch**, and you're done.
+
+{/* truncate */}
+
+## What CC Switch is
+
+CC Switch is a free, MIT-licensed desktop app for macOS, Windows and Linux. It manages the providers of Claude Code, Codex, Gemini CLI and several other AI coding tools, so you don't have to edit their config files by hand.
+
+Provider switching is its core feature, and it also offers:
+
+- **A tray menu** to switch providers without opening the app.
+- **MCP servers, Skills and prompts** managed in one place and synced to the tools you choose.
+- **A usage dashboard** with tokens, spending and request logs.
+- **Automatic backups** of its data, and optional cloud sync through WebDAV or S3-compatible storage.
+- **Deep links** (`ccswitch://`) that import a provider from a web page with its settings filled in. This is what the TokHive console uses.
+
+:::note
+CC Switch is a third-party open-source project, not made by TokHive. Download it only from [ccswitch.io](https://ccswitch.io) or its [GitHub Releases](https://github.com/farion1231/cc-switch/releases). A site or app that asks for payment or your credentials isn't the official one.
+:::
+
+## How switching works
+
+![CC Switch writes the active provider's connection fields into Claude Code's settings.json and Codex's config.toml](/img/blog/cc-switch-providers.svg)
+
+*Figure 1: Each provider is a card in CC Switch. Switching rewrites only the connection fields in each tool's own config.*
+
+When you switch, CC Switch changes only the endpoint, key, model and API format in the tool's config file, and leaves your other settings alone. It backs up the original file the first time it changes it.
+
+Claude Code picks up the new provider immediately. Codex reads its provider only at startup, so quit it and start it again after switching.
+
+## Why it pairs well with TokHive
+
+- **Native APIs, no conversion.** TokHive serves the Anthropic Messages API for Claude Code and the Responses API for Codex, so it works in CC Switch's default **Direct** mode. You don't need its routing or aggregation modes, and no local proxy sits between your tool and TokHive.
+- **Your subscription and TokHive, side by side.** Keep **Claude Official** or your ChatGPT sign-in as one card and TokHive as another. When your plan runs out, switch to TokHive. When it resets, switch back.
+- **Subagents keep working.** Claude Code sends subagents and background work to its `opus`, `sonnet`, `haiku` and `fable` aliases. The console fills these in with models TokHive offers, so those requests don't fail with `model_not_found`.
+- **One balance, every call recorded.** Whichever tool you use, calls through TokHive draw on the same balance and appear in the console's **Call Records**.
+
+## Import TokHive from the console
+
+The console builds the CC Switch link for you:
+
+1. In the [console](https://console.tokhive.ai), open **API Keys** and click **Create key**.
+2. In the **Key Created** dialog, open the **Claude Code** or **Codex** tab and pick a model.
+3. Click **Import to CC Switch** and let your browser open CC Switch.
+4. Check the import dialog, which shows TokHive's endpoint, your key (masked) and the models, then confirm. To start using TokHive right away, turn on the switch to use it after import.
+
+Repeat from step 2 for the other tool. The link carries your new key, so the button only appears while the key is on screen. If you've already closed the dialog, create another key, or add TokHive by hand.
+
+Then run a quick check:
+
+```sh
+claude -p "Reply with exactly OK."
+codex exec "Reply with exactly OK."
+```
+
+Each should answer `OK`, and the calls appear in **Call Records**.
+
+## Get started
+
+The [CC Switch guide](/consumer/cc-switch) covers installation, the one-click import, manual setup for both tools, and troubleshooting. If you only ever use TokHive, the [Claude Code](/consumer/claude-code) and [Codex](/consumer/codex) guides are simpler: you set TokHive up once and don't need a switcher.
