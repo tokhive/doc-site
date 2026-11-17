@@ -55,7 +55,7 @@ Revoking a key refuses new requests immediately; requests it already started sti
 
 | Limit | Value |
 | --- | --- |
-| Request body | 8 MiB. Compressed request bodies are refused. |
+| Request body | 32 MiB; larger bodies get `413 request_too_large`. Compressed request bodies are refused with `415`. |
 | Concurrent requests per API key | 20. More return `429 concurrency_limit`. |
 | Provider fallback | A request that fails before any output is retried on another provider. Once output has started, it is never continued by a different provider. |
 

@@ -74,7 +74,7 @@ Changing your password doesn't affect your API keys. Revoke them separately if y
 
 ### Which tools work with TokHive?
 
-Any tool that speaks the OpenAI Responses or Chat Completions API, or the Anthropic Messages API. Step-by-step guides cover [Codex](./codex.mdx) and [Claude Code](./claude-code.mdx); the console's **Setup guides** also cover OpenCode and the official SDKs. Streaming, tool calls and prompt caching work as in the vendors' own APIs.
+Any tool that speaks the OpenAI Responses or Chat Completions API, or the Anthropic Messages API. Step-by-step guides cover [Codex](./codex.mdx) and [Claude Code](./claude-code.mdx), and [CC Switch](./cc-switch.mdx) switches them between TokHive and other providers. The console's **Setup guides** also cover OpenCode and the official SDKs. Streaming, tool calls and prompt caching work as in the vendors' own APIs.
 
 Some sampling parameters aren't accepted by the subscription upstream, for example `temperature` and `max_output_tokens` on the Responses API. TokHive drops them and names them in the `X-Hive-Ignored-Params` response header; see [Responses](../api/responses.mdx).
 
