@@ -21,7 +21,7 @@ OpenAI's Responses API, served by ChatGPT subscriptions. This is the recommended
 
 ```sh
 curl https://api.tokhive.ai/v1/responses \
-  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Authorization: Bearer $HIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-6-sol",
@@ -33,9 +33,10 @@ curl https://api.tokhive.ai/v1/responses \
 <TabItem value="python" label="Python">
 
 ```python
+import os
 from openai import OpenAI
 
-client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
+client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=os.environ["HIVE_API_KEY"])
 response = client.responses.create(model="gpt-6-sol", input="Reply with exactly OK.")
 print(response.output_text)
 ```
@@ -46,7 +47,7 @@ print(response.output_text)
 ```ts
 import OpenAI from "openai";
 
-const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
+const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.HIVE_API_KEY });
 const response = await client.responses.create({ model: "gpt-6-sol", input: "Reply with exactly OK." });
 console.log(response.output_text);
 ```

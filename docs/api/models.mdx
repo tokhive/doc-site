@@ -24,16 +24,17 @@ Lists the OpenAI models you can call through [Responses](responses.mdx) and [Cha
 
 ```sh
 curl https://api.tokhive.ai/v1/models \
-  -H "Authorization: Bearer $TOKHIVE_API_KEY"
+  -H "Authorization: Bearer $HIVE_API_KEY"
 ```
 
 </TabItem>
 <TabItem value="python" label="Python">
 
 ```python
+import os
 from openai import OpenAI
 
-client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
+client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=os.environ["HIVE_API_KEY"])
 for model in client.models.list():
     print(model.id)
 ```
@@ -44,7 +45,7 @@ for model in client.models.list():
 ```ts
 import OpenAI from "openai";
 
-const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
+const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.HIVE_API_KEY });
 for await (const model of client.models.list()) {
   console.log(model.id);
 }
@@ -69,16 +70,17 @@ Lists the Claude models you can call through [Messages](messages.mdx), in Anthro
 
 ```sh
 curl https://api.tokhive.ai/anthropic/v1/models \
-  -H "x-api-key: $TOKHIVE_API_KEY"
+  -H "x-api-key: $HIVE_API_KEY"
 ```
 
 </TabItem>
 <TabItem value="python" label="Python">
 
 ```python
+import os
 import anthropic
 
-client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=TOKHIVE_API_KEY)
+client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=os.environ["HIVE_API_KEY"])
 for model in client.models.list():
     print(model.id)
 ```
@@ -89,7 +91,7 @@ for model in client.models.list():
 ```ts
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.TOKHIVE_API_KEY });
+const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.HIVE_API_KEY });
 for await (const model of client.models.list()) {
   console.log(model.id);
 }

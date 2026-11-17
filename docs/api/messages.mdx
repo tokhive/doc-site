@@ -21,7 +21,7 @@ Anthropic's native Messages API, served by Claude subscriptions. Requests and re
 
 ```sh
 curl https://api.tokhive.ai/anthropic/v1/messages \
-  -H "x-api-key: $TOKHIVE_API_KEY" \
+  -H "x-api-key: $HIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{
@@ -35,9 +35,10 @@ curl https://api.tokhive.ai/anthropic/v1/messages \
 <TabItem value="python" label="Python">
 
 ```python
+import os
 import anthropic
 
-client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=TOKHIVE_API_KEY)
+client = anthropic.Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=os.environ["HIVE_API_KEY"])
 message = client.messages.create(
     model="claude-opus-5-5",
     max_tokens=1024,
@@ -52,7 +53,7 @@ print(message.content[0].text)
 ```ts
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.TOKHIVE_API_KEY });
+const client = new Anthropic({ baseURL: "https://api.tokhive.ai/anthropic", apiKey: process.env.HIVE_API_KEY });
 const message = await client.messages.create({
   model: "claude-opus-5-5",
   max_tokens: 1024,
@@ -64,10 +65,15 @@ console.log(message.content);
 </TabItem>
 <TabItem value="claude-code" label="Claude Code">
 
-```sh
-export ANTHROPIC_BASE_URL=https://api.tokhive.ai/anthropic
-export ANTHROPIC_AUTH_TOKEN=$TOKHIVE_API_KEY
-claude
+Add to `~/.claude/settings.json`, then run `claude`. [QuickStart](../quickstart.mdx#claude-code) shows how to point Claude Code's model aliases at offered models too.
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.tokhive.ai/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  }
+}
 ```
 
 </TabItem>
@@ -157,7 +163,7 @@ Counts the input tokens of a Messages request, as the upstream counts them. Anth
 
 ```sh
 curl https://api.tokhive.ai/anthropic/v1/messages/count_tokens \
-  -H "x-api-key: $TOKHIVE_API_KEY" \
+  -H "x-api-key: $HIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{
