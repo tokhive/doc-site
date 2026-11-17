@@ -1,11 +1,12 @@
 ---
-sidebar_position: 2.5
+sidebar_position: 2
+sidebar_label: FAQ
 title: Consumer FAQ
 ---
 
 # Consumer FAQ
 
-Questions Consumers ask about pricing, billing, availability and data. For the endpoints themselves, see the [API reference](./api/overview.mdx).
+Questions Consumers ask about pricing, billing, availability and data. For the endpoints themselves, see the [API reference](../api/overview.mdx).
 
 ## Pricing and billing
 
@@ -17,11 +18,11 @@ Different Providers can charge different prices for the same model. A request go
 
 ### When am I charged?
 
-Only for a response that completed and whose [execution receipt](./trust/execution-receipts.mdx) verified, by the tokens it actually used. A request that fails or is interrupted costs nothing, even if it had started to stream.
+Only for a response that completed and whose [execution receipt](../trust/execution-receipts.mdx) verified, by the tokens it actually used. A request that fails or is interrupted costs nothing, even if it had started to stream.
 
 ### How do I add funds?
 
-Deposit a stablecoin: USDT0 on Conflux eSpace, or USDT on Ethereum. Your deposit address is yours permanently, and a deposit is credited in US dollars automatically after the network's confirmations. See [Add balance](./quickstart.mdx#3-add-balance).
+Deposit USDT0 on Conflux eSpace, currently the only accepted stablecoin; card and bank payments aren't supported yet. Your deposit address is yours permanently, and a deposit is credited in US dollars automatically after the network's confirmations. If your USDT is on another network or an exchange, [Deposits](./deposits.mdx) shows how to bring it to Conflux eSpace.
 
 ### Why did my balance go below zero?
 
@@ -35,7 +36,7 @@ Balances can't be withdrawn from the console. For questions about your balance, 
 
 ### Which models can I use?
 
-The ones listed by [`/v1/models` and `/anthropic/v1/models`](./api/models.mdx): enabled, priced, and offered by at least one online Provider. The list follows the Provider network, so a model can disappear while nobody offers it.
+The ones listed by [`/v1/models` and `/anthropic/v1/models`](../api/models.mdx): enabled, priced, and offered by at least one online Provider. The list follows the Provider network, so a model can disappear while nobody offers it.
 
 ### What happens when no Provider can take my request?
 
@@ -49,11 +50,11 @@ Call Records shows which source served each attempt. This fallback is on by defa
 
 ### Why do I get `503 no_supply`?
 
-No account can serve the model right now, and fallback supply is off or has nothing for the model. When accounts are only busy or briefly rate limited, the `Retry-After` header says when to retry. See [Errors](./api/overview.mdx#errors).
+No account can serve the model right now, and fallback supply is off or has nothing for the model. When accounts are only busy or briefly rate limited, the `Retry-After` header says when to retry. See [Errors](../api/overview.mdx#errors).
 
 ### Is Claude fast mode available?
 
-No. Requests that ask for fast mode run at the standard speed and are billed at the standard price. See [Messages](./api/messages.mdx#fast-mode-is-not-offered).
+No. Requests that ask for fast mode run at the standard speed and are billed at the standard price. See [Messages](../api/messages.mdx#fast-mode-is-not-offered).
 
 ### How many requests can I run at once?
 
@@ -68,7 +69,7 @@ Up to 20 at a time per API key. More return `429 concurrency_limit`.
 - **Providers** cannot see your prompts, your responses or who you are; their machine only relays encrypted bytes.
 - **The upstream vendor** (OpenAI or Anthropic) processes the request as it does any other.
 
-End-to-end encryption that would hide prompts from Hive too is planned. See [Trust Model](./trust/trust-model.mdx).
+End-to-end encryption that would hide prompts from Hive too is planned. See [Trust Model](../trust/trust-model.mdx).
 
 ### What does TokHive keep?
 
@@ -76,7 +77,7 @@ Call records keep metadata only: endpoint, model, timing, status, usage, cost an
 
 ### Can I check that my request really reached OpenAI or Anthropic?
 
-Every execution has a TEE-signed receipt naming the upstream host, and Hive verifies it before you are charged. **Call Records** shows the receipt digests. Independent verification by Consumers is part of the planned [Web Proof](./web-proof/web-proof.mdx) work.
+Every execution has a TEE-signed receipt naming the upstream host, and Hive verifies it before you are charged. **Call Records** shows the receipt digests. Independent verification by Consumers is part of the planned [Web Proof](../web-proof/web-proof.mdx) work.
 
 ## Help
 
