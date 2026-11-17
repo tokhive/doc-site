@@ -6,7 +6,7 @@ title: Consumer FAQ
 
 # Consumer FAQ
 
-Questions Consumers ask about pricing, billing, availability and data. For the endpoints themselves, see the [API reference](../api/overview.mdx).
+Questions Consumers ask about pricing, billing, accounts, using TokHive and data. For the endpoints themselves, see the [API reference](../api/overview.mdx).
 
 ## Pricing and billing
 
@@ -24,13 +24,63 @@ Only for a response that completed and whose [execution receipt](../trust/execut
 
 Deposit USDT0 on Conflux eSpace, currently the only accepted stablecoin; card and bank payments aren't supported yet. Your deposit address is yours permanently, and a deposit is credited in US dollars automatically after the network's confirmations. If your USDT is on another network or an exchange, [Deposits](./deposits.mdx) shows how to bring it to Conflux eSpace.
 
+### Why did a request cost more than the lowest listed price?
+
+The [price list](https://tokhive.ai/models/) shows the lowest price on TokHive right now. A single request can cost more when:
+
+- **Your conversation stays on its account.** A follow-up goes to the account that already holds the conversation, so it keeps its context and prompt cache, even if a cheaper Provider is available.
+- **It enters a long-context tier.** Some models charge more once a request's input, cached tokens included, passes a model-specific threshold. The whole request, output included, is then billed at that model's long-context prices.
+- **It writes to the prompt cache.** Cache writes have their own price where the model charges for them.
+- **It's served by fallback supply.** See [What happens when no Provider can take my request?](#what-happens-when-no-provider-can-take-my-request)
+
+**Call Records** shows each call's tokens and cost.
+
 ### Why did my balance go below zero?
 
 A request only needs a balance above zero to start, and it is charged when it finishes. A long request can therefore take the balance below zero. New requests are refused with `402 insufficient_balance` until you add funds.
 
-### Can I withdraw or refund my balance?
+### Can I withdraw my balance?
 
-Balances can't be withdrawn from the console. For questions about your balance, including refunds, email [hello@tokhive.ai](mailto:hello@tokhive.ai).
+Yes, the withdrawable part of it: funds you deposited and earnings you transferred in. Credits granted by TokHive can only be spent on requests, and they are spent first. **Balances and Ledger** shows how much you can withdraw.
+
+1. In **Account**, set up an authenticator app. Every withdrawal asks for a code from it.
+2. On **Balances and Ledger**, add a receiving address under **Withdrawal Addresses**. A new address can be used 24 hours after you add it.
+3. Click **Withdraw**, choose the network, address and amount, and enter your authenticator code.
+
+- The minimum is $10.
+- The fee is the network's actual gas cost. It's taken from the amount, and the form shows it before you confirm.
+- Withdrawals over $1,000, or beyond a daily limit for automatic approval, are reviewed by hand before they are sent.
+- You can't withdraw while you have requests running.
+
+For refunds or other questions about your balance, email [hello@tokhive.ai](mailto:hello@tokhive.ai).
+
+### Can I get an invoice?
+
+TokHive doesn't issue invoices yet. **Call Records** lists every call with its cost, and **Balances and Ledger** lists your deposits, charges and withdrawals. If you need documents for accounting, email [hello@tokhive.ai](mailto:hello@tokhive.ai).
+
+## Account and keys
+
+### I lost my API key, or it may have leaked
+
+A key is shown only once, when it's created, and TokHive keeps only a hash of it, so it can't be recovered. On the **API Keys** page, revoke the old key, which stops it working right away, and create a new one. You can have several keys, for example one per machine; they share your balance and each runs up to 20 requests at once.
+
+### I forgot my password
+
+If you set up an authenticator app in **Account › Password and Recovery**, click **Forgot password?** on the sign-in page and reset it with a code from the app. Otherwise, email [hello@tokhive.ai](mailto:hello@tokhive.ai) from the address you signed up with, and we'll send you a one-time reset link.
+
+Changing your password doesn't affect your API keys. Revoke them separately if you think they were exposed.
+
+## Using TokHive
+
+### Which tools work with TokHive?
+
+Any tool that speaks the OpenAI Responses or Chat Completions API, or the Anthropic Messages API. Step-by-step guides cover [Codex](./codex.mdx) and [Claude Code](./claude-code.mdx); the console's **Setup guides** also cover OpenCode and the official SDKs. Streaming, tool calls and prompt caching work as in the vendors' own APIs.
+
+Some sampling parameters aren't accepted by the subscription upstream, for example `temperature` and `max_output_tokens` on the Responses API. TokHive drops them and names them in the `X-Hive-Ignored-Params` response header; see [Responses](../api/responses.mdx).
+
+### Why can't my conversation continue?
+
+Some conversations can only continue on the account that served them. If that account becomes unavailable, the request returns `409 session_context_unavailable`. When the response has a `Retry-After` header, retry after that time; otherwise start a new conversation.
 
 ## Availability
 
@@ -74,6 +124,10 @@ End-to-end encryption that would hide prompts from Hive too is planned. See [Tru
 ### What does TokHive keep?
 
 Call records keep metadata only: endpoint, model, timing, status, usage, cost and receipt digests. When a call fails, Hive also keeps your request and the upstream's response in restricted diagnostic logs, to investigate the failure, and deletes them after 3 months. Nothing is kept for successful calls.
+
+### Is my data used to train models?
+
+No. TokHive doesn't use your prompts or responses to train models, and doesn't sell them.
 
 ### Can I check that my request really reached OpenAI or Anthropic?
 
