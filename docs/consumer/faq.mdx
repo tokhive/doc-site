@@ -77,7 +77,7 @@ Call records keep metadata only: endpoint, model, timing, status, usage, cost an
 
 ### Can I check that my request really reached OpenAI or Anthropic?
 
-Every execution has a TEE-signed receipt naming the upstream host, and Hive verifies it before you are charged. **Call Records** shows the receipt digests. Independent verification by Consumers is part of the planned [Web Proof](../web-proof/web-proof.mdx) work.
+Yes. Every execution has a TEE-signed receipt naming the upstream host, and Hive verifies it before you are charged. You can also verify it yourself: download the receipt from **Call Records** and check it with the open-source verifier at [verifier.tokhive.ai](https://verifier.tokhive.ai/). See [Verify a receipt yourself](../trust/execution-receipts.mdx#verify-a-receipt-yourself).
 
 ## Help
 
