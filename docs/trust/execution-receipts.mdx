@@ -43,7 +43,9 @@ Only executions that completed successfully with full usage are settled. A `comp
 
 ### As a Consumer
 
-Open a call on the **Call Records** page. Each execution attempt shows its **Receipt SHA-256**, the digest of the archived signed receipt. Quote it when you ask about a specific call. Consumers can't download the raw receipt.
+Open a call on the **Call Records** page. Each execution attempt shows its **Receipt SHA-256**, the digest of the archived signed receipt; quote it when you ask about a specific call.
+
+Under **Verify execution receipts**, click **Download for verifier** next to an attempt to save its raw signed receipt. The console checks the file's SHA-256 against the recorded digest before saving it. To check the receipt yourself, see [Verify a receipt yourself](#verify-a-receipt-yourself).
 
 ### As a Provider
 
@@ -57,13 +59,43 @@ shasum -a 256 receipt-<id>.cbor
 
 The output must equal the **Receipt SHA-256** shown in the console.
 
+## Verify a receipt yourself
+
+You don't have to take Hive's word for it. The open-source [TokHive verifier](https://github.com/tokhive/verifier) checks a receipt independently, in your own browser or on your own machine.
+
+1. **Download the receipt.** In **Call Records**, open the call and click **Download for verifier** next to the attempt. A call that was retried has one receipt per attempt; verify each one separately.
+2. **Open the verifier.** Click **Open verifier** in the console, or go to [verifier.tokhive.ai](https://verifier.tokhive.ai/). Choose **Receipt file** and select the file. The receipt is checked in your browser; nothing is uploaded.
+3. **Enter the trusted application identity.** Under **Trusted application identity**, enter the `snp-app:…` identity of a TokHive TEE release you trust. Take it from the signed [TEE release catalog](https://github.com/tokhive/tee/blob/main/releases/catalog.json), not from the receipt itself, which only states what it claims to be. The [TEE release verification guide](https://github.com/tokhive/tee/blob/main/docs/public-verification.md) explains how to check the catalog's signature and pick the release that was active at the time of your call.
+4. **Read the result.** The verifier reports each check:
+
+| Check | What it proves |
+| --- | --- |
+| Receipt signature | The receipt was signed by the key it names and hasn't been altered. |
+| AMD + AWS attestation | That key belongs to a genuine AMD SEV-SNP enclave, according to hardware evidence embedded in the receipt. |
+| Trusted application | The enclave runs the TEE release you trust, so it only connects to the upstream hosts in that release's policy. |
+| Request / response integrity | Optional: the request and response bytes you supply match the digests in the receipt. |
+
+The overall result is **Verified**, **Incomplete** (something needed is missing, such as the trusted application identity) or **Failed**. Once verified, the receipt's target host, for example `api.anthropic.com`, tells you where your request went.
+
+### By request ID
+
+Every response carries an `X-Request-Id` header. With it, you can fetch the receipts of your own request from the API:
+
+```sh
+curl https://api.tokhive.ai/v1/verification/requests/REQUEST_ID \
+  -H "Authorization: Bearer $HIVE_API_KEY"
+```
+
+The response lists each attempt with its `receipt_sha256` and the raw receipt as base64-encoded canonical CBOR. It works even when your balance is zero, and only for requests made with your own keys. The verifier's **Request ID** mode and its command-line tool use this endpoint; see the [verifier repository](https://github.com/tokhive/verifier) for running them locally.
+
 ## Retention
 
 Receipts are kept permanently and stored as the original signed bytes. They are never edited, because changing any signed field would make them fail verification.
 
 ## Limitations
 
-- There is no standalone tool yet to verify a receipt's signature and attestation outside Hive. Consumers rely on Hive's verification before settlement.
-- A receipt proves where a request went and which bytes came back; it doesn't prove which model produced them. Proving model provenance to Consumers directly is the goal of [Web Proof](../web-proof/web-proof.mdx).
+- Hive doesn't archive your original request and response alongside the receipt, so comparing content needs the bytes you kept yourself.
+- Older receipts that carry only a hash of their hardware evidence can verify as **Incomplete** if that evidence is no longer available. Production receipts now embed the full evidence.
+- A receipt proves where a request went and which bytes came back; it doesn't prove which model produced them. Proving model provenance to Consumers directly is the goal of [Web Proof](./web-proof.mdx).
 
 See also: [Trust Model](./trust-model.mdx), [Glossary](../glossary.mdx#execution-receipt).

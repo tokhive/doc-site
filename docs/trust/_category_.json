@@ -3,6 +3,6 @@
   "position": 4,
   "link": {
     "type": "generated-index",
-    "description": "Who can see what in TokHive, what the TEE guarantees, and how execution receipts work."
+    "description": "Who can see what in TokHive, what the TEE guarantees, how execution receipts work and how to verify them, and the Web Proof technology behind it."
   }
 }
