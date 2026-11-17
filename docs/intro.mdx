@@ -60,7 +60,7 @@ When AI requests arise in the network, TokHive automatically schedules them base
 
 Once a request is completed, the platform settles payment based on the actual number of tokens contributed.
 
-The income a Provider earns can be transferred to their TokHive balance and spent on AI calls. Cashing out earnings to a stablecoin wallet is coming soon.
+The income a Provider earns can be transferred to their TokHive balance, then spent on AI calls or withdrawn to a stablecoin wallet.
 
 One important design principle of TokHive is:
 
@@ -246,11 +246,10 @@ A planned optional end-to-end encryption scheme will protect user request data d
 * **Compatible APIs:** OpenAI Responses and Chat Completions, Anthropic Messages and token counting. They work with Codex, Claude Code and the official SDKs.
 * **Trusted execution.** Provider credentials are sealed to an AMD SEV-SNP TEE, Hive checks the TEE by remote attestation, and every execution has a signed receipt that Hive verifies before settlement.
 * **Fallback supply.** When no Provider can serve a request, vetted premium API services can take it, and Consumers can turn this off.
-* **Payments.** Stablecoin deposits ([USDT0 on Conflux eSpace](./consumer/deposits.mdx)). Providers set their own quotes and can spend their earnings on TokHive.
+* **Payments.** Stablecoin deposits ([USDT0 on Conflux eSpace](./consumer/deposits.mdx)) and [withdrawals](./consumer/faq.mdx#can-i-withdraw-my-balance). Providers set their own quotes, and can spend or withdraw their earnings.
 
 ### Coming next
 
-* **Cash-out:** withdrawing Provider earnings to a stablecoin wallet.
 * **Content safeguards:** refusing requests for illegal content before they reach a Provider's account.
 
 ### Planned
