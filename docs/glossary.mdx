@@ -141,7 +141,7 @@ The allowlist in the egress configuration of upstream `host:port` addresses Bee 
 
 ### TEE
 
-Trusted Execution Environment: an isolated, attested environment that runs each request. It opens the Provider's sealed credential, opens a TLS session to the upstream vendor that ends inside the enclave, and signs an [execution receipt](#execution-receipt). Neither Hive nor Bee can read what happens inside it. See [TEE zkTLS](./web-proof/tee-zktls-technical-principles.mdx).
+Trusted Execution Environment: an isolated, attested environment that runs each request. It opens the Provider's sealed credential, opens a TLS session to the upstream vendor that ends inside the enclave, and signs an [execution receipt](#execution-receipt). Neither Hive nor Bee can read what happens inside it. See [TEE zkTLS](./trust/tee-zktls-technical-principles.mdx).
 
 ### USDT0
 
@@ -149,4 +149,4 @@ The cross-chain version of USDT, backed 1:1 by USDT, and the stablecoin TokHive 
 
 ### Web Proof
 
-Techniques, also called zkTLS, that prove a piece of web data really came from a given server and was not altered. TokHive uses them to make it verifiable that a request was served by the claimed upstream model. See [Web Proof](./web-proof/web-proof.mdx).
+Techniques, also called zkTLS, that prove a piece of web data really came from a given server and was not altered. TokHive uses them to make it verifiable that a request was served by the claimed upstream model. See [Web Proof](./trust/web-proof.mdx).
