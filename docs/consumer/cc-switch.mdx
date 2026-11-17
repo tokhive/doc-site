@@ -1,0 +1,140 @@
+---
+sidebar_position: 1.7
+title: Use CC Switch
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Use CC Switch
+
+[CC Switch](https://github.com/farion1231/cc-switch) is a free, open-source desktop app for macOS, Windows and Linux that manages the providers of Claude Code, Codex and other AI coding tools. Instead of editing config files by hand, you add TokHive once as a provider, then switch between TokHive and your other accounts with one click, or from the menu bar or system tray.
+
+Use it if you move between TokHive and another provider, such as your own Claude or ChatGPT subscription. If you only ever use TokHive, the [Codex](./codex.mdx) and [Claude Code](./claude-code.mdx) guides are simpler.
+
+:::note
+CC Switch is a third-party project, not made by TokHive. This guide follows its [user manual](https://github.com/farion1231/cc-switch/tree/main/docs/user-manual/en) for version 4; labels can differ in other versions.
+:::
+
+## How it works
+
+When you switch to a provider, CC Switch rewrites only the connection fields in the tool's own config file (endpoint, key, model and API format) and leaves your other settings alone. It backs up the original config file the first time it changes it, and keeps its own data in `~/.cc-switch`.
+
+TokHive speaks both tools' native APIs, so it works in CC Switch's default **Direct** mode. You don't need its Routing or Aggregation modes.
+
+## 1. Install CC Switch
+
+Download CC Switch only from [ccswitch.io](https://ccswitch.io) or its [GitHub Releases](https://github.com/farion1231/cc-switch/releases). A site or app that asks for payment or your credentials isn't the official one.
+
+<Tabs groupId="os">
+<TabItem value="unix" label="macOS / Linux">
+
+On macOS 12 or later:
+
+```sh
+brew install --cask cc-switch
+```
+
+Or download the `.dmg` from GitHub Releases. On Linux, use the `.deb`, `.rpm` or `.AppImage` from GitHub Releases, or `paru -S cc-switch-bin` on Arch.
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+On Windows 10 or later, download `CC-Switch-v{version}-Windows.msi` from [GitHub Releases](https://github.com/farion1231/cc-switch/releases) and run it.
+
+</TabItem>
+</Tabs>
+
+CC Switch manages tools you have installed. If Claude Code or Codex isn't installed yet, install it from **Apps** at the bottom of CC Switch's sidebar, or as in the [Codex](./codex.mdx#1-install-codex) or [Claude Code](./claude-code.mdx#1-install-claude-code) guide.
+
+## 2. Create an API key
+
+In the [console](https://console.tokhive.ai), open **API Keys**, click **Create key** and copy the key, which starts with `hive_` and is shown only once. Keep the dialog open: its **Codex** and **Claude Code** tabs list the models TokHive offers, which you need below. The [Codex guide](./codex.mdx#2-create-an-api-key) shows the dialog.
+
+## 3. Add TokHive for Claude Code
+
+1. In CC Switch's sidebar, select **Claude Code**, then click **Add Provider** (the **+** button) at the top right.
+2. Choose **Custom Configuration**.
+3. Name it `TokHive`, and in the configuration editor enter your key and TokHive's endpoint:
+
+   ```json
+   {
+     "env": {
+       "ANTHROPIC_BASE_URL": "https://api.tokhive.ai/anthropic",
+       "ANTHROPIC_AUTH_TOKEN": "hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+       "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+       "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
+       "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-5-5",
+       "ANTHROPIC_DEFAULT_FABLE_MODEL": "claude-fable-5-2"
+     }
+   }
+   ```
+
+   Point each `ANTHROPIC_DEFAULT_*_MODEL` at a model TokHive offers; the console's **Claude Code** tab fills them in for you. Claude Code uses these aliases for subagents and background work, so a model TokHive doesn't offer makes those requests fail. See [Set Up Claude Code](./claude-code.mdx#3-add-tokhive-to-the-claude-code-settings) for what each setting does.
+4. Under **Advanced Options**, leave **Upstream Format** on **Anthropic Messages (Native)**.
+5. Click **Add**.
+6. On the **Direct** page, click **Switch** on the TokHive card. The card shows **In use**, and Claude Code uses TokHive right away; no restart is needed.
+
+## 4. Add TokHive for Codex
+
+1. In the sidebar, select **Codex**, then click **Add Provider** (**+**).
+2. Choose **Custom Configuration** and name it `TokHive`.
+3. In the **auth.json** section, enter your key:
+
+   ```json
+   {
+     "OPENAI_API_KEY": "hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   }
+   ```
+
+   CC Switch stores the key with the provider and writes it to Codex's `config.toml` when you switch to TokHive. It doesn't write the key to `auth.json`, which Codex keeps for the official ChatGPT login.
+4. In the **config.toml** section, enter TokHive's endpoint:
+
+   ```toml
+   model_provider = "tokhive"
+   model = "gpt-6-sol"
+
+   [model_providers.tokhive]
+   name = "TokHive"
+   base_url = "https://api.tokhive.ai/v1/codex"
+   wire_api = "responses"
+   requires_openai_auth = false
+   ```
+
+5. Under **Advanced Options**, leave **Upstream Format** on **Responses (native)**.
+6. In the **Model Mapping** table, add a row for each TokHive model you want in Codex's `/model` picker. Put the model ID, such as `gpt-6-sol`, under **Actual Request Model**, and a name of your choice under **Menu Display Name**. The first row is the default model. The console's **Codex** tab and the [price list](https://tokhive.ai/models/) show the offered models.
+7. Click **Add**, then click **Switch** on the TokHive card.
+8. Quit Codex and start it again; Codex reads its provider only at startup.
+
+## 5. Check that it works
+
+Run a one-off request in each tool you set up:
+
+```sh
+claude -p "Reply with exactly OK."
+codex exec "Reply with exactly OK."
+```
+
+Each should answer `OK`, and the calls appear in the console's **Call Records**.
+
+## Switch between TokHive and other providers
+
+- **In the app:** on a tool's **Direct** page, click **Switch** on the provider you want.
+- **From the menu bar or tray:** right-click the CC Switch icon, open the tool's submenu and pick a provider. A notification confirms the switch.
+
+Claude Code picks up the new provider immediately. Codex needs a restart: quit it and run `codex` again.
+
+To keep using your own subscription alongside TokHive, add it as another provider from the **Account sign-in** presets, such as **Claude Official** for Claude Code, and switch between the two cards.
+
+## Troubleshooting
+
+| What you see | What to do |
+| --- | --- |
+| Codex still uses the old provider | Quit Codex completely and start it again after switching. |
+| `401` or `invalid_api_key` | Edit the TokHive card and check the key. If it was revoked, create a new one and paste it in. |
+| `402` or `insufficient_balance` | Your balance is 0 or below. [Add funds](./deposits.mdx). |
+| `model_not_found` | A model on the card isn't offered: an `ANTHROPIC_DEFAULT_*_MODEL` for Claude Code, or an **Actual Request Model** for Codex. Replace it with a model from the [price list](https://tokhive.ai/models/). |
+| `503` or `no_supply` | No account can serve that model right now. Retry shortly, or pick another model. |
+| The card says **Needs Routing** | An advanced option changed the API format. Set **Upstream Format** back to the native option, and turn off **Full URL** if it's on. |
+
+For every error code, see [Errors](../api/overview.mdx#errors). For CC Switch itself, see its [user manual](https://github.com/farion1231/cc-switch/tree/main/docs/user-manual/en).
