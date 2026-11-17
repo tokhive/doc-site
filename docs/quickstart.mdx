@@ -3,6 +3,9 @@ sidebar_position: 2
 slug: /quickstart
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # QuickStart
 
 This page gets you from zero to your first call through TokHive in a few minutes. If you have an idle ChatGPT or Claude subscription, [Supply your subscription](#supply-your-subscription) shows how to earn from it.
@@ -15,15 +18,38 @@ You can use any machine that runs an OpenAI or Anthropic client.
 
 ### 1. Create an account
 
-Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) with an email address and a password of at least 10 characters.
+Register at [console.tokhive.ai/register](https://console.tokhive.ai/register) with an email address and a password of at least 8 characters.
 
 ### 2. Create an API key
 
 In the console, open **API Keys** and click **Create key**. The key starts with `hive_` and is **shown only once**, so copy it right away. You can revoke a key and create a new one at any time.
 
+Save the key as `HIVE_API_KEY`, so your tools find it in every new terminal, not just the current one:
+
+<Tabs groupId="os">
+<TabItem value="unix" label="macOS / Linux">
+
 ```sh
-export TOKHIVE_API_KEY=hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo "export HIVE_API_KEY='hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx'" >> ~/.$(basename "$SHELL")rc
+export HIVE_API_KEY='hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
+
+The first line adds the key to `~/.zshrc` or `~/.bashrc`; the second sets it in the terminal you are using now.
+
+</TabItem>
+<TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+[Environment]::SetEnvironmentVariable("HIVE_API_KEY", 'hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx', "User")
+$env:HIVE_API_KEY = 'hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+```
+
+The first line saves the key for your Windows user; the second sets it in the PowerShell window you are using now.
+
+</TabItem>
+</Tabs>
+
+The **Setup guides** on the **API Keys** page give you these commands with your own key filled in.
 
 ### 3. Add balance
 
@@ -50,55 +76,128 @@ TokHive speaks both the OpenAI and the Anthropic API. You only change the base U
 
 Both accept `Authorization: Bearer hive_...`. The Anthropic API also accepts `x-api-key: hive_...`, which the Anthropic SDKs and Claude Code use by default. The **API Keys** page has copy buttons for both URLs.
 
-#### Codex CLI
+#### Codex
 
-Add to `~/.codex/config.toml`:
+Merge this into `~/.codex/config.toml` (on Windows, `%USERPROFILE%\.codex\config.toml`), keeping your other settings:
 
 ```toml
+model = "gpt-6-sol"
 model_provider = "tokhive"
 
 [model_providers.tokhive]
 name = "TokHive"
-base_url = "https://api.tokhive.ai/v1"
-env_key = "TOKHIVE_API_KEY"
+base_url = "https://api.tokhive.ai/v1/codex"
+model_catalog_url = "https://api.tokhive.ai/v1/codex/models"
+env_key = "HIVE_API_KEY"
 wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
 ```
 
-Then run `codex` as usual, with `TOKHIVE_API_KEY` set.
+Then run `codex` as usual. Codex uses its own endpoint under `/v1/codex`, which passes its requests through unchanged, so new Codex versions keep working.
 
 #### Claude Code
 
-```sh
-export ANTHROPIC_BASE_URL=https://api.tokhive.ai/anthropic
-export ANTHROPIC_AUTH_TOKEN=$TOKHIVE_API_KEY
-claude
+Merge this into `~/.claude/settings.json` (on Windows, `%USERPROFILE%\.claude\settings.json`), keeping your other settings, then run `claude`:
+
+```json
+{
+  "model": "claude-opus-5-5",
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.tokhive.ai/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "hive_xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-5-5",
+    "ANTHROPIC_DEFAULT_FABLE_MODEL": "claude-fable-5-2"
+  }
+}
+```
+
+Claude Code reads this file in every terminal and editor, so you don't need shell variables. Besides your main model, it uses the `opus`, `sonnet`, `haiku` and `fable` aliases for subagents and background work; point each at a model TokHive offers, or those requests fail with `model_not_found`. The **Setup guides** fill all of these in from the models offered right now.
+
+#### OpenCode
+
+Merge this into `~/.config/opencode/opencode.json`, keeping your other settings, then run `opencode`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "tokhive/gpt-6-sol",
+  "provider": {
+    "tokhive": {
+      "npm": "@ai-sdk/openai",
+      "name": "TokHive",
+      "options": { "baseURL": "https://api.tokhive.ai/v1", "apiKey": "{env:HIVE_API_KEY}" },
+      "models": { "gpt-6-sol": { "name": "gpt-6-sol" } }
+    }
+  }
+}
 ```
 
 #### SDKs
 
-- **OpenAI SDK:** set `OPENAI_BASE_URL=https://api.tokhive.ai/v1` and `OPENAI_API_KEY` to your key.
-- **Anthropic SDK:** pass `base_url="https://api.tokhive.ai/anthropic"` and `api_key` set to your key.
+Pass the base URL and read the key from `HIVE_API_KEY`:
+
+- **OpenAI SDK:** `OpenAI(base_url="https://api.tokhive.ai/v1", api_key=os.environ["HIVE_API_KEY"])`
+- **Anthropic SDK:** `Anthropic(base_url="https://api.tokhive.ai/anthropic", api_key=os.environ["HIVE_API_KEY"])`
+
+The [API reference](./api/overview.mdx) has Python and Node.js examples for every endpoint.
 
 ### 5. Make your first call
 
+<Tabs groupId="os">
+<TabItem value="unix" label="macOS / Linux">
+
 ```sh
 curl https://api.tokhive.ai/v1/chat/completions \
-  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Authorization: Bearer $HIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"gpt-6-sol","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 
 curl https://api.tokhive.ai/anthropic/v1/messages \
-  -H "x-api-key: $TOKHIVE_API_KEY" \
+  -H "x-api-key: $HIVE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{"model":"claude-opus-5-5","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
 ```
 
+</TabItem>
+<TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+$body = '{"model":"gpt-6-sol","messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+Invoke-RestMethod https://api.tokhive.ai/v1/chat/completions -Method Post `
+  -Headers @{ Authorization = "Bearer $env:HIVE_API_KEY" } `
+  -ContentType "application/json" -Body $body
+
+$body = '{"model":"claude-opus-5-5","max_tokens":16,"messages":[{"role":"user","content":"Reply with exactly OK."}]}'
+Invoke-RestMethod https://api.tokhive.ai/anthropic/v1/messages -Method Post `
+  -Headers @{ "x-api-key" = $env:HIVE_API_KEY; "anthropic-version" = "2023-06-01" } `
+  -ContentType "application/json" -Body $body
+```
+
+</TabItem>
+</Tabs>
+
 To see which models you can use right now:
 
+<Tabs groupId="os">
+<TabItem value="unix" label="macOS / Linux">
+
 ```sh
-curl https://api.tokhive.ai/v1/models -H "Authorization: Bearer $TOKHIVE_API_KEY"
+curl https://api.tokhive.ai/v1/models -H "Authorization: Bearer $HIVE_API_KEY"
 ```
+
+</TabItem>
+<TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+(Invoke-RestMethod https://api.tokhive.ai/v1/models -Headers @{ Authorization = "Bearer $env:HIVE_API_KEY" }).data.id
+```
+
+</TabItem>
+</Tabs>
 
 The list only includes models that currently have supply online, so it can get shorter when providers go offline.
 

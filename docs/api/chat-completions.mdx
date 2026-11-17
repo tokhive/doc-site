@@ -21,7 +21,7 @@ OpenAI's Chat Completions format, for tools that do not speak [Responses](respon
 
 ```sh
 curl https://api.tokhive.ai/v1/chat/completions \
-  -H "Authorization: Bearer $TOKHIVE_API_KEY" \
+  -H "Authorization: Bearer $HIVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-6-sol",
@@ -33,9 +33,10 @@ curl https://api.tokhive.ai/v1/chat/completions \
 <TabItem value="python" label="Python">
 
 ```python
+import os
 from openai import OpenAI
 
-client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=TOKHIVE_API_KEY)
+client = OpenAI(base_url="https://api.tokhive.ai/v1", api_key=os.environ["HIVE_API_KEY"])
 completion = client.chat.completions.create(
     model="gpt-6-sol",
     messages=[{"role": "user", "content": "Reply with exactly OK."}],
@@ -49,7 +50,7 @@ print(completion.choices[0].message.content)
 ```ts
 import OpenAI from "openai";
 
-const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.TOKHIVE_API_KEY });
+const client = new OpenAI({ baseURL: "https://api.tokhive.ai/v1", apiKey: process.env.HIVE_API_KEY });
 const completion = await client.chat.completions.create({
   model: "gpt-6-sol",
   messages: [{ role: "user", content: "Reply with exactly OK." }],
