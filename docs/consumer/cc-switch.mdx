@@ -47,11 +47,27 @@ On Windows 10 or later, download `CC-Switch-v{version}-Windows.msi` from [GitHub
 
 CC Switch manages tools you have installed. If Claude Code or Codex isn't installed yet, install it from **Apps** at the bottom of CC Switch's sidebar, or as in the [Codex](./codex.mdx#1-install-codex) or [Claude Code](./claude-code.mdx#1-install-claude-code) guide.
 
-## 2. Create an API key
+## 2. Import TokHive from the console
 
-In the [console](https://console.tokhive.ai), open **API Keys**, click **Create key** and copy the key, which starts with `hive_` and is shown only once. Keep the dialog open: its **Codex** and **Claude Code** tabs list the models TokHive offers, which you need below. The [Codex guide](./codex.mdx#2-create-an-api-key) shows the dialog.
+The quickest way: the console fills in everything for you.
 
-## 3. Add TokHive for Claude Code
+1. In the [console](https://console.tokhive.ai), open **API Keys**, click **Create key**, name it and click **Create**.
+2. In the **Key Created** dialog, open the **Claude Code** or **Codex** tab and choose a model under **Model ID**.
+3. Click **Import to CC Switch**. Your browser asks whether to open CC Switch; allow it.
+4. CC Switch shows an import dialog with TokHive's endpoint, your key (masked) and the models. To start using TokHive right away, turn on the switch to use this provider after import, then confirm.
+5. To set up the other tool too, open its tab in the same dialog and click **Import to CC Switch** again.
+
+The link carries your new key, so the button only appears while the key is on screen; if you already closed the dialog, create another key. When you're done, click **I have saved my key**. If you use Codex, quit it and start it again. Then [check that it works](#4-check-that-it-works).
+
+:::tip[Nothing happens when you click the button?]
+Your browser hands the link to CC Switch, so CC Switch must be installed and opened at least once. On macOS, move it to the Applications folder first. If it still doesn't open, reinstall CC Switch, or add TokHive by hand as below.
+:::
+
+## 3. Or add TokHive by hand
+
+If you'd rather enter the settings yourself, for example with a key you created earlier, have the key and the console's **Codex** or **Claude Code** tab at hand: the tabs list the models TokHive offers, which you need below.
+
+### Claude Code
 
 1. In CC Switch's sidebar, select **Claude Code**, then click **Add Provider** (the **+** button) at the top right.
 2. Choose **Custom Configuration**.
@@ -75,7 +91,7 @@ In the [console](https://console.tokhive.ai), open **API Keys**, click **Create 
 5. Click **Add**.
 6. On the **Direct** page, click **Switch** on the TokHive card. The card shows **In use**, and Claude Code uses TokHive right away; no restart is needed.
 
-## 4. Add TokHive for Codex
+### Codex
 
 1. In the sidebar, select **Codex**, then click **Add Provider** (**+**).
 2. Choose **Custom Configuration** and name it `TokHive`.
@@ -106,7 +122,7 @@ In the [console](https://console.tokhive.ai), open **API Keys**, click **Create 
 7. Click **Add**, then click **Switch** on the TokHive card.
 8. Quit Codex and start it again; Codex reads its provider only at startup.
 
-## 5. Check that it works
+## 4. Check that it works
 
 Run a one-off request in each tool you set up:
 
@@ -130,6 +146,7 @@ To keep using your own subscription alongside TokHive, add it as another provide
 
 | What you see | What to do |
 | --- | --- |
+| No **Import to CC Switch** button | It appears only in the **Key Created** dialog, once the models have loaded. Create a new key, or add TokHive by hand. |
 | Codex still uses the old provider | Quit Codex completely and start it again after switching. |
 | `401` or `invalid_api_key` | Edit the TokHive card and check the key. If it was revoked, create a new one and paste it in. |
 | `402` or `insufficient_balance` | Your balance is 0 or below. [Add funds](./deposits.mdx). |
