@@ -1,0 +1,45 @@
+---
+sidebar_position: 0
+title: Why TokHive
+---
+
+# Why TokHive
+
+TokHive gives you the same OpenAI and Anthropic models you already use, for much less, with guarantees an ordinary API relay can't give. Three things set it apart.
+
+## Pay a fraction of the official price
+
+TokHive serves requests from ChatGPT and Claude subscriptions that their owners aren't using. That capacity is already paid for, so it can be offered far below the official API price: **as low as a tenth of it**.
+
+- **Compare before you call.** The [model price list](https://tokhive.ai/models/) shows each model's official price beside the lowest price on TokHive right now. Different Providers can quote different prices for the same model; see [How is the price of a request set?](./faq.mdx#how-is-the-price-of-a-request-set)
+- **Pay only for requests that succeed.** A request is charged only when it completed and its execution receipt verified, by the tokens it actually used. Failed or interrupted requests cost nothing, even if they had started to stream.
+- **No subscription, no minimum.** Add funds when you need them, with no monthly fee, deposit fee or minimum deposit.
+
+## Get the genuine official models
+
+When you ask for a model, you get that model from OpenAI or Anthropic: not a distilled copy, not a cheaper model under its name.
+
+- **Sent to the real upstream.** Requests run inside a trusted execution environment (TEE) that opens the connection to the upstream API itself, for example `chatgpt.com` or `api.anthropic.com`, over a TLS session that ends inside the enclave. The Provider's machine only relays encrypted bytes, so it can't change or substitute the request or the response.
+- **Checked on every response.** If the upstream answers as a different model from the one you asked for, TokHive rejects the response and doesn't charge you.
+- **Backed by a signed receipt.** Every execution has a receipt signed inside the TEE, recording where the request went and what came back. Hive verifies it before you are charged. See [Execution Receipts](../trust/execution-receipts.mdx).
+
+## Keep your requests private from Providers
+
+The people who supply their subscriptions never see what you send.
+
+- **Providers can't read your traffic.** A Provider's machine carries only encrypted TLS bytes between the TEE and the vendor. It can't see your prompts or your responses.
+- **Providers learn almost nothing.** Your identity is never passed to them. From the receipts of the requests they carry, they see only the target host, byte counts and timing.
+
+Hive, the marketplace service, handles your requests to route them, the way any API provider does. [Trust Model](../trust/trust-model.mdx#who-can-see-what) sets out exactly who can see what.
+
+## More reasons
+
+- **Works with the tools you use.** TokHive speaks the OpenAI API (Responses, Chat Completions, Models) and the Anthropic API (Messages and token counting). Codex, Claude Code, OpenCode and the official SDKs only need a new base URL and key. See [QuickStart](../quickstart.mdx#4-point-your-client-at-tokhive).
+- **One key for both vendors.** The same key and balance call OpenAI and Anthropic models.
+- **Keeps going when an account doesn't.** If an account fails before answering, TokHive retries on another one at no charge. A conversation stays on the account that served it where possible, so it keeps its context and prompt cache.
+- **Every call accounted for.** **Call Records** shows each call's model, input, output and cache tokens, cost, timing and, for failures, the reason.
+- **No credit card needed.** Fund your balance with stablecoins, credited one to one in US dollars. See [Deposits](./deposits.mdx).
+
+## Get started
+
+[QuickStart](../quickstart.mdx) takes you from sign-up to your first call in a few minutes.
