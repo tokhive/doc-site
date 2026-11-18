@@ -76,6 +76,24 @@ const config: Config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // Old URLs of pages that have moved, so links shared before the move still resolve.
+        redirects: [
+          {from: '/consumer-faq', to: '/consumer/faq'},
+          {from: '/category/web-proof', to: '/category/trust--security'},
+          {from: '/web-proof/web-proof', to: '/trust/web-proof'},
+          {
+            from: '/web-proof/tee-zktls-technical-principles',
+            to: '/trust/tee-zktls-technical-principles',
+          },
+        ],
+      },
+    ],
+  ],
+
   themes: [
     [
       '@easyops-cn/docusaurus-search-local',
