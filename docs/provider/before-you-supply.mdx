@@ -31,7 +31,7 @@ TokHive is designed to keep that likelihood as low as it can, by making supplied
 - **Your plan's pace.** An account never runs more requests at once than the concurrency limit set for its plan.
 - **Stopping at limits.** Bee stops at a fully used quota window. When the upstream rate-limits the account, it stays out of rotation until the time the upstream gives.
 - **One account per conversation.** A conversation stays on the account that started it, rather than jumping between accounts.
-- **Your login untouched.** Bee doesn't sign in, sign out or refresh tokens unless you turn on Claude token refresh. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
+- **Your login stays yours.** Bee doesn't sign in or sign out. It renews an expiring login only for Codex, and for Claude only if you turn on Claude token refresh. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
 
 **Consumer content is not reviewed today.** Consumers' requests run on your account, and TokHive does not yet check what they ask. The vendor's own safety systems still apply to every request, as they do to your own use. A check that refuses requests for illegal content is planned.
 
@@ -76,7 +76,7 @@ Claude's **fast mode** is billed to extra usage from the first token. TokHive ne
 
 ## Your login
 
-- Bee only reads the official client's login. Your access token leaves your machine only sealed to the TEE, and your refresh token stays in the official client's store. The one exception is Claude token refresh, which is off by default.
+- Your access token leaves your machine only sealed to the TEE. Your refresh token is never sent to TokHive: Bee uses it only on your machine, to renew a Codex login, or a Claude login if you turn on Claude token refresh. See [Renewing the login](./security.mdx#renewing-the-login).
 - Hive can't open the sealed token. The TEE can use it only through a connection that your running Bee relays: **when Bee is stopped, no request can run on your account.**
 - You can keep using Codex or Claude Code on the same account while Bee supplies it.
 

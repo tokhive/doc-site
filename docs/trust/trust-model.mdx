@@ -48,7 +48,7 @@ You trust Hive with your prompts and responses, the same way you would trust any
 
 You don't have to trust Hive with your credentials:
 
-- Your access token leaves your machine only sealed to the TEE. Your refresh token never leaves the official client's store, unless you enable token refresh for Claude, in which case Bee writes refreshed tokens back locally.
+- Your access token leaves your machine only sealed to the TEE. Your refresh token is never sent to Hive or to the TEE. Bee uses it only on your machine, to renew the login directly with the vendor: automatically for Codex, and for Claude only if you enable token refresh. See [Renewing the login](../provider/security.mdx#renewing-the-login).
 - Bee connects only to the hosts in its [allowlist](../provider/configuration.mdx#targets), and every upstream connection leaves from your own IP.
 - Bee is [open source](https://github.com/tokhive/bee), so you can check what it does with your login.
 

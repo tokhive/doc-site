@@ -23,7 +23,7 @@ Bee runs on your own machine and keeps a connection open to a **Hive**, the mark
 | Your refresh token | Stays in the official client's local store | Never | Never |
 | Consumer prompts and model responses | Encrypted TLS traffic only | Plaintext: Hive receives each Consumer request, passes it to the TEE, and returns the response to the Consumer | Plaintext, inside the enclave |
 
-Bee only reads the official client's login. It doesn't sign you in, sign you out or change the login, unless you explicitly turn on token refresh for Claude (see [Configuration](./configuration.mdx#claude)).
+Bee doesn't sign you in or out. It changes the official client's login only to renew it: a Codex login kept in `auth.json` is renewed automatically, and a Claude login only if you turn on token refresh (see [Configuration](./configuration.mdx#claude)). A renewal happens on your machine, and the refresh token is never sent to Hive or to the TEE. See [Renewing the login](./security.mdx#renewing-the-login).
 
 Every execution produces a receipt signed by the TEE. You can view and download receipts on the **Execution Receipts** page of the console. See [Trust Model](../trust/trust-model.mdx) and [Execution Receipts](../trust/execution-receipts.mdx) for the full picture.
 

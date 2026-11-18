@@ -1,0 +1,123 @@
+---
+sidebar_position: 1.6
+title: Security for Providers
+---
+
+# Security for Providers
+
+Supplying a subscription means running Bee on your machine and letting requests from Consumers run on your account. This page explains how that is kept safe: what happens to your login, what Bee does on your machine, how your account and your earnings are protected, and what you still have to trust.
+
+It is about how TokHive is built. The risk that a vendor restricts an account it considers shared is a separate matter, covered in [Account risk](./before-you-supply.mdx#account-risk).
+
+## At a glance
+
+| You may worry that | What protects you |
+| --- | --- |
+| TokHive keeps a copy of my login | Only your access token leaves your machine, encrypted to the TEE. Your refresh token never goes to TokHive. |
+| My account is used when I don't want it to be | Requests reach the vendor only through your running Bee. Stop Bee and nothing can run. |
+| Bee does something else on my machine | Bee is open source. It relays traffic only to the vendor hosts in its allowlist. |
+| Consumers' content ends up on my machine | Bee relays encrypted bytes it can't read, and stores none of them. |
+| Consumers learn who I am | Consumers never see your identity, and the TEE knows you only by a pseudonymous device ID. |
+| I am not paid for what my account served | Every execution has a receipt signed inside the TEE, which you can download and verify. |
+
+## Your login
+
+### What leaves your machine
+
+Bee reads the login that the official client already keeps: Codex for an OpenAI subscription, Claude Code for a Claude subscription. A login has two parts, and Bee treats them differently:
+
+| Part | What it is | Where it goes |
+| --- | --- | --- |
+| Access token | Lets its holder call the vendor until it expires. | Encrypted on your machine to the TEE's public key, then uploaded. |
+| Refresh token | Lets its holder obtain new access tokens. | Stays in the official client's store. It is never sent to Hive or to the TEE. |
+
+Bee never sends either token to Hive in plaintext, and never writes one to its logs.
+
+### How the access token is sealed
+
+1. Bee fetches the TEE's current public key and checks that the key matches its ID.
+1. Bee encrypts the access token on your machine, using a fresh key agreement (X25519) and authenticated encryption (AES-GCM) for every envelope.
+1. Bee uploads the sealed envelope. Hive stores and forwards it, but can't open it.
+1. The TEE opens the envelope inside the enclave and uses the token only for requests to the vendor.
+
+The TEE keeps the private key only in enclave memory and never writes it to disk. A restarted TEE has a new key, so the old envelope becomes useless, and Bee seals the token again for the new key.
+
+### Renewing the login
+
+An access token expires. Renewing it needs the refresh token, so it always happens on your machine, in a direct connection from Bee to the vendor:
+
+| Platform | When Bee renews the login | Where |
+| --- | --- | --- |
+| OpenAI | When the token is about to expire, if Codex keeps its login in `auth.json`. A login kept in the macOS Keychain is renewed only by Codex itself. | `auth.openai.com` |
+| Claude | Only if you turn on [`claude.refresh`](./configuration.mdx#claude). It is off by default, and then Bee only re-seals tokens that Claude Code has renewed itself. | `platform.claude.com` |
+
+After a renewal Bee writes the new login back to the official client's store, so the official client keeps working. Apart from that, Bee doesn't sign you in, sign you out or change the login.
+
+### Stopping is in your hands
+
+The TEE holds your sealed token, but it has no route to the vendor of its own. Every upstream connection goes through your running Bee and leaves from your machine. So:
+
+- **When Bee is stopped, no request can run on your account.** There is nothing to revoke first.
+- The envelope Bee uploaded lapses when the access token expires. Nobody but you can renew it, because the refresh token never left your machine.
+- To stop one platform and keep the other, use `bee pause --platform PLATFORM`. See [Staying in control, and leaving](./before-you-supply.mdx#staying-in-control-and-leaving).
+
+## Your machine
+
+### Open source
+
+Bee is published at [github.com/tokhive/bee](https://github.com/tokhive/bee) under the MIT license. You can read what it does with your login, and [build it yourself](./install.mdx#build-from-source) instead of using a release.
+
+The install script verifies each download against the release's `checksums.txt` before installing it. For a manual download you can run the same check yourself; see [Manual download](./install.mdx#manual-download).
+
+### What Bee connects to
+
+| Host | What for |
+| --- | --- |
+| Your Hive | The control connection, and the encrypted traffic between the TEE and the vendor. |
+| `chatgpt.com:443` | OpenAI subscription: relayed requests, and reading your models and quota. |
+| `api.anthropic.com:443` | Claude subscription: relayed requests, and reading your models and quota. |
+| `auth.openai.com`, `platform.claude.com` | Renewing the login, as described [above](#renewing-the-login). |
+
+Traffic that Bee relays for the TEE can only go to the addresses in the [`targets`](./configuration.mdx#targets) allowlist of your egress configuration. Bee refuses any other address, so the TEE can't use your machine to reach anything else.
+
+### What Bee can see
+
+Consumer requests run inside the TEE, which opens its own TLS session to the vendor. That session ends inside the enclave, not on your machine. Bee carries its encrypted bytes and can't read, change or store them. Neither you nor anything else on your machine sees a Consumer's prompts or the model's responses.
+
+### What Bee keeps on disk
+
+- **The device configuration**, `bee.json`, holds the Hive address and the device secret that proves your pairing. Bee writes it with mode `0600` and refuses to use a file that other users can read. See [Device configuration](./configuration.mdx#device-configuration).
+- **The egress configuration**, `egress.json`, lists the subscriptions you supply and the allowlist. It holds no token.
+- **Logs** never contain tokens, prompts or responses.
+
+The device secret identifies your Bee to Hive. It is not a login to OpenAI or Anthropic, and it can't be used to call them.
+
+## Your account
+
+- **Nothing is added to your conversation history.** OpenAI requests are sent with `store: false`, and Claude requests go through Claude Code's API, not claude.ai.
+- **Your identity stays private.** Consumers can't see which Provider served them. The TEE knows your Bee only by a pseudonymous device ID.
+- **A fixed pace.** An account never runs more requests at once than the concurrency limit set for its plan.
+- **Stopping at limits.** Bee stops taking work when a quota window is fully used. When the vendor rate-limits the account, it stays out of rotation until the time the vendor gives.
+- **No fast mode.** TokHive never sends a Claude fast-mode request to your account, which would be billed to extra usage from the first token. See [Usage that is billed beyond your subscription](./before-you-supply.mdx#usage-that-is-billed-beyond-your-subscription) for the paid usage that can still occur.
+- **No silent account change.** If you sign in to a different account in the official client, Bee pauses that platform until you confirm the change with `bee confirm-account`.
+- **One owner per account.** A subscription account can be supplied by only one TokHive account, so nobody else can register yours once you have.
+
+## Your earnings
+
+- **Paid per verified execution.** Each execution has a [receipt](../trust/execution-receipts.mdx) signed inside the TEE. Hive verifies it before it charges the Consumer and credits you.
+- **You can check it yourself.** The **Execution Receipts** page of the console lists the receipt of every execution your Bee carried. You can download each one and verify it with the open-source [verifier](https://github.com/tokhive/verifier).
+- **Settled earnings stay yours.** Stopping Bee doesn't affect them. If the marketplace suspends your supply, your earnings are not frozen: you can still transfer and spend them.
+
+## What you still trust
+
+No design removes trust completely. Supplying a subscription relies on these:
+
+- **The TEE.** Your access token is in plaintext inside the enclave. You trust that the TEE runs the published image and keeps the token there. The enclave is an AMD SEV-SNP virtual machine, its [source and releases](https://github.com/tokhive/tee) are public, and Hive checks its hardware attestation on every connection. See [Trusting the TEE](../trust/trust-model.mdx#trusting-the-tee).
+- **The vendor.** OpenAI and Anthropic may restrict an account they consider shared. See [Account risk](./before-you-supply.mdx#account-risk).
+- **Consumers.** Their requests run on your account, and TokHive doesn't yet review what they ask. They are bound by the [Acceptable Use Policy](https://tokhive.ai/acceptable-use), and the vendor's own safety systems apply to every request.
+
+The full picture, for Consumers too, is in the [Trust Model](../trust/trust-model.mdx).
+
+## Report a vulnerability
+
+Report security vulnerabilities privately through [GitHub private vulnerability reporting](https://github.com/tokhive/tee/security/advisories/new) on tokhive/tee. It covers every TokHive component, including Bee.
