@@ -18,8 +18,9 @@
   --ifm-color-primary-lighter: #688700;
   --ifm-color-primary-lightest: #779a00;
 
-  --ifm-font-family-base: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Self-hosted variable fonts from @fontsource-variable, loaded in src/clientModules/fonts.ts. */
+  --ifm-font-family-base: 'Sora Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
   --ifm-heading-font-weight: 600;
   --ifm-font-weight-bold: 600;
   --ifm-line-height-base: 1.65;
@@ -148,6 +149,18 @@ h3 {
 .medium-zoom-overlay,
 .medium-zoom-image--opened {
   z-index: calc(var(--ifm-z-index-fixed) + 1);
+}
+
+/* Links in body text: underline them so they don't rely on color alone (WCAG 1.4.1). */
+.markdown a:not(.hash-link):not(.card) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.markdown a:not(.hash-link):not(.card):hover {
+  text-decoration-color: currentColor;
 }
 
 /* Code */
