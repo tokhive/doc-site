@@ -92,6 +92,13 @@ When Bee and the official client use the same account, a refresh of the login on
 
 Another machine was paired to your account and replaced this one. Run Bee on the new machine. To supply from this machine again, run `bee login` here and confirm the replacement in the console.
 
+### Bee stops: "the TEE did not prove the inbox key belongs to a trusted enclave"
+
+Before it seals your login, Bee checks the TEE's hardware attestation against the TEE images built into its release (see [How the access token is sealed](./security.mdx#how-the-access-token-is-sealed)). This message means the check failed, so Bee sent nothing and stopped. Retrying doesn't help.
+
+- **Most often, Bee is older than the TEE.** After a TEE upgrade, a Bee release that doesn't know the new image refuses it. [Update Bee](./install.mdx) and start it again.
+- If the latest Bee still stops with this message, keep it stopped and [report it](./security.mdx#report-a-vulnerability) with the full message and the time.
+
 ## Why an account is not taking work
 
 These are the reasons Hive gives. `bee status` shows the description; `bee supply-status` and the **Bee Device** page show the code. Reasons marked **administrator** need the marketplace administrator.
