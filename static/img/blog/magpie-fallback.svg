@@ -1,0 +1,41 @@
+<svg viewBox="0 0 680 360" width="100%" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Sora, system-ui, -apple-system, Segoe UI, sans-serif">
+<title>One gateway, with TokHive as the fallback</title>
+<desc>Claude Code and Codex send their requests to magpie's local gateway at 127.0.0.1:3425. A routing group in order mode sends each request to your own Claude or ChatGPT plan first, and to TokHive when the plan has hit its limit.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect x="0" y="0" width="680" height="360" rx="14" fill="#141517" stroke="#34373a" stroke-width="0.5"/>
+<text x="40" y="45" font-size="15" font-weight="500" fill="#f2f2ee">One gateway, with a fallback</text>
+<text x="40" y="68" font-size="12" fill="#b4b6b0">A routing group tries your own plan first, then TokHive</text>
+
+<text x="40" y="108" font-size="11" fill="#b4b6b0">AGENTS</text>
+<rect x="40" y="118" width="150" height="52" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="56" y="149" font-size="13" font-weight="500" fill="#f2f2ee">Claude Code</text>
+<rect x="40" y="186" width="150" height="52" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="56" y="217" font-size="13" font-weight="500" fill="#f2f2ee">Codex</text>
+
+<rect x="236" y="118" width="170" height="120" rx="12" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="321" y="164" font-size="14" font-weight="500" text-anchor="middle" fill="#f2f2ee">magpie gateway</text>
+<text x="321" y="186" font-size="11" text-anchor="middle" fill="#b4b6b0" font-family="JetBrains Mono, ui-monospace, monospace">127.0.0.1:3425</text>
+<text x="321" y="208" font-size="11" text-anchor="middle" fill="#b4b6b0">routing=order</text>
+
+<path d="M194 144 L232 160" fill="none" stroke="#b4b6b0" stroke-width="1" marker-end="url(#arrow)"/>
+<path d="M194 212 L232 196" fill="none" stroke="#b4b6b0" stroke-width="1" marker-end="url(#arrow)"/>
+
+<text x="452" y="108" font-size="11" fill="#b4b6b0">ROUTING GROUP</text>
+<rect x="452" y="118" width="188" height="52" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="468" y="141" font-size="13" fill="#e6e7e2">1 · Your own plan</text>
+<text x="468" y="160" font-size="11" fill="#b4b6b0">Claude or ChatGPT, until its limit</text>
+<rect x="452" y="186" width="188" height="52" rx="10" fill="#1c1e20" stroke="#c8f031" stroke-width="0.75"/>
+<text x="468" y="209" font-size="13" font-weight="500" fill="#c8f031">2 · TokHive</text>
+<text x="468" y="228" font-size="11" fill="#b4b6b0">takes over, same models</text>
+
+<path d="M410 160 L448 146" fill="none" stroke="#b4b6b0" stroke-width="1" marker-end="url(#arrow)"/>
+<path d="M410 196 L448 210" fill="none" stroke="#c8f031" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="40" y="270" width="600" height="56" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="56" y="293" font-size="12" fill="#e6e7e2">When the plan answers with a limit error, magpie retries the same request on TokHive</text>
+<text x="56" y="312" font-size="12" fill="#b4b6b0">before the agent sees it. When the plan resets, requests go back to it.</text>
+</svg>
