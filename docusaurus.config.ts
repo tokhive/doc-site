@@ -136,9 +136,11 @@ const config: Config = {
           position: 'right',
         },
         {
+          // Icon only: the GitHub mark is drawn by .header-github-link in custom.css.
           href: 'https://github.com/tokhive',
-          label: 'GitHub',
           position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub',
         },
       ],
     },
