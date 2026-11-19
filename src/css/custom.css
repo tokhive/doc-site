@@ -96,6 +96,20 @@ h3 {
   border-bottom: 1px solid var(--th-line);
 }
 
+/*
+ * A backdrop-filter makes the navbar the containing block for its fixed
+ * children, which squeezes the mobile drawer (.navbar-sidebar) into the 60px
+ * bar. Drop the blur while the drawer is open so it fills the viewport again,
+ * and give the drawer an opaque background so page text does not show through.
+ */
+.navbar.navbar-sidebar--show {
+  backdrop-filter: none;
+}
+
+.navbar-sidebar {
+  background-color: var(--ifm-background-color);
+}
+
 .navbar__title {
   font-weight: 700;
   font-size: 1.15rem;
