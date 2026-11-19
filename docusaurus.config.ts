@@ -92,6 +92,30 @@ const config: Config = {
         ],
       },
     ],
+    [
+      // Writes /llms.txt (an index) and /llms-full.txt (every doc in one file) so AI
+      // coding tools can read these docs. See https://llmstxt.org.
+      'docusaurus-plugin-llms',
+      {
+        title: 'TokHive Docs',
+        description:
+          'TokHive is a decentralized marketplace for AI inference: consumers call OpenAI- and Anthropic-compatible APIs, providers supply idle AI subscriptions.',
+        // The docs are served from the site root (routeBasePath '/'); the plugin assumes '/docs' otherwise.
+        docsDir: [{path: 'docs', routeBasePath: '/'}],
+        excludeImports: true,
+        removeDuplicateHeadings: true,
+        // Site-relative paths: a bare 'quickstart.mdx' also matches provider/quickstart.mdx.
+        includeOrder: [
+          'docs/intro.mdx',
+          'docs/quickstart.mdx',
+          'docs/consumer/**',
+          'docs/api/**',
+          'docs/provider/**',
+          'docs/trust/**',
+          'docs/glossary.mdx',
+        ],
+      },
+    ],
   ],
 
   themes: [
