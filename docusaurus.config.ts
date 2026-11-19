@@ -25,22 +25,17 @@ const config: Config = {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
-  // Set the production url of your site here
   url: 'https://docs.tokhive.ai',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
+  // GitHub Pages serves each page as <path>/index.html and 301-redirects <path> to <path>/,
+  // so canonical URLs, the sitemap and internal links all use the trailing slash.
+  trailingSlash: true,
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'tokhive', // Usually your GitHub org/user name.
-  projectName: 'doc-site', // Usually your repo name.
+  organizationName: 'tokhive',
+  projectName: 'doc-site',
 
   onBrokenLinks: 'throw',
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -53,24 +48,25 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
         },
         blog: {
+          blogDescription:
+            'Product updates, guides and research from TokHive, the decentralized marketplace for AI inference.',
           showReadingTime: true,
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
         },
         theme: {
           customCss: './src/css/custom.css',
+        },
+        sitemap: {
+          // Listing pages with no content of their own.
+          ignorePatterns: ['/search/', '/blog/archive/', '/blog/authors/**', '/blog/tags/**', '/blog/page/**'],
         },
       } satisfies Preset.Options,
     ],
@@ -133,7 +129,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
+    // Link preview image (og:image / twitter:image), 1200×630. Source: scripts/social-card/.
+    image: 'img/social-card.png',
     colorMode: {
       defaultMode: 'dark',
       respectPrefersColorScheme: false,

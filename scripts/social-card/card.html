@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+  Source of static/img/social-card.png, the docs' link preview image (1200×630).
+  Styled after tokhive.ai's own preview image. Regenerate with ./render.sh.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Sora:wght@400;700&display=block">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    box-sizing: border-box;
+    padding: 72px 80px;
+    background:
+      radial-gradient(circle at 1060px 160px, rgba(200, 240, 49, 0.16), rgba(200, 240, 49, 0) 340px),
+      #0a0b0c;
+    color: #f2f2ee;
+    font-family: 'Sora', sans-serif;
+  }
+  .brand { display: flex; align-items: center; gap: 22px; }
+  .brand svg { width: 60px; height: 60px; }
+  .brand span { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+  h1 {
+    margin: 108px 0 0;
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1;
+  }
+  h1 em { font-style: normal; color: #c8f031; }
+  p { margin: 30px 0 0; font-size: 30px; color: #a9aba5; letter-spacing: -0.01em; }
+  .foot {
+    position: absolute; left: 80px; right: 80px; bottom: 64px;
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+  .foot .tags { color: #c8f031; text-transform: uppercase; }
+  .foot .url { color: #c9cbc5; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50,6 L88.1,28 L88.1,72 L50,94 L11.9,72 L11.9,28 Z M11.9,36.5 h76.2 v9 h-76.2 Z M11.9,54.5 h76.2 v9 h-76.2 Z" fill="#C8F031" fill-rule="evenodd"/></svg>
+    <span>TokHive</span>
+  </div>
+  <h1>TokHive <em>Docs.</em></h1>
+  <p>Call Claude and GPT for less, or earn from an idle subscription.</p>
+  <div class="foot">
+    <span class="tags">Quickstart · API · Provider guide · Trust model</span>
+    <span class="url">docs.tokhive.ai</span>
+  </div>
+</body>
+</html>
