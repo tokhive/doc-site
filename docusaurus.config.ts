@@ -116,6 +116,8 @@ const config: Config = {
         ],
       },
     ],
+    // Tap or click a doc image to see it full screen; options are under themeConfig.zoom.
+    'docusaurus-plugin-image-zoom',
   ],
 
   themes: [
@@ -215,6 +217,17 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.vsDark,
+    },
+    // docusaurus-plugin-image-zoom (medium-zoom). Images inside links keep opening the link.
+    zoom: {
+      selector: '.markdown img:not(a img)',
+      background: {
+        light: 'rgb(251, 251, 248)',
+        dark: 'rgb(10, 11, 12)',
+      },
+      config: {
+        margin: 16,
+      },
     },
   } satisfies Preset.ThemeConfig,
 };

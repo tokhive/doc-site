@@ -144,6 +144,12 @@ h3 {
   font-weight: 600;
 }
 
+/* Image zoom (medium-zoom): its overlay sets no z-index, so lift it and the opened image above the fixed navbar. */
+.medium-zoom-overlay,
+.medium-zoom-image--opened {
+  z-index: calc(var(--ifm-z-index-fixed) + 1);
+}
+
 /* Code */
 code {
   border: none;
