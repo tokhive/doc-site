@@ -40,7 +40,7 @@ Two points follow from this table:
 
 You trust Hive with your prompts and responses, the same way you would trust any API provider. In exchange, the TEE gives you guarantees no ordinary relay can:
 
-- Your request is sent to the real upstream host (`chatgpt.com` or `api.anthropic.com`), over a TLS session that ends inside the TEE. The Provider's machine only relays encrypted bytes and can't read, change or substitute the request or the response.
+- Your request goes only to a host on the allowlist built into the TEE image, over a TLS session that ends inside the TEE. For a Provider's subscription or API key, that is the vendor's own endpoint: `chatgpt.com`, `api.openai.com` or `api.anthropic.com`. When [fallback supply](../consumer/faq.mdx#what-happens-when-no-provider-can-take-my-request) serves the request, it goes to a vetted premium API service instead. The receipt records the host that was actually called. The Provider's machine only relays encrypted bytes and can't read, change or substitute the request or the response.
 - Every execution has a receipt signed inside the TEE, and Hive verifies it before you are charged. See [Execution Receipts](./execution-receipts.mdx).
 - A Provider can't see who you are or what you asked.
 

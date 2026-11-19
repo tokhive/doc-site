@@ -19,7 +19,7 @@ TokHive serves requests from ChatGPT and Claude subscriptions that their owners 
 
 When you ask for a model, you get that model from OpenAI or Anthropic: not a distilled copy, not a cheaper model under its name.
 
-- **Sent to the real upstream.** Requests run inside a trusted execution environment (TEE) that opens the connection to the upstream API itself, for example `chatgpt.com` or `api.anthropic.com`, over a TLS session that ends inside the enclave. The Provider's machine only relays encrypted bytes, so it can't change or substitute the request or the response.
+- **Sent to the real upstream.** Requests run inside a trusted execution environment (TEE) that opens the connection to the upstream API itself, for example `chatgpt.com` or `api.anthropic.com`, over a TLS session that ends inside the enclave. The Provider's machine only relays encrypted bytes, so it can't change or substitute the request or the response. A request served by [fallback supply](./faq.mdx#what-happens-when-no-provider-can-take-my-request) goes to a vetted premium API service instead, and the receipt shows which host served it.
 - **Checked on every response.** If the upstream answers as a different model from the one you asked for, TokHive rejects the response and doesn't charge you.
 - **Backed by a signed receipt you can check yourself.** Every execution has a receipt signed inside the TEE, recording where the request went and what came back. Hive verifies it before you are charged, and you can download it from **Call Records** and verify it with the open-source [TokHive verifier](https://verifier.tokhive.ai/), without trusting Hive. See [Verify a receipt yourself](../trust/execution-receipts.mdx#verify-a-receipt-yourself).
 
