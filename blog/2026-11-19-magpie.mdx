@@ -4,12 +4,12 @@ title: "Meet magpie: Every Agent's Model in One Place, With TokHive as the Fallb
 date: 2026-11-19
 authors: [tokhive]
 tags: [guides]
-description: "magpie is a free, open-source app that picks the model for every coding agent from one place, through one local gateway. Here is what it does, why it pairs well with TokHive, and how to add TokHive as a provider and a fallback."
+description: "magpie is a free, open-source app that picks the model for every coding agent from one place, through one local gateway. Here is what it does, why it pairs well with TokHive, and how to import TokHive from the console as a provider and a fallback."
 ---
 
 Claude Code keeps its model in `~/.claude/settings.json`, Codex in `~/.codex/config.toml`, and every other agent somewhere of its own, each with its own keys and base URLs. A subscription you pay for works in one agent and nowhere else, and when its 5-hour window runs out in the middle of a task, the agent simply stops.
 
-[magpie](https://github.com/yetone/magpie) puts all of that behind one app and one local gateway. You add a provider once, pick a model for each agent from one list, and group providers so that when one runs out, the next takes over. Add TokHive as one of those providers, and your own plan hitting its limit no longer stops your agent: magpie sends the same request to TokHive instead.
+[magpie](https://github.com/yetone/magpie) puts all of that behind one app and one local gateway. You add a provider once, pick a model for each agent from one list, and group providers so that when one runs out, the next takes over. Add TokHive as one of those providers, and your own plan hitting its limit no longer stops your agent: magpie sends the same request to TokHive instead. The TokHive console can now add it for you: create a key, click **Import to magpie**, and confirm.
 
 {/* truncate */}
 
@@ -42,13 +42,40 @@ A routing group in `order` mode uses its first member until it can't answer, the
 - **Both APIs in one provider.** TokHive serves the Anthropic Messages API for Claude models and the OpenAI Responses and Chat Completions APIs for OpenAI models. A magpie custom provider can hold an OpenAI base URL and an Anthropic base URL at once, so one TokHive provider covers Claude Code and Codex, each on its native API.
 - **The same models your plan has.** TokHive serves first-party Claude and OpenAI models, so a group of `claude/claude-opus-5-5` and `tokhive/claude-opus-5-5` falls back to the same model, not a substitute.
 - **You pay only for the overflow.** Your subscription does the work it's paid for; TokHive's balance is used only when it runs out, at a fraction of the official API price.
-- **Every call recorded.** Calls that reach TokHive draw on one balance and appear in the console's **Call Records**, and magpie's Usage page shows how much went to each provider.
+- **Your balance in magpie, every call in the console.** magpie shows your TokHive balance on the provider's card. Calls that reach TokHive appear in the console's **Call Records**, and magpie's Usage page shows how much went to each provider.
 
-## Add TokHive to magpie
+## Import TokHive from the console
 
-First create a key: in the [console](https://console.tokhive.ai), open **API Keys** and click **Create key**. The key starts with `hive_` and is shown only once.
+The console builds the magpie link for you:
 
-Then add TokHive as a custom provider, with both base URLs. In the app, go to **Providers → Add provider**, choose a custom provider, and enter:
+1. In the [console](https://console.tokhive.ai), open **API Keys** and click **Create key**.
+2. In the **Key Created** dialog, click **Import to magpie**. Your browser opens magpie's import page, which opens the app, or offers to download it if it isn't installed.
+3. Check what magpie shows before anything is saved: the name TokHive, the hosts your prompts and key will go to (`api.tokhive.ai`), and the models. Then click **Add**.
+
+TokHive is now one provider with both of its APIs: Claude models are asked on the Anthropic Messages API and OpenAI models on Responses. The link carries your new key, so the button only appears while the key is on screen. If you've already closed the dialog, create another key, or add TokHive by hand.
+
+Then pick TokHive for an agent, or build the fallback group:
+
+```sh
+magpie claude tokhive/claude-opus-5-5          # Claude Code on TokHive
+magpie codex tokhive/gpt-6-sol                 # Codex on TokHive
+
+magpie group add "Opus with fallback" models=claude/claude-opus-5-5,tokhive/claude-opus-5-5 routing=order
+magpie claude group/opus-with-fallback         # your Claude plan first, TokHive when it runs out
+```
+
+The same is on the app's **Agents** page (pick a model) and **Routing** view (make a group). Start a new session in the agent, and run a quick check:
+
+```sh
+claude -p "Reply with exactly OK."
+codex exec "Reply with exactly OK."
+```
+
+Each should answer `OK`. The calls that went to TokHive appear in **Call Records**; `magpie provider test tokhive` also sends one small request per API and reports the latency.
+
+### Add TokHive by hand
+
+In magpie, go to **Providers → Add provider**, choose a custom provider, and enter:
 
 | Field | Value |
 | --- | --- |
@@ -63,31 +90,12 @@ Or from the terminal:
 magpie provider add TokHive url=https://api.tokhive.ai/v1 anthropic=https://api.tokhive.ai/anthropic key=hive_…
 ```
 
-TokHive accepts Claude models only on Messages and OpenAI models only on Responses and Chat Completions. Tell magpie which API each model is asked on, so it never sends one to the other:
+TokHive accepts Claude models only on Messages and OpenAI models only on Responses and Chat Completions. If a request ever comes back with `400 wrong_protocol`, tell magpie which API the model is asked on, under **API this model is asked on** in the model's settings, or from the terminal:
 
 ```sh
-magpie model api tokhive/claude-opus-5-5 tokhive/claude-sonnet-5-5 anthropic
+magpie model api tokhive/claude-opus-5-5 anthropic
 magpie model api tokhive/gpt-6-sol responses
 ```
-
-The same setting is **API this model is asked on** under a model's settings in the provider editor. Then pick TokHive for an agent, or build the fallback group:
-
-```sh
-magpie claude tokhive/claude-opus-5-5          # Claude Code on TokHive
-magpie codex tokhive/gpt-6-sol                 # Codex on TokHive
-
-magpie group add "Opus with fallback" models=claude/claude-opus-5-5,tokhive/claude-opus-5-5 routing=order
-magpie claude group/opus-with-fallback         # your Claude plan first, TokHive when it runs out
-```
-
-Start a new session in the agent, and run a quick check:
-
-```sh
-claude -p "Reply with exactly OK."
-codex exec "Reply with exactly OK."
-```
-
-Each should answer `OK`. The calls that went to TokHive appear in **Call Records**; `magpie provider test tokhive` also sends one small request per API and reports the latency.
 
 ## Get started
 
