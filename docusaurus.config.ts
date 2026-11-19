@@ -9,16 +9,7 @@ const config: Config = {
   tagline: 'A decentralized marketplace for AI Inference',
   favicon: 'img/app-icon-dark.svg',
 
-  stylesheets: [
-    {
-      href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap',
-      type: 'text/css',
-    },
-  ],
-  headTags: [
-    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'}},
-    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'}},
-  ],
+  clientModules: ['./src/clientModules/fonts.ts'],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -48,11 +39,15 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
+          editUrl: 'https://github.com/tokhive/doc-site/edit/main/',
+          // From git history; the deploy workflow checks out with fetch-depth: 0 for this.
+          showLastUpdateTime: true,
         },
         blog: {
           blogDescription:
             'Product updates, guides and research from TokHive, the decentralized marketplace for AI inference.',
           showReadingTime: true,
+          editUrl: 'https://github.com/tokhive/doc-site/edit/main/',
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
@@ -65,6 +60,8 @@ const config: Config = {
           customCss: './src/css/custom.css',
         },
         sitemap: {
+          // Last git commit date of each doc (needs showLastUpdateTime).
+          lastmod: 'date',
           // Listing pages with no content of their own.
           ignorePatterns: ['/search/', '/blog/archive/', '/blog/authors/**', '/blog/tags/**', '/blog/page/**'],
         },
