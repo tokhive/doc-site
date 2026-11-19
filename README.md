@@ -1,43 +1,27 @@
-# Website
+# TokHive Docs
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Source of [docs.tokhive.ai](https://docs.tokhive.ai), built with [Docusaurus](https://docusaurus.io/).
 
-## Installation
+## Layout
 
-```bash
-npm install
-```
+- `docs/`: the documentation, served from the site root. Each folder is a sidebar category, described by its `_category_.json`.
+- `blog/`: blog posts; authors and tags are in `authors.yml` and `tags.yml`.
+- `src/css/custom.css`: the TokHive theme on top of Docusaurus's Infima styles.
+- `static/`: files copied as-is, including `CNAME`, `robots.txt` and `img/social-card.png`.
+- `scripts/social-card/`: the HTML source of the link preview image; run `./scripts/social-card/render.sh` to regenerate the PNG.
 
-**Note**: feel free to use the package manager of your choice.
-
-## Local Development
-
-```bash
-npm run start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-## Build
+## Develop
 
 ```bash
-npm run build
+npm ci
+npm start           # dev server with live reload
+npm run build       # production build into build/, also writes llms.txt and llms-full.txt
+npm run serve       # serve build/ locally
+npm run typecheck
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Give every new page a `description` in its front matter; it is used for search results and link previews.
 
-## Deployment
+## Deploy
 
-Using SSH:
-
-```bash
-USE_SSH=true npm run deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> npm run deploy
-```
-
-If you are using GitHub Pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+GitHub Actions builds every pull request (`.github/workflows/test-deploy.yml`) and deploys `main` to GitHub Pages on every push (`.github/workflows/deploy.yml`). The custom domain comes from `static/CNAME`.
