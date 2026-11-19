@@ -1,0 +1,102 @@
+---
+slug: magpie
+title: "Meet magpie: Every Agent's Model in One Place, With TokHive as the Fallback"
+date: 2026-11-20
+authors: [tokhive]
+tags: [guides]
+description: "magpie is a free, open-source app that picks the model for every coding agent from one place, through one local gateway. Here is what it does, why it pairs well with TokHive, and how to import TokHive from the console as a provider and a fallback."
+---
+
+Claude Code keeps its model in `~/.claude/settings.json`, Codex in `~/.codex/config.toml`, and every other agent somewhere of its own, each with its own keys and base URLs. A subscription you pay for works in one agent and nowhere else, and when its 5-hour window runs out in the middle of a task, the agent simply stops.
+
+[magpie](https://github.com/yetone/magpie) puts all of that behind one app and one local gateway. You add a provider once, pick a model for each agent from one list, and group providers so that when one runs out, the next takes over. Add TokHive as one of those providers, and your own plan hitting its limit no longer stops your agent: magpie sends the same request to TokHive instead. The TokHive console can now add it for you: create a key, click **Import to magpie**, and confirm.
+
+{/* truncate */}
+
+## What magpie is
+
+magpie is a free, MIT-licensed app for macOS, Windows and Linux, with a menu bar panel, a window, a terminal UI and a CLI. It also runs in Docker. It works with Claude Code, Codex, Gemini CLI, OpenCode and dozens of other agents, and with any tool that takes a base URL.
+
+- **One model picker for every agent.** Every model of every provider you added appears as `provider/model`. Picking one rewrites only that key in the agent's own config, keeping its comments and formatting. **Profiles** switch every agent at once.
+- **One local gateway.** Agents talk to magpie at `127.0.0.1:3425`, which speaks OpenAI Chat Completions, OpenAI Responses, Anthropic Messages and Gemini, and translates between them, streaming and tool calls included. Agents never hold vendor keys.
+- **Routing groups.** Several models that an agent picks as one, such as `group/opus`, with a policy: in order, in turn, least used first, or the subscription that renews soonest. A failing or rate-limited account is skipped and the request is retried elsewhere before the agent sees an error.
+- **Subscriptions as providers.** The Claude, ChatGPT or Copilot plan you are signed in to becomes a provider that other agents can use too.
+- **Privacy masking**, off by default. Once you turn it on, API keys, tokens and emails in a prompt are replaced with placeholders on your computer before the request leaves it, and put back in the reply.
+- **Usage and cost** per agent, per provider and per key, and the quota left on every plan.
+- **Import** of the providers you already set up in CC Switch, Claude Code or Codex.
+
+:::note
+magpie is a third-party open-source project, not made by TokHive. Download it only from [usemagpie.ai](https://usemagpie.ai) or its [GitHub releases](https://github.com/yetone/magpie-releases/releases). By default it reads the sign-ins of the agents on your machine to offer your subscriptions as providers, and sends a daily anonymous usage ping; both can be turned off in **Settings → Privacy**.
+:::
+
+## How the fallback works
+
+![Claude Code and Codex send requests to magpie's local gateway, which tries your own plan first and TokHive second](/img/blog/magpie-fallback.svg)
+
+*Figure 1: A routing group in `order` mode. Your plan answers while it can; when it hits its limit, the same request goes to TokHive.*
+
+A routing group in `order` mode uses its first member until it can't answer, then the next. Put your own plan first and TokHive second, and point Claude Code at the group. While your plan has quota, nothing changes. When it returns a limit error, magpie sets that account aside until its window resets, sends the request to TokHive, and your agent carries on with the same model. A conversation stays with the account that answered it while the prompt cache is worth keeping, so one session doesn't bounce between providers turn by turn.
+
+## Why it pairs well with TokHive
+
+- **Both APIs in one provider.** TokHive serves the Anthropic Messages API for Claude models and the OpenAI Responses and Chat Completions APIs for OpenAI models. A magpie custom provider can hold an OpenAI base URL and an Anthropic base URL at once, so one TokHive provider covers Claude Code and Codex, each on its native API.
+- **The same models your plan has.** TokHive serves first-party Claude and OpenAI models, so a group of `claude/claude-opus-5-5` and `tokhive/claude-opus-5-5` falls back to the same model, not a substitute.
+- **You pay only for the overflow.** Your subscription does the work it's paid for; TokHive's balance is used only when it runs out, at a fraction of the official API price.
+- **Your balance in magpie, every call in the console.** magpie shows your TokHive balance on the provider's card. Calls that reach TokHive appear in the console's **Call Records**, and magpie's Usage page shows how much went to each provider.
+
+## Import TokHive from the console
+
+The console builds the magpie link for you:
+
+1. In the [console](https://console.tokhive.ai), open **API Keys** and click **Create key**.
+2. In the **Key Created** dialog, click **Import to magpie**. Your browser opens magpie's import page, which opens the app, or offers to download it if it isn't installed.
+3. Check what magpie shows before anything is saved: the name TokHive, the hosts your prompts and key will go to (`api.tokhive.ai`), and the models. Then click **Add**.
+
+TokHive is now one provider with both of its APIs: Claude models are asked on the Anthropic Messages API and OpenAI models on Responses. The link carries your new key, so the button only appears while the key is on screen. If you've already closed the dialog, create another key, or add TokHive by hand.
+
+Then pick TokHive for an agent, or build the fallback group:
+
+```sh
+magpie claude tokhive/claude-opus-5-5          # Claude Code on TokHive
+magpie codex tokhive/gpt-6-sol                 # Codex on TokHive
+
+magpie group add "Opus with fallback" models=claude/claude-opus-5-5,tokhive/claude-opus-5-5 routing=order
+magpie claude group/opus-with-fallback         # your Claude plan first, TokHive when it runs out
+```
+
+The same is on the app's **Agents** page (pick a model) and **Routing** view (make a group). Start a new session in the agent, and run a quick check:
+
+```sh
+claude -p "Reply with exactly OK."
+codex exec "Reply with exactly OK."
+```
+
+Each should answer `OK`. The calls that went to TokHive appear in **Call Records**; `magpie provider test tokhive` also sends one small request per API and reports the latency.
+
+### Add TokHive by hand
+
+In magpie, go to **Providers → Add provider**, choose a custom provider, and enter:
+
+| Field | Value |
+| --- | --- |
+| Name | `TokHive` |
+| OpenAI base URL | `https://api.tokhive.ai/v1` |
+| Anthropic base URL | `https://api.tokhive.ai/anthropic` |
+| API key | your `hive_…` key |
+
+Or from the terminal:
+
+```sh
+magpie provider add TokHive url=https://api.tokhive.ai/v1 anthropic=https://api.tokhive.ai/anthropic key=hive_…
+```
+
+TokHive accepts Claude models only on Messages and OpenAI models only on Responses and Chat Completions. If a request ever comes back with `400 wrong_protocol`, tell magpie which API the model is asked on, under **API this model is asked on** in the model's settings, or from the terminal:
+
+```sh
+magpie model api tokhive/claude-opus-5-5 anthropic
+magpie model api tokhive/gpt-6-sol responses
+```
+
+## Get started
+
+magpie's [getting started guide](https://usemagpie.ai/docs/start) and [reference](https://github.com/yetone/magpie/blob/main/docs/reference.md) cover installation, every agent and every routing option. If you'd rather switch providers by hand than route between them, [CC Switch](/blog/cc-switch/) does that, and the TokHive console imports into it in one click. If you only ever use TokHive, the [Claude Code](/consumer/claude-code/) and [Codex](/consumer/codex/) guides are simpler still: you set TokHive up once and don't need either app.
