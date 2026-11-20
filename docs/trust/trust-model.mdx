@@ -77,4 +77,4 @@ Neither Hive nor Bee simply trusts the TEE:
 - Hive handles Consumer prompts and responses in plaintext. End-to-end encryption is planned.
 - Consumers can download each receipt and verify its signature, hardware attestation and TEE release themselves; see [Verify a receipt yourself](./execution-receipts.mdx#verify-a-receipt-yourself). Proving which model produced a response is the goal of [Web Proof](./web-proof.mdx).
 - A receipt proves where a request was sent and what bytes came back. It does not by itself prove the token usage that was billed; Hive takes usage from the verified response.
-- Bee versions before **vX.Y.Z** don't check the TEE's attestation. They take the TEE's public key from Hive and check only that it matches its ID, so with them you trust Hive to hand over the real key. [Update Bee](../provider/install.mdx) to get the check.
+- Bee versions before **v0.0.12** don't check the TEE's attestation. They take the TEE's public key from Hive and check only that it matches its ID, so with them you trust Hive to hand over the real key. [Update Bee](../provider/install.mdx) to get the check.
