@@ -35,7 +35,8 @@ Bee never sends either token to Hive in plaintext, and never writes one to its l
 
 ### How the access token is sealed
 
-1. Bee fetches the TEE's current public key and checks that the key matches its ID.
+1. Bee asks for the TEE's current public key with a fresh random challenge. The TEE answers with a statement, signed by its attested key, that binds the public key to that challenge and to its whitelist, together with its hardware attestation report. Hive only passes the statement on.
+1. Bee checks the statement itself before it uses the key. The attestation report must be a genuine AMD SEV-SNP report for a TEE image this Bee release trusts, booted under TokHive's Secure Boot key. The whitelist and the challenge must match, and the signature must cover the public key. If any check fails, Bee sends nothing and stops. Hive can't substitute a key of its own.
 1. Bee encrypts the access token on your machine, using a fresh key agreement (X25519) and authenticated encryption (AES-GCM) for every envelope.
 1. Bee uploads the sealed envelope. Hive stores and forwards it, but can't open it.
 1. The TEE opens the envelope inside the enclave and uses the token only for requests to the vendor.
@@ -112,7 +113,7 @@ The device secret identifies your Bee to Hive. It is not a login to OpenAI or An
 
 No design removes trust completely. Supplying a subscription relies on these:
 
-- **The TEE.** Your access token is in plaintext inside the enclave. You trust that the TEE runs the published image and keeps the token there. The enclave is an AMD SEV-SNP virtual machine, its [source and releases](https://github.com/tokhive/tee) are public, and Hive checks its hardware attestation on every connection. See [Trusting the TEE](../trust/trust-model.mdx#trusting-the-tee).
+- **The TEE.** Your access token is in plaintext inside the enclave. You trust that the TEE runs the published image and keeps the token there. The enclave is an AMD SEV-SNP virtual machine, its [source and releases](https://github.com/tokhive/tee) are public, Hive checks its hardware attestation on every connection, and Bee checks it again itself before it seals your token. See [Trusting the TEE](../trust/trust-model.mdx#trusting-the-tee).
 - **The vendor.** OpenAI and Anthropic may restrict an account they consider shared. See [Account risk](./before-you-supply.mdx#account-risk).
 - **Consumers.** Their requests run on your account, and TokHive doesn't yet review what they ask. They are bound by the [Acceptable Use Policy](https://tokhive.ai/acceptable-use), and the vendor's own safety systems apply to every request.
 

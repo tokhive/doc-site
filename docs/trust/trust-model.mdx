@@ -49,6 +49,7 @@ You trust Hive with your prompts and responses, the same way you would trust any
 
 You don't have to trust Hive with your credentials:
 
+- Bee checks the TEE's hardware attestation itself before it seals anything, so the key it encrypts to belongs to a TEE image this Bee release trusts. Hive only passes the key on and can't swap in one of its own. See [How the access token is sealed](../provider/security.mdx#how-the-access-token-is-sealed).
 - Your access token leaves your machine only sealed to the TEE. Your refresh token is never sent to Hive or to the TEE. Bee uses it only on your machine, to renew the login directly with the vendor: automatically for Codex, and for Claude only if you enable token refresh. See [Renewing the login](../provider/security.mdx#renewing-the-login).
 - Bee connects only to the hosts in its [allowlist](../provider/configuration.mdx#targets), and every upstream connection leaves from your own IP.
 - Bee is [open source](https://github.com/tokhive/bee), so you can check what it does with your login.
@@ -57,9 +58,10 @@ You do trust the TEE operator's hardware attestation: that the TEE runs the publ
 
 ### Trusting the TEE
 
-Hive doesn't simply trust the TEE either:
+Neither Hive nor Bee simply trusts the TEE:
 
 - Every connection from Hive to the TEE uses mutual TLS with **remote attestation** (RA-TLS). Hive checks the hardware attestation report and that the TEE runs the expected image measurement before sending anything.
+- Bee checks the TEE's attestation independently of Hive before sealing a credential. It accepts only the TEE images and whitelist built into its release, and only a TEE booted under TokHive's Secure Boot release key.
 - Every receipt carries its own attestation report, which proves that the key that signed it belongs to a genuine SEV-SNP enclave running the expected image.
 - The list of upstream hosts and paths the TEE may call is built into the measured image, and every receipt names it.
 
@@ -75,3 +77,4 @@ Hive doesn't simply trust the TEE either:
 - Hive handles Consumer prompts and responses in plaintext. End-to-end encryption is planned.
 - Consumers can download each receipt and verify its signature, hardware attestation and TEE release themselves; see [Verify a receipt yourself](./execution-receipts.mdx#verify-a-receipt-yourself). Proving which model produced a response is the goal of [Web Proof](./web-proof.mdx).
 - A receipt proves where a request was sent and what bytes came back. It does not by itself prove the token usage that was billed; Hive takes usage from the verified response.
+- Bee versions before **v0.0.12** don't check the TEE's attestation. They take the TEE's public key from Hive and check only that it matches its ID, so with them you trust Hive to hand over the real key. [Update Bee](../provider/install.mdx) to get the check.
