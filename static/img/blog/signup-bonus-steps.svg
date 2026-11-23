@@ -1,0 +1,42 @@
+<svg viewBox="0 0 680 310" width="100%" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Sora, system-ui, -apple-system, Segoe UI, sans-serif">
+<title>Claim the sign-up bonus in three steps</title>
+<desc>Step 1: register at console.tokhive.ai/register. Step 2: set up an authenticator app under Account, Password and Recovery. Step 3: the $10 of credits for GPT models is added to your balance as soon as setup succeeds. The credits pay for GPT models only, cannot be withdrawn and do not expire.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect x="0" y="0" width="680" height="310" rx="14" fill="#141517" stroke="#34373a" stroke-width="0.5"/>
+<text x="40" y="45" font-size="15" font-weight="500" fill="#f2f2ee">Claim your $10</text>
+<text x="40" y="68" font-size="12" fill="#b4b6b0">The credits are added the moment setup succeeds</text>
+
+<rect x="40" y="98" width="180" height="120" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="56" y="124" font-size="11" fill="#b4b6b0">STEP 1</text>
+<text x="56" y="152" font-size="14" font-weight="500" fill="#f2f2ee">Register</text>
+<text x="56" y="180" font-size="11" fill="#b4b6b0" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace">console.tokhive.ai</text>
+<text x="56" y="197" font-size="11" fill="#b4b6b0" font-family="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace">/register</text>
+
+<path d="M224 158 L246 158" fill="none" stroke="#5a5d60" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="250" y="98" width="180" height="120" rx="10" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="266" y="124" font-size="11" fill="#b4b6b0">STEP 2</text>
+<text x="266" y="152" font-size="14" font-weight="500" fill="#f2f2ee">Authenticator app</text>
+<text x="266" y="180" font-size="11" fill="#b4b6b0">Account › Password and</text>
+<text x="266" y="197" font-size="11" fill="#b4b6b0">Recovery › Set up</text>
+
+<path d="M434 158 L456 158" fill="none" stroke="#c8f031" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="460" y="98" width="180" height="120" rx="10" fill="#1c1e20" stroke="#c8f031" stroke-width="0.75"/>
+<text x="476" y="124" font-size="11" fill="#c8f031">STEP 3</text>
+<text x="476" y="152" font-size="14" font-weight="500" fill="#c8f031">$10 added</text>
+<text x="476" y="180" font-size="11" fill="#b4b6b0">Credits for GPT models</text>
+<text x="476" y="197" font-size="11" fill="#b4b6b0">in your balance</text>
+
+<text x="40" y="254" font-size="11" fill="#b4b6b0">THE CREDITS</text>
+<rect x="40" y="264" width="128" height="26" rx="13" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="104" y="281" font-size="11" text-anchor="middle" fill="#e6e7e2">GPT models only</text>
+<rect x="178" y="264" width="135" height="26" rx="13" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="245.5" y="281" font-size="11" text-anchor="middle" fill="#e6e7e2">Not withdrawable</text>
+<rect x="323" y="264" width="88" height="26" rx="13" fill="#1c1e20" stroke="#34373a" stroke-width="0.5"/>
+<text x="367" y="281" font-size="11" text-anchor="middle" fill="#e6e7e2">No expiry</text>
+</svg>
