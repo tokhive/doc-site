@@ -22,7 +22,7 @@ Only for a response that completed and whose [execution receipt](../trust/execut
 
 ### How do I add funds?
 
-Deposit USDT0 on Conflux eSpace, currently the only accepted stablecoin; card and bank payments aren't supported yet. Your deposit address is yours permanently, and a deposit is credited in US dollars automatically after the network's confirmations. If your USDT is on another network or an exchange, [Deposits](./deposits.mdx) shows how to bring it to Conflux eSpace.
+Deposit a stablecoin: USDT or USDC on Ethereum, or USDT0 on Conflux eSpace. Card and bank payments aren't supported yet. Your deposit address is yours permanently and the same on both networks, and a deposit is credited in US dollars automatically after the network's confirmations. [Deposits](./deposits.mdx) shows how to deposit from a wallet or an exchange, and how to bring stablecoins from other networks.
 
 ### Why did a request cost more than the lowest listed price?
 
@@ -43,9 +43,11 @@ A request only needs a balance above zero to start, and it is charged when it fi
 
 Yes, the withdrawable part of it: funds you deposited and earnings you transferred in. Credits granted by TokHive can only be spent on requests, and they are spent first. **Balances** shows how much you can withdraw.
 
+Withdrawals are currently sent as **USDT0 on Conflux eSpace** only, whichever network you deposited on, so the receiving address must be one you control on Conflux eSpace. Any EVM wallet address works, such as your MetaMask or Rabby address. To move the USDT0 to another network afterwards, use the [USDT0 bridge](https://usdt0.to/transfer).
+
 1. In **Account**, set up an authenticator app. Every withdrawal asks for a code from it.
 2. On **Balances**, add a receiving address under **Withdrawal Addresses**. A new address can be used 24 hours after you add it.
-3. Click **Withdraw**, choose the network, address and amount, and enter your authenticator code.
+3. Click **Withdraw**, choose the network (Conflux eSpace) and the address, enter the amount, and enter your authenticator code.
 
 - The minimum is $10.
 - The fee is the network's actual gas cost. It's taken from the amount, and the form shows it before you confirm.
