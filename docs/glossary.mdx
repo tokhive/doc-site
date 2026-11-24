@@ -39,6 +39,10 @@ The fee Hive charges the Consumer on top of the Provider's quote. It is calculat
 
 The maximum number of requests that may run at once. For Consumers it applies per API key (`429 concurrency_limit`); for Providers it applies per subscription account, depending on the plan (`concurrency_full`).
 
+### Credits
+
+Funds TokHive adds to a [balance](#balance), for example a referral bonus. Credits are spent first, pay for GPT models only and can't be withdrawn. **Balances** shows them separately from withdrawable funds.
+
 ### Consumer
 
 A user who calls AI models through TokHive. Also called a buyer. The same TokHive account can act as both a Consumer and a Provider.
@@ -106,6 +110,10 @@ The price a Provider receives for its supply, before commission. A Provider eith
 ### Quote multiplier
 
 The factor applied to a model's [base price](#base-price) to get the Provider's quote. For example, `0.1` means 10% of the vendor's price. It applies equally to input, output and cached tokens.
+
+### Referral
+
+The link between an account and the account whose invite link or code it registered with. It is set at registration and can't be changed. Deposits by the invited person can earn [credits](#credits) for both of them, and their sales as a Provider earn the inviter a share. See [Referrals](./consumer/referrals.mdx).
 
 ### Relay
 
