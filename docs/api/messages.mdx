@@ -156,7 +156,8 @@ Antigravity, Google's coding agent, also offers Claude models. When no Claude su
 
 - `stop_sequences` is not sent, so it has no effect, and `stop_reason` is never `stop_sequence`.
 - Images or documents given by URL, and structured output (`output_config.format`), return `400 invalid_request` instead of being served.
-- Claude Code's opening identity sentence in the system prompt is replaced with a neutral one, and its billing header line is removed.
+- The system prompt is sent at the start of the first user message rather than as a system prompt, because Antigravity refuses some of Claude Code's system prompt text there. Claude Code's opening identity sentence is replaced with a neutral one, and its billing header line is removed.
+- A refusal from Google that gives no reason doesn't count against the account; the request moves on to the next source.
 - Cache reads are reported, but no cache writes: `cache_creation_input_tokens` is `0`.
 - Token counting never goes to a Google account.
 
