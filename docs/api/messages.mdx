@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 POST /anthropic/v1/messages
 ```
 
-Anthropic's native Messages API, served by Claude subscriptions, and by Google accounts when no Claude subscription can take a request (see [When a Google account serves the request](#when-a-google-account-serves-the-request)). Requests and responses are Anthropic's own format, streaming and non-streaming. Point an official Anthropic SDK at `https://api.tokhive.ai/anthropic` and call it as usual.
+Anthropic's native Messages API, served by Claude subscriptions. Requests and responses are Anthropic's own format, unconverted, streaming and non-streaming. Point an official Anthropic SDK at `https://api.tokhive.ai/anthropic` and call it as usual.
 
 ## Example
 
@@ -149,18 +149,6 @@ When the original account is unavailable:
 
 - Plain text, client tool calls and their results, and inline base64 images can continue on another account.
 - Thinking signatures, file references, remote image URLs, containers and unknown content blocks only make sense on the original account, so the call returns `409 session_context_unavailable`. With a `Retry-After` header, the same history can continue later; without one, start a new conversation.
-
-## When a Google account serves the request
-
-Antigravity, Google's coding agent, also offers Claude models. When no Claude subscription can take a request, a Google account can serve it through Antigravity, before any other fallback. TokHive converts the request to Antigravity's format and the answer back into Messages, so the response format and the prices are the same. A few things differ:
-
-- `stop_sequences` is not sent, so it has no effect, and `stop_reason` is never `stop_sequence`.
-- Images or documents given by URL, and structured output (`output_config.format`), return `400 invalid_request` instead of being served.
-- Claude Code's opening identity sentence in the system prompt is replaced with a neutral one, and its billing header line is removed.
-- Cache reads are reported, but no cache writes: `cache_creation_input_tokens` is `0`.
-- Token counting never goes to a Google account.
-
-A conversation started on a Google account stays on it like any other, so its thinking signatures continue there.
 
 ## Token counting
 

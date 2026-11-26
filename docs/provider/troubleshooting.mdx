@@ -50,7 +50,6 @@ A binary downloaded through a browser is quarantined. Run `xattr -d com.apple.qu
 - **OpenAI:** sign in with `codex login`. If your Codex directory is not `~/.codex`, pass `--codex-home` or set `CODEX_HOME`. Error: `BEE-SETUP-CODEX-NOT-FOUND`.
 - **Claude on macOS:** sign in with `claude`. When Bee first reads the Keychain, macOS may ask for permission; allow it. If the Keychain is locked, unlock it.
 - **Claude on Linux:** sign in with `claude` so that `~/.claude/.credentials.json` exists (or `$CLAUDE_CONFIG_DIR/.credentials.json`). It must be a regular file, not a symbolic link, and readable by the user running Bee.
-- **Google:** no official client is read. Run `bee antigravity-login` as the user that runs Bee, then `bee setup` again. Error: `BEE-ANTIGRAVITY-SOURCE`.
 - Running from a script or without a terminal: add `--yes` (`BEE-SETUP-NO-ANSWER`).
 
 You can check what Bee sees without contacting Hive:
@@ -58,10 +57,7 @@ You can check what Bee sees without contacting Hive:
 ```sh
 bee codex-status
 bee claude-status
-bee antigravity-status
 ```
-
-`bee antigravity-status --verify` also asks Google which account and tier the sign-in belongs to.
 
 ### Bee is online, but an account doesn't take work
 
@@ -74,7 +70,7 @@ Being ready means Hive *may* send work to the account. Requests only arrive when
 ### Network and proxy
 
 - `BEE-HIVE-UNREACHABLE`: Bee can't reach Hive. Check the network and the Hive address. Bee keeps retrying on its own.
-- `BEE-EGRESS-DIAL`: Bee can't reach `chatgpt.com`, `api.anthropic.com` or Google's `cloudcode-pa.googleapis.com` hosts. Check DNS, firewall, and whether this machine needs a proxy.
+- `BEE-EGRESS-DIAL`: Bee can't reach `chatgpt.com` or `api.anthropic.com`. Check DNS, firewall, and whether this machine needs a proxy.
 - `BEE-EGRESS-PROXY`: the proxy in `connect_proxy` isn't running or refused the `CONNECT`.
 
 If the machine needs a proxy for the upstream platforms, set one with `bee setup --connect-proxy http://127.0.0.1:PORT`, or export `HTTPS_PROXY`. See [Configuration](./configuration.mdx#connect_proxy).
@@ -87,8 +83,6 @@ Bee doesn't silently switch to a different account. New work for that platform i
 bee account-status --platform claude
 bee confirm-account --platform claude --account-fingerprint <full fingerprint>
 ```
-
-For Google, the account changes when you run `bee antigravity-login` with a different Google account; confirm it the same way with `--platform google`.
 
 ### The official client asks me to sign in again
 
@@ -127,9 +121,6 @@ These are the reasons Hive gives. `bee status` shows the description; `bee suppl
 | `claude_authorization_rejected` | Claude authorization rejected by upstream | Sign in to Claude Code again. |
 | `codex_confirmation_required` | OpenAI account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
 | `claude_confirmation_required` | Claude account changed; awaiting explicit confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
-| `antigravity_source_unavailable` | waiting for a new Antigravity sign-in | Run `bee antigravity-login`; a running Bee picks it up. |
-| `antigravity_authorization_rejected` | Google authorization rejected | Run `bee antigravity-login`. If Google has disabled Antigravity for the account (`BEE-ANTIGRAVITY-DISABLED`), it can't supply. |
-| `antigravity_confirmation_required` | Google account awaiting confirmation | See [I switched accounts](#i-switched-accounts-in-the-official-client). |
 | `device_draining` | device being replaced; finishing in-flight execution and settlement | Run the new Bee; it takes over once the old one has drained. |
 | `plan_not_configured` | no concurrency limit configured for this plan | **Administrator.** Email [hello@tokhive.ai](mailto:hello@tokhive.ai). |
 | `banned` | banned by administrator | **Administrator.** Email [hello@tokhive.ai](mailto:hello@tokhive.ai). |
@@ -142,7 +133,7 @@ These are the reasons Hive gives. `bee status` shows the description; `bee suppl
 | --- | --- |
 | `BEE-SETUP-NEEDED` | No subscriptions chosen yet. Bee stays online but supplies nothing. Run `bee setup`, then restart Bee. |
 | `BEE-START-HIVE` | Not paired and no Hive address given. Pass `--hive`, or copy the command from the **Bee Device** page. |
-| `BEE-SETUP-PLATFORM` | `--platform` names an unknown platform. Use `openai`, `claude` or `google`, or several separated by commas. |
+| `BEE-SETUP-PLATFORM` | `--platform` names an unknown platform. Use `openai`, `claude`, or `openai,claude`. |
 | `BEE-SETUP-CODEX-NOT-FOUND` | No Codex directory at `--codex-home`, `$CODEX_HOME` or `~/.codex`. Sign in with `codex login`, or pass the directory. |
 | `BEE-SETUP-NO-ANSWER` | Setup needs an answer but has no terminal. Run it in a terminal, or add `--yes`. |
 | `BEE-SETUP-NOTHING` | No account selected, so nothing was written. Sign in to the official clients and run `bee setup` again. |
@@ -171,23 +162,6 @@ These are the reasons Hive gives. `bee status` shows the description; `bee suppl
 | `BEE-CLAUDE-SCOPE` | The login lacks the `user:inference` scope. Sign in to Claude Code again with a subscription account. |
 | `BEE-CLAUDE-UNSUPPORTED` | `claude.store` is `keychain` on Linux. Set it to `file`, or run `bee setup` again. |
 
-### Google sign-in
-
-| Code | Meaning and fix |
-| --- | --- |
-| `BEE-ANTIGRAVITY-SOURCE` | Bee has no Google sign-in it can use: none is stored, or the file is unreadable, open to other users, a symbolic link or incomplete. Run `bee antigravity-login`. |
-| `BEE-ANTIGRAVITY-SIGNIN` | Google refused to renew the sign-in: access was removed, the password changed, or it went unused too long. Run `bee antigravity-login`; a running Bee picks it up. |
-| `BEE-ANTIGRAVITY-EXPIRED` | The access token ran out. A warning while a refresh token is stored, because Hive schedules the renewal while Bee is connected. If supply doesn't recover, run `bee antigravity-login`. |
-| `BEE-ANTIGRAVITY-LOGIN` | `bee antigravity-login` didn't finish; the message says where it stopped. Run it again. With `--no-browser`, or when port 51121 is taken, paste the whole address the browser was sent to. |
-| `BEE-ANTIGRAVITY-STORE` | The sign-in succeeded but couldn't be saved. The device configuration's directory must belong to you, and `accounts/antigravity` in it must be a real directory, not a link. |
-| `BEE-ANTIGRAVITY-TIER` | Google reports a tier Bee doesn't supply. Bee supplies the free tier, Google AI Pro and Google AI Ultra of a personal Google account. |
-| `BEE-ANTIGRAVITY-INELIGIBLE` | Google lists the account as not eligible for Antigravity, for example because of its region or account type. It can't supply. |
-| `BEE-ANTIGRAVITY-PROJECT` | Google gave the account no Antigravity project. Open the Antigravity app once with this account, then run `bee antigravity-login` again. |
-| `BEE-ANTIGRAVITY-VERIFY` | Google asks for the account to be verified first. Open the address in the message in a browser signed in to this account; Bee asks again by itself. |
-| `BEE-ANTIGRAVITY-DISABLED` | Google has disabled Antigravity for this account under its terms of service. It can't supply while that lasts; the message carries Google's appeal address if there is one. |
-| `BEE-ANTIGRAVITY-FORBIDDEN` | Google refused an account query without a reason Bee recognizes. Check the account works in the Antigravity app, then run `bee antigravity-login`. |
-| `BEE-ANTIGRAVITY-UPSTREAM` | A request to Google failed or wasn't understood. Check the network; Bee's own requests to Google follow `HTTPS_PROXY`, else `connect_proxy`. |
-
 ### Egress configuration
 
 These appear when `egress.json` was edited by hand. Running `bee setup` again usually fixes them.
@@ -206,7 +180,7 @@ These appear when `egress.json` was edited by hand. Running `bee setup` again us
 | `BEE-CONFIG-NO-TARGETS` | `targets` is empty or missing. |
 | `BEE-CONFIG-TOO-MANY-TARGETS` | More than 16 targets. |
 | `BEE-CONFIG-TARGET-FORMAT` | A target isn't `host:port`. |
-| `BEE-CONFIG-TARGET-MISSING` | A configured platform's address is missing from `targets`: `chatgpt.com:443` for `codex`, `api.anthropic.com:443` for `claude`, both `cloudcode-pa.googleapis.com:443` and `daily-cloudcode-pa.googleapis.com:443` for `antigravity`. |
+| `BEE-CONFIG-TARGET-MISSING` | A configured platform's address is missing from `targets`: `chatgpt.com:443` for `codex`, `api.anthropic.com:443` for `claude`. |
 | `BEE-CONFIG-NO-SOURCE` | Neither `codex` nor `claude` is configured. |
 | `BEE-CONFIG-PROXY` | `connect_proxy` isn't `http://127.0.0.1:PORT` (or another loopback address). |
 | `BEE-CONFIG-CAPABILITIES-SOURCE` | The top-level `capabilities` needs `codex`. For Claude, use `claude.capabilities: true`. |

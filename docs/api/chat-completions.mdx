@@ -61,7 +61,7 @@ console.log(completion.choices[0].message.content);
 </TabItem>
 </Tabs>
 
-`model` and a non-empty `messages` are required. OpenAI and Gemini models are accepted; a Claude model returns `400 wrong_protocol`. For a Gemini model, see [Gemini models](#gemini-models). `"stream": true` returns chunks as server-sent events, and otherwise a single JSON object is returned.
+`model` and a non-empty `messages` are required. Only OpenAI models are accepted; a Claude model returns `400 wrong_protocol`. `"stream": true` returns chunks as server-sent events, and otherwise a single JSON object is returned.
 
 ## Supported fields
 
@@ -81,25 +81,6 @@ Images must be inline base64 data URLs (PNG, JPEG, GIF or WebP). Remote image UR
 ## Ignored fields
 
 `temperature`, `top_p`, `max_tokens`, `max_completion_tokens`, `stop`, `n`, `logprobs`, `user`, `presence_penalty`, `frequency_penalty`, `metadata` and similar fields are **silently dropped**: the subscription upstream does not accept them. Don't rely on them to shape the output, and in particular don't rely on `max_tokens` to limit its length.
-
-These two lists describe OpenAI models. Gemini models take more of the sampling fields; see below.
-
-## Gemini models
-
-A request for a Gemini model is converted to the [Gemini API](gemini.mdx) instead of Responses, and its result back into Chat's format. Supply, verification and billing are those of the Gemini API. Gemini models are not in `/v1/models`, so enter the model ID by hand.
-
-| Chat field | Behavior with a Gemini model |
-| --- | --- |
-| `system` and `developer` messages | Joined, in order, into the system instruction. |
-| `temperature`, `top_p`, `max_completion_tokens` (or `max_tokens`), `stop` | Sent to the model. |
-| `reasoning_effort` | Sets the thinking level, and the thoughts come back in `reasoning_content`. Gemini models can't turn thinking off: `none` is sent as `low`, and the response says so in `X-Hive-Adjusted-Params`. Without it, no thoughts are returned. |
-| `tools`, `tool_choice`, `response_format` | Function tools and JSON schemas are supported. A schema's name and `strict` have no counterpart and are dropped. |
-| `tool_calls` | A call's thought signature comes back in `extra_content.google.thought_signature`, where Google's own OpenAI-compatible endpoint puts it. Send it back unchanged with the call; without it the model loses its reasoning from the previous turn, though the request still works. |
-| `n`, `seed`, penalties, `logprobs`, `logit_bias`, `user`, `metadata` | Dropped, and named in `X-Hive-Ignored-Params`. |
-
-Remote image URLs, tool types other than functions, audio and file content, images inside tool results, and tool results that answer no earlier call are refused with `400`.
-
-`finish_reason` is `tool_calls` when the answer calls a tool, `length` at the token limit, `content_filter` when a safety rule stopped it, and `stop` otherwise. `prompt_tokens` includes cached tokens, which are also listed as `cached_tokens`, and `completion_tokens` includes thinking, also listed as `reasoning_tokens`.
 
 ## Conversations
 
