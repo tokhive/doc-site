@@ -24,12 +24,12 @@ It is about how TokHive is built. The risk that a vendor restricts an account it
 
 ### What leaves your machine
 
-Bee reads the login that the official client already keeps: Codex for an OpenAI subscription, Claude Code for a Claude subscription. A login has two parts, and Bee treats them differently:
+Bee reads the login that the official client already keeps: Codex for an OpenAI subscription, Claude Code for a Claude subscription. For a Google account no official client keeps a login Bee could read, so `bee antigravity-login` signs in and Bee keeps the result in `accounts/antigravity/credentials.json` beside the device configuration, readable only by you. A login has two parts, and Bee treats them differently:
 
 | Part | What it is | Where it goes |
 | --- | --- | --- |
 | Access token | Lets its holder call the vendor until it expires. | Encrypted on your machine to the TEE's public key, then uploaded. |
-| Refresh token | Lets its holder obtain new access tokens. | Stays in the official client's store. It is never sent to Hive or to the TEE. |
+| Refresh token | Lets its holder obtain new access tokens. | Stays in the official client's store, or in Bee's own file for Google. It is never sent to Hive or to the TEE. |
 
 Bee never sends either token to Hive in plaintext, and never writes one to its logs.
 
@@ -51,8 +51,9 @@ An access token expires. Renewing it needs the refresh token, so it always happe
 | --- | --- | --- |
 | OpenAI | When the token is about to expire, if Codex keeps its login in `auth.json`. A login kept in the macOS Keychain is renewed only by Codex itself. | `auth.openai.com` |
 | Claude | Only if you turn on [`claude.refresh`](./configuration.mdx#claude). It is off by default, and then Bee only re-seals tokens that Claude Code has renewed itself. | `platform.claude.com` |
+| Google | When Hive schedules it, before the token expires. | `oauth2.googleapis.com` |
 
-After a renewal Bee writes the new login back to the official client's store, so the official client keeps working. Apart from that, Bee doesn't sign you in, sign you out or change the login.
+After a renewal Bee writes the new login back to the official client's store, so the official client keeps working. Apart from that, Bee doesn't sign you in to the official clients, sign you out or change the login. If Google refuses to renew its sign-in, Bee stops offering it and asks you to run `bee antigravity-login` again.
 
 ### Stopping is in your hands
 
@@ -77,7 +78,8 @@ The install script verifies each download against the release's `checksums.txt` 
 | Your Hive | The control connection, and the encrypted traffic between the TEE and the vendor. |
 | `chatgpt.com:443` | OpenAI subscription: relayed requests, and reading your models and quota. |
 | `api.anthropic.com:443` | Claude subscription: relayed requests, and reading your models and quota. |
-| `auth.openai.com`, `platform.claude.com` | Renewing the login, as described [above](#renewing-the-login). |
+| `cloudcode-pa.googleapis.com:443`, `daily-cloudcode-pa.googleapis.com:443` | Google account: relayed requests, and reading your account, models and quota. |
+| `auth.openai.com`, `platform.claude.com`, `oauth2.googleapis.com` | Renewing the login, as described [above](#renewing-the-login). |
 
 Traffic that Bee relays for the TEE can only go to the addresses in the [`targets`](./configuration.mdx#targets) allowlist of your egress configuration. Bee refuses any other address, so the TEE can't use your machine to reach anything else.
 
@@ -89,6 +91,7 @@ Consumer requests run inside the TEE, which opens its own TLS session to the ven
 
 - **The device configuration**, `bee.json`, holds the Hive address and the device secret that proves your pairing. Bee writes it with mode `0600` and refuses to use a file that other users can read. See [Device configuration](./configuration.mdx#device-configuration).
 - **The egress configuration**, `egress.json`, lists the subscriptions you supply and the allowlist. It holds no token.
+- **The Google sign-in**, `accounts/antigravity/credentials.json`, only if you supply a Google account. It holds the access and refresh tokens. Bee writes it with mode `0600` in a directory that must belong to you, and refuses symbolic links.
 - **Logs** never contain tokens, prompts or responses.
 
 The device secret identifies your Bee to Hive. It is not a login to OpenAI or Anthropic, and it can't be used to call them.
@@ -114,7 +117,7 @@ The device secret identifies your Bee to Hive. It is not a login to OpenAI or An
 No design removes trust completely. Supplying a subscription relies on these:
 
 - **The TEE.** Your access token is in plaintext inside the enclave. You trust that the TEE runs the published image and keeps the token there. The enclave is an AMD SEV-SNP virtual machine, its [source and releases](https://github.com/tokhive/tee) are public, Hive checks its hardware attestation on every connection, and Bee checks it again itself before it seals your token. See [Trusting the TEE](../trust/trust-model.mdx#trusting-the-tee).
-- **The vendor.** OpenAI and Anthropic may restrict an account they consider shared. See [Account risk](./before-you-supply.mdx#account-risk).
+- **The vendor.** OpenAI and Anthropic may restrict an account they consider shared, and Google has disabled Antigravity for accounts used through third-party software. See [Account risk](./before-you-supply.mdx#account-risk).
 - **Consumers.** Their requests run on your account, and TokHive doesn't yet review what they ask. They are bound by the [Acceptable Use Policy](https://tokhive.ai/acceptable-use), and the vendor's own safety systems apply to every request.
 
 The full picture, for Consumers too, is in the [Trust Model](../trust/trust-model.mdx).

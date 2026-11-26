@@ -118,6 +118,38 @@ for await (const model of client.models.list()) {
 
 The whole list always fits on one page, so `has_more` is always `false`. Retrieving a model that is not in the list returns `404`.
 
+## Gemini models
+
+```http
+GET /gemini/v1beta/models
+GET /gemini/v1beta/models/{model}
+```
+
+Lists the Gemini models you can call through the [Gemini API](gemini.mdx), in Google's format. Each model's `name` is `models/` followed by its ID.
+
+```sh
+curl https://api.tokhive.ai/gemini/v1beta/models \
+  -H "x-goog-api-key: $HIVE_API_KEY"
+```
+
+```json
+{
+  "models": [
+    {
+      "name": "models/gemini-4-argon",
+      "baseModelId": "gemini-4-argon",
+      "displayName": "Gemini 4 Argon",
+      "inputTokenLimit": 1048576,
+      "supportedGenerationMethods": ["generateContent", "streamGenerateContent"]
+    }
+  ]
+}
+```
+
+`inputTokenLimit` is present when the model's context window is known. Retrieving a model that is not in the list returns `404` in Google's error shape.
+
+Gemini models are not in `/v1/models`, although [Chat Completions](chat-completions.mdx#gemini-models) serves them: enter the model ID in your Chat client by hand.
+
 ## Codex model catalog
 
 ```http

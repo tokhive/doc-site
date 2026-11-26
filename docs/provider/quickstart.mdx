@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1.7
 title: Provider Quickstart
-description: "Start supplying your ChatGPT or Claude subscription in about ten minutes: create an account, sign in to the official client, then install and start Bee."
+description: "Start supplying your ChatGPT, Claude or Google subscription in about ten minutes: create an account, sign in, then install and start Bee."
 ---
 
 import Tabs from '@theme/Tabs';
@@ -36,6 +36,8 @@ claude                                           # then sign in with your Claude
 Claude Code's npm package is deprecated; use the native installer or Homebrew.
 
 On a server without a browser, run `codex login --device-auth` and complete the sign-in on another device. Claude Code shows a sign-in link that you can open on another device. Check that it worked with a short request, for example `codex exec "say hi"`, or by asking Claude Code something.
+
+**Google (Antigravity):** there is no official client to sign in to. Bee signs in itself: after you install Bee in the next step, run `bee antigravity-login` before you start it (add `--no-browser` on a server). Read the [Google account risk](./before-you-supply.mdx#account-risk) first.
 
 ## 3. Install Bee and start it
 
