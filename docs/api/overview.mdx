@@ -1,21 +1,22 @@
 ---
 sidebar_position: 1
 title: Overview
-description: "TokHive's OpenAI- and Anthropic-compatible APIs: endpoints, base URLs, authentication and errors. Official SDKs work after changing the base URL and key."
+description: "TokHive's OpenAI-, Anthropic- and Gemini-compatible APIs: endpoints, base URLs, authentication and errors. Official SDKs work after changing the base URL and key."
 ---
 
 # Overview
 
-TokHive serves first-party OpenAI and Claude models through two compatible APIs. Each one imitates its vendor's API, including the request format, the response format and the error shape, so the official SDKs and tools work after you change only the base URL and the API key.
+TokHive serves first-party OpenAI, Claude and Gemini models through three compatible APIs. Each one imitates its vendor's API, including the request format, the response format and the error shape, so the official SDKs and tools work after you change only the base URL and the API key.
 
 | API | URL | SDK base URL | Models |
 | --- | --- | --- | --- |
 | OpenAI compatible | `https://api.tokhive.ai/v1` | `https://api.tokhive.ai/v1` | OpenAI |
 | Anthropic compatible | `https://api.tokhive.ai/anthropic/v1` | `https://api.tokhive.ai/anthropic` | Claude |
+| Gemini compatible | `https://api.tokhive.ai/gemini/v1beta` | `https://api.tokhive.ai/gemini` | Gemini |
 
-The Anthropic SDKs and Claude Code add `/v1` themselves, so their base URL stops at `/anthropic`.
+The Anthropic SDKs and Claude Code add `/v1` themselves, so their base URL stops at `/anthropic`. Google's Gen AI SDKs add `/v1beta` the same way.
 
-TokHive does not convert between the two APIs. OpenAI models are called through the OpenAI-compatible API, and Claude models through the Anthropic-compatible one. Sending a model to the other API returns `400 wrong_protocol`, and the error message names the right path.
+TokHive does not convert between the native APIs. OpenAI models are called through the OpenAI-compatible API, Claude models through the Anthropic-compatible one, and Gemini models through the Gemini-compatible one. The one exception is [Chat Completions](chat-completions.mdx), which TokHive converts for OpenAI and Gemini models alike. Sending a model to an API that doesn't serve it returns `400 wrong_protocol`, and the error message names the right path.
 
 ## Endpoints
 
@@ -24,13 +25,17 @@ TokHive does not convert between the two APIs. OpenAI models are called through 
 | `GET` | [`/v1/models`](models.mdx#openai-models) | List OpenAI models |
 | `GET` | [`/v1/models/{id}`](models.mdx#openai-models) | Retrieve one OpenAI model |
 | `POST` | [`/v1/responses`](responses.mdx) | Generate a response (OpenAI Responses) |
-| `POST` | [`/v1/chat/completions`](chat-completions.mdx) | Generate a chat completion, converted to Responses |
+| `POST` | [`/v1/chat/completions`](chat-completions.mdx) | Generate a chat completion, converted to Responses, or to Gemini for a Gemini model |
 | `GET` | [`/v1/codex/models`](models.mdx#codex-model-catalog) | Model catalog for Codex |
 | `POST` | [`/v1/codex/responses`](responses.mdx#codex) | Responses in Codex's own request format |
 | `GET` | [`/anthropic/v1/models`](models.mdx#claude-models) | List Claude models |
 | `GET` | [`/anthropic/v1/models/{id}`](models.mdx#claude-models) | Retrieve one Claude model |
 | `POST` | [`/anthropic/v1/messages`](messages.mdx) | Create a message (Anthropic Messages) |
 | `POST` | [`/anthropic/v1/messages/count_tokens`](messages.mdx#token-counting) | Count input tokens, free |
+| `GET` | [`/gemini/v1beta/models`](models.mdx#gemini-models) | List Gemini models |
+| `GET` | [`/gemini/v1beta/models/{model}`](models.mdx#gemini-models) | Retrieve one Gemini model |
+| `POST` | [`/gemini/v1beta/models/{model}:generateContent`](gemini.mdx) | Generate content (Gemini) |
+| `POST` | [`/gemini/v1beta/models/{model}:streamGenerateContent?alt=sse`](gemini.mdx#streaming) | Generate content as a stream |
 
 Any other path returns `404` in the error format of its API.
 
@@ -42,6 +47,7 @@ Create an API key in the console under **API Keys**. The full key is shown only 
 | --- | --- |
 | OpenAI compatible | `Authorization: Bearer <your key>` |
 | Anthropic compatible | `x-api-key: <your key>`, or `Authorization: Bearer <your key>`. If you send both, they must be the same key. |
+| Gemini compatible | `x-goog-api-key: <your key>`, or `Authorization: Bearer <your key>`. If you send both, they must be the same key. The `key` query parameter is not read. |
 
 Revoking a key refuses new requests immediately; requests it already started still finish and are charged. A console login cannot stand in for an API key.
 
@@ -89,6 +95,8 @@ Each API returns errors in its vendor's shape.
   "request_id": "..."
 }
 ```
+
+**Gemini compatible**: Google's shape, with TokHive's code in `details[0].reason`. See [Gemini errors](gemini.mdx#errors).
 
 Every response carries an `X-Request-Id` header. Include it when you ask for help with a request.
 

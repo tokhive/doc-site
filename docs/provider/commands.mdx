@@ -7,7 +7,7 @@ title: Command Reference
 
 `bee help` lists the commands, and `bee <command> -h` shows a command's options.
 
-Every command accepts `--config PATH` to use a device configuration other than the default (see [Configuration](./configuration.mdx#device-configuration)). `PLATFORM` is `openai` or `claude`.
+Every command accepts `--config PATH` to use a device configuration other than the default (see [Configuration](./configuration.mdx#device-configuration)). `PLATFORM` is `openai`, `claude` or `google`.
 
 ## Getting started
 
@@ -63,7 +63,7 @@ Detects the official sign-ins on this machine, only reading them, asks which to 
 
 | Option | Meaning |
 | --- | --- |
-| `--platform openai,claude` | Only these platforms. A named platform that has no sign-in is an error. Default: every account found. |
+| `--platform openai,claude,google` | Only these platforms. A named platform that has no sign-in is an error. Default: every account found. |
 | `--yes` | Supply the selected accounts without asking. |
 | `--codex-home DIR` | Codex directory. Default: `$CODEX_HOME`, else `~/.codex`. |
 | `--claude-config-dir DIR` | Claude Code configuration directory. Default: `$CLAUDE_CONFIG_DIR`, else `~/.claude`. |
@@ -97,3 +97,22 @@ Accepts a new account after you switched accounts in the official client. Take t
 ### `bee codex-status` / `bee claude-status`
 
 Inspect the local official login without contacting Hive: account, plan, expiry and where the login was read from.
+
+## Google
+
+### `bee antigravity-login`
+
+Signs in to the Google account to supply through Antigravity and stores the sign-in for Bee in `accounts/antigravity/credentials.json` beside the device configuration. Run it again to replace the account, or to renew a sign-in that Google ended. A running Bee picks up the new sign-in by itself.
+
+| Option | Meaning |
+| --- | --- |
+| `--no-browser` | Don't open a browser or wait on `localhost:51121`. Open the printed address on any device, sign in, and paste back the whole address the browser is sent to. |
+
+### `bee antigravity-status`
+
+Inspects the sign-in Bee keeps for Google. By default it only reads the file, without contacting anyone.
+
+| Option | Meaning |
+| --- | --- |
+| `--verify` | Ask Google which account and tier the sign-in belongs to. |
+| `--capabilities` | Read the account's Gemini and Claude models and the quota windows of each. |

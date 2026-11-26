@@ -32,7 +32,7 @@ While `bee start`, `bee login` or `bee run` is running, Bee holds a lock file ne
 `bee run`, `bee start` and `bee doctor` use this file unless you pass `--egress-config PATH`. If there is neither, Bee stays online but supplies nothing and prints `BEE-SETUP-NEEDED`.
 
 :::tip
-You rarely need to edit this file. Running `bee setup` again is safe: it rewrites the file with the platforms you choose this time, and keeps your `connect_proxy`, `claude.refresh` and `claude.config_dir` settings.
+You rarely need to edit this file. Running `bee setup` again is safe: it rewrites the file with the platforms you choose this time, and keeps your `connect_proxy`, `claude.refresh` and `claude.config_dir` settings. For Google, run `bee antigravity-login` before `bee setup`, so that setup finds the account.
 :::
 
 ### Example
@@ -62,6 +62,7 @@ The allowlist of upstream addresses, as `host:port`, that Bee will open connecti
 | --- | --- |
 | OpenAI | `chatgpt.com:443` |
 | Claude | `api.anthropic.com:443` |
+| Google | `cloudcode-pa.googleapis.com:443` and `daily-cloudcode-pa.googleapis.com:443`. Google serves an account with a paid plan from the second and every other account from the first. |
 
 Every configured platform must have its target, or Bee refuses to start with `BEE-CONFIG-TARGET-MISSING`.
 
@@ -89,6 +90,16 @@ Where to read the Claude Code login, for a Claude subscription.
 | `capabilities` | `true` enables model and quota reports, which are required for taking work. |
 | `refresh` | `false` (default): Bee only re-seals tokens that Claude Code has refreshed itself. `true`: Hive may also schedule token refreshes, and Bee writes the refreshed token back to Claude Code's store. A running Bee picks up a change to this field automatically. |
 
+#### `antigravity`
+
+Supplies the Google account signed in with `bee antigravity-login`, for example `"antigravity": {"capabilities": true}`.
+
+| Field | Meaning |
+| --- | --- |
+| `capabilities` | `true` enables model and quota reports, which are required for taking work. A report covers the account's Gemini models and the Claude models Antigravity offers, each group with its own quota windows. |
+
+Hive schedules each renewal of the sign-in, and Bee makes it with the refresh token it keeps, which is sent to Google only.
+
 #### `connect_proxy`
 
 Optional. Sends Bee's outbound connections to the upstream platforms through a local HTTP proxy, for example `http://127.0.0.1:7890`. It must be an unauthenticated HTTP proxy on a loopback address that allows `CONNECT`. Set or remove it with:
@@ -108,7 +119,7 @@ Run `bee setup` and answer no for the platform you don't want, or use:
 bee setup --platform openai --yes
 ```
 
-By hand, remove the other platform's object (`codex` and the top-level `capabilities`, or `claude`) and its target.
+By hand, remove the other platforms' objects (`codex` and the top-level `capabilities`, `claude`, or `antigravity`) and their targets.
 
 ## Environment variables
 

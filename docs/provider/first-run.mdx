@@ -19,8 +19,11 @@ Sign in on this machine, **as the same system user that will run Bee**, to the c
 | --- | --- | --- |
 | ChatGPT (OpenAI) | Codex CLI | `codex login` |
 | Claude | Claude Code | `claude`, then sign in with your subscription account |
+| Google | None; Bee keeps its own sign-in | `bee antigravity-login` |
 
 On a Linux server without a browser, both clients offer a sign-in flow you can complete from another device.
+
+For Google, no official client keeps the Antigravity sign-in where Bee could read it, so Bee signs in itself. `bee antigravity-login` opens Google's sign-in page in a browser and waits for it on `localhost:51121`. Bee then stores the sign-in in `accounts/antigravity/credentials.json` beside the device configuration, readable only by you. On a machine without a browser, or when that port is taken, add `--no-browser`: open the printed address on any device, sign in, and paste back the whole address the browser is sent to. Read [Before You Supply](./before-you-supply.mdx#account-risk) first: supplying a Google account can cost it its Antigravity access.
 
 ## 2. Start Bee
 
@@ -99,7 +102,7 @@ The console shows the device as online as soon as Bee is connected. Whether an a
 | --- | --- |
 | Start Bee | `bee start` |
 | Stop Bee | Ctrl-C |
-| Pause one platform without stopping Bee | `bee pause --platform openai` (or `claude`) |
+| Pause one platform without stopping Bee | `bee pause --platform openai` (or `claude`, or `google`) |
 | Resume a paused platform | `bee resume --platform openai` |
 | Add or remove a platform | Stop Bee, run `bee setup`, then `bee start` |
 | Check everything | `bee doctor` |

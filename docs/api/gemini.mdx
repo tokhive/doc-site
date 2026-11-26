@@ -1,0 +1,129 @@
+---
+sidebar_position: 6
+title: Gemini
+description: "Google's native Gemini API (generateContent), served by Google subscription accounts. Point Google's Gen AI SDK at TokHive and call it as usual."
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Gemini
+
+```http
+POST /gemini/v1beta/models/{model}:generateContent
+POST /gemini/v1beta/models/{model}:streamGenerateContent?alt=sse
+```
+
+Google's native Gemini API, served by Google subscription accounts through Antigravity. Requests and responses are Google's own format, streaming and non-streaming. Point Google's Gen AI SDK at `https://api.tokhive.ai/gemini` and call it as usual; the SDK adds `/v1beta` itself.
+
+Gemini models are also available through [Chat Completions](chat-completions.mdx#gemini-models), for tools that speak only OpenAI's format.
+
+## Example
+
+<Tabs groupId="lang">
+<TabItem value="curl" label="cURL">
+
+```sh
+curl "https://api.tokhive.ai/gemini/v1beta/models/gemini-4-argon:generateContent" \
+  -H "x-goog-api-key: $HIVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contents": [{"role": "user", "parts": [{"text": "Hello"}]}]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import os
+from google import genai
+
+client = genai.Client(
+    api_key=os.environ["HIVE_API_KEY"],
+    http_options={"base_url": "https://api.tokhive.ai/gemini"},
+)
+response = client.models.generate_content(model="gemini-4-argon", contents="Hello")
+print(response.text)
+```
+
+</TabItem>
+<TabItem value="typescript" label="TypeScript">
+
+```ts
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.HIVE_API_KEY,
+  httpOptions: { baseUrl: "https://api.tokhive.ai/gemini" },
+});
+const response = await ai.models.generateContent({ model: "gemini-4-argon", contents: "Hello" });
+console.log(response.text);
+```
+
+</TabItem>
+</Tabs>
+
+The models you can call are listed by [`/gemini/v1beta/models`](models.mdx#gemini-models).
+
+## Request
+
+| Header | Notes |
+| --- | --- |
+| `x-goog-api-key` or `Authorization: Bearer` | Your TokHive API key. If you send both, they must be the same key. The `key` query parameter is not read, because URLs end up in logs. |
+
+| Field | Notes |
+| --- | --- |
+| `contents` | Required. |
+| `systemInstruction`, `tools`, `toolConfig`, `generationConfig`, `safetySettings` | Passed through unchanged. |
+| `generationConfig.thinkingConfig.thinkingLevel` | Picks the model's thinking level. Without it, the model's default level is used. |
+| `cachedContent` | Not supported: `400 unsupported_gemini_request`. A cache created in advance lives in an API-key project that subscription accounts don't run in. Repeated prefixes are cached implicitly instead, and the cached part is billed at the cache-read price. |
+
+The model comes from the path; a `model` field in the body is ignored.
+
+## Streaming
+
+`streamGenerateContent` needs `alt=sse`; without it the request returns `400`. Chunks are the same as from Google's API. TokHive holds back the chunk that carries the finish reason until the result is verified and settled, so it can arrive a moment after the last content. The stream sends no keep-alive comments, because Google's SDKs treat them as malformed chunks.
+
+`generateContent` returns a single response, which TokHive assembles from the upstream stream once it is verified.
+
+If a stream fails after output has started, it ends with an error chunk, and nothing is charged.
+
+## Usage and billing
+
+The usage comes from the last chunk's `usageMetadata`:
+
+| Billed as | From |
+| --- | --- |
+| Input | `promptTokenCount` + `toolUsePromptTokenCount` − `cachedContentTokenCount` |
+| Cache read | `cachedContentTokenCount` |
+| Output | `candidatesTokenCount` + `thoughtsTokenCount` |
+
+Gemini models can be paid with credits.
+
+## Conversations
+
+A Gemini request carries its whole history and names no conversation, so TokHive doesn't keep it on one account. Thought signatures belong to the account that issued them. When a history signed by another account is refused, TokHive replaces its signatures with Google's documented placeholder and retries once.
+
+## Not supported
+
+- `countTokens` returns `404`.
+- `cachedContent`, as above.
+- There is no fallback supply: when no Google account can take a request, it returns `503 no_supply`.
+
+## Errors
+
+Errors under `/gemini` are in Google's shape. TokHive's error code is in `details[0].reason`:
+
+```json
+{
+  "error": {
+    "code": 503,
+    "status": "UNAVAILABLE",
+    "message": "no provider is offering this model right now",
+    "details": [{ "reason": "no_supply" }]
+  }
+}
+```
+
+When the upstream rejects the request itself (`400`, `413` or `422`), its status and message are passed through, with the account's project ID masked. Other upstream failures return `502 upstream_error`. A Gemini model sent to another API returns `400 wrong_protocol`, with the right path in the message. See [Errors](overview.mdx#errors) for the codes.
