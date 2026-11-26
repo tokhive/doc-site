@@ -1,0 +1,95 @@
+---
+slug: agent-workbenches
+title: "Ten Claude Codes at Once: Paseo, T3 Code and Orca Compared"
+date: 2026-11-26
+authors: [tokhive]
+tags: [guides]
+description: "Paseo, T3 Code and Orca are open-source apps for running many coding agents in parallel from your desktop and phone. Here is what each one focuses on, and how they compare."
+image: /img/blog/agent-workbenches-cover.png
+---
+
+![The Paseo, T3 Code and Orca app icons](/img/blog/agent-workbenches-cover.png)
+
+Use Claude Code or Codex for long enough and you run into the same problem. One agent in one terminal isn't enough, but five or six are hard to keep track of. Which one is waiting for your approval? Which one just broke a file? And how do you check on them once you've left your desk?
+
+A wave of tools appeared over the past year to solve exactly this. Three open-source projects get the most attention: Paseo, T3 Code and Orca. They share the same basic idea, which you could call a **workbench for coding agents**:
+
+- **No models of their own, no tokens for sale.** They drive the Claude Code, Codex and other CLIs already installed and signed in on your machine, on your own subscriptions.
+- **Agents in parallel.** Each task runs in its own git worktree, so agents don't step on each other. When one finishes, you review the diff and open a pull request.
+- **Across devices.** Besides the desktop app, each has iOS and Android apps. The agents run on your computer, and you approve and reply from your phone.
+
+Same category, different emphasis. Here is each one in turn.
+
+{/* truncate */}
+
+## T3 Code: the lightest control panel
+
+<img src="/img/blog/agent-workbenches-t3code-logo.png" width="72" alt="T3 Code logo" />
+
+T3 Code comes from Theo and the T3 team. It was open-sourced in February 2026 under the MIT license. It calls itself "the open-source control plane for coding agents", and its README says plainly that it took inspiration from the Codex desktop app, Conductor and Claude Desktop, but found none of them good enough.
+
+The interface is built around conversation threads. It keeps the feature set restrained and puts its effort into two things:
+
+- **Speed.** The team treats performance as a feature: a dropped frame is a bug.
+- **Moving between agents.** You can switch models in the middle of a thread, or have Claude hand a task to Codex. Besides the built-in Claude Code, Codex, Cursor, OpenCode and others, any agent that speaks ACP can be connected.
+
+![T3 Code on desktop and phone, with threads grouped by project on the left](/img/blog/agent-workbenches-t3code.webp)
+
+It suits people who want a clean, fast chat interface for their agents and don't need much else.
+
+## Paseo: programmable and self-hosted
+
+<img src="/img/blog/agent-workbenches-paseo-logo.png" width="72" alt="Paseo logo" />
+
+Paseo is the oldest of the three. It was open-sourced in October 2025 under Apache 2.0 and is maintained by a small team.
+
+Its architecture is the most server-like: a daemon on your machine manages every agent, and the desktop, web, mobile and CLI apps are all clients that connect to it. That gives it a few distinctive traits:
+
+- **Programmable.** A full CLI (`paseo run`, `paseo send`) and a TypeScript SDK let you script agents or build services around them. It also runs on a server in Docker.
+- **Agents that orchestrate agents.** With its skills installed, `/paseo-handoff` passes a planned task to another agent to implement, and `/paseo-committee` puts two contrasting agents on the same problem.
+- **Privacy first.** No telemetry, no forced login. Remote access goes through an optional end-to-end encrypted relay.
+- **Write a plugin once, use it everywhere.** Plugins run on the daemon, so the desktop and phone show the same UI.
+
+![Paseo on desktop and phone, with the agent session in the middle and the diff on the right](/img/blog/agent-workbenches-paseo.webp)
+
+It suits developers who like to tinker, want agents wired into their own workflows, or want them running on a server.
+
+## Orca: the full agent IDE
+
+<img src="/img/blog/agent-workbenches-orca-logo.png" width="72" alt="Orca logo" />
+
+Orca is built by Stably AI. It was open-sourced in March 2026 under the MIT license and has the most GitHub stars of the three.
+
+It takes the everything-included route. In essence it is an IDE redesigned around agents:
+
+- **A built-in browser with a design mode.** Click an element on a page to send its HTML, styles and selector to an agent. You can also run an iOS Simulator or Android emulator alongside, and let the agent tap through and check its own work.
+- **Bots.** Mention a bot in Slack, Linear or GitHub to fix a bug, and come back to a tested pull request. It still runs on your own Claude Code or Codex. Bots can run on a schedule or on events, such as a pull request opening or a CI check failing.
+- **Runs anywhere.** It works on SSH hosts, and can give a single worktree its own cloud VM, so agents keep running after you close your laptop.
+- **The widest compatibility.** Any agent that runs in a terminal runs in Orca; the official list alone has more than thirty.
+
+![In Orca, a coordinator agent splits a task between Codex and Grok workers running in parallel, with each account's usage along the bottom](/img/blog/agent-workbenches-orca.webp)
+
+It suits people who want editing, review, debugging and collaboration in one app. The trade-off is that it has the most to learn.
+
+## Comparison
+
+| | T3 Code | Paseo | Orca |
+| --- | --- | --- | --- |
+| In one line | A lightweight agent control panel | A programmable, self-hosted agent environment | A full-featured agent IDE |
+| Made by | T3 Tools (Theo's team) | A small independent team | Stably AI |
+| License | MIT | Apache 2.0 | MIT |
+| GitHub stars (Nov 2026) | ~80k | ~25k | ~138k |
+| Clients | Desktop, web, iOS, Android | Desktop, web, iOS, Android, CLI | Desktop, iOS, Android, CLI |
+| Supported agents | About ten, plus any ACP agent | Dozens, extensible with plugins | Any CLI agent |
+| Parallel worktrees | ✅ | ✅ | ✅ |
+| Orchestration | Hand-offs within a thread | Skills, CLI and SDK | A coordinator splits work across worker agents |
+| Remote access | LAN, Tailscale, T3 Connect | Encrypted relay, VPN, Docker | Remote server, SSH, cloud VMs |
+| Stands out for | Speed and simplicity | Daemon architecture, SDK, no telemetry | Built-in browser, bots, automations |
+
+The core features of the three now overlap heavily. Parallel worktrees, phone access and support for many agents are table stakes in this category. The choice mostly comes down to taste: T3 Code if you want simple and fast, Paseo if you want something programmable and self-hosted, Orca if you want an all-in-one IDE. All three are free and open source, so trying one costs little.
+
+## Links
+
+- T3 Code: [t3.codes](https://t3.codes) · [GitHub](https://github.com/pingdotgg/t3code)
+- Paseo: [paseo.sh](https://paseo.sh) · [GitHub](https://github.com/getpaseo/paseo)
+- Orca: [orca.dev](https://orca.dev) · [GitHub](https://github.com/stablyai/orca)
