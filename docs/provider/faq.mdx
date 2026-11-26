@@ -13,11 +13,11 @@ No. Consumer requests run inside a Trusted Execution Environment (TEE), which op
 
 ### Does my login leave my machine?
 
-Your access token leaves only sealed to the TEE; neither Bee's network traffic nor Hive can read it. Your refresh token stays in the official client's local store, or for Google in Bee's own file, and is sent only to the vendor when the login is renewed.
+Your access token leaves only sealed to the TEE; neither Bee's network traffic nor Hive can read it. Your refresh token stays in the official client's local store.
 
 ### Which hosts does Bee connect to?
 
-Your Hive, and the upstream hosts in the `targets` allowlist of the egress configuration: `chatgpt.com:443`, `api.anthropic.com:443`, and for Google `cloudcode-pa.googleapis.com:443` and `daily-cloudcode-pa.googleapis.com:443`. Bee refuses any other address. Renewing a login also reaches the vendor's sign-in service; see [What Bee connects to](./security.mdx#what-bee-connects-to).
+Your Hive, and the upstream hosts in the `targets` allowlist of the egress configuration: `chatgpt.com:443` and `api.anthropic.com:443`. Bee refuses any other address.
 
 ### Is Bee open source?
 
@@ -43,7 +43,7 @@ Supplied work counts against the same subscription quota you use yourself, and n
 
 ### Can my account be banned for supplying?
 
-It can. The vendors' consumer terms don't allow sharing an account, and TokHive offers no compensation if an account is restricted. TokHive keeps the risk as low as it can: work leaves from your own IP in the official client's format, stays within your plan's concurrency limit, stops at quota and rate limits, and keeps each conversation on one account. A Google account carries a higher risk: Google forbids using an Antigravity sign-in in third-party software and has disabled Antigravity for accounts doing so. See [Account risk](./before-you-supply.mdx#account-risk).
+It can. The vendors' consumer terms don't allow sharing an account, and TokHive offers no compensation if an account is restricted. TokHive keeps the risk as low as it can: work leaves from your own IP in the official client's format, stays within your plan's concurrency limit, stops at quota and rate limits, and keeps each conversation on one account. See [Account risk](./before-you-supply.mdx#account-risk).
 
 ### Does TokHive review what Consumers send through my account?
 
@@ -51,7 +51,7 @@ Not yet. The vendor's own safety systems apply to every request, as they do to y
 
 ### Which plans can I supply?
 
-OpenAI Free, Go, Plus, Pro, Team, Business, Enterprise and Edu, through Codex; Claude Pro, Max, Ultra, Team and Enterprise, through Claude Code; and the free tier, Google AI Pro and Google AI Ultra of a personal Google account, through Antigravity. A plan takes work once the marketplace has set its concurrency limit. See [Before You Supply](./before-you-supply.mdx#which-subscriptions-can-be-supplied).
+OpenAI Free, Go, Plus, Pro, Team, Business, Enterprise and Edu, through Codex; Claude Pro, Max, Ultra, Team and Enterprise, through Claude Code. A plan takes work once the marketplace has set its concurrency limit. See [Before You Supply](./before-you-supply.mdx#which-subscriptions-can-be-supplied).
 
 ### Can supplying cost me money beyond my subscription?
 
@@ -61,9 +61,9 @@ It can, if the account has paid usage beyond the plan: OpenAI credits, or Claude
 
 At most the concurrency limit the marketplace sets for your plan. When it is reached, new requests wait or go to other providers, and `bee status` shows `concurrency_full`.
 
-### Can I supply a ChatGPT, a Claude and a Google subscription together?
+### Can I supply both a ChatGPT and a Claude subscription?
 
-Yes, from the same Bee, one account per platform. Sign in to Codex and Claude Code, run `bee antigravity-login` for the Google account, and choose them during `bee start` or `bee setup`.
+Yes, from the same Bee. Sign in to both Codex and Claude Code, and choose both during `bee start` or `bee setup`.
 
 ### Can I run Bee on several machines?
 
@@ -93,7 +93,7 @@ Yes, while you want to supply. A sleeping machine disconnects, and Bee reconnect
 
 ### Can I run Bee on a server without a desktop?
 
-Yes. Bee needs no browser on the machine: open the pairing link on any other device. Sign in to Codex and Claude Code on the server first. For Google, run `bee antigravity-login --no-browser` and finish the sign-in on another device.
+Yes. Bee needs no browser on the machine: open the pairing link on any other device. Sign in to Codex and Claude Code on the server first.
 
 ## Earnings
 

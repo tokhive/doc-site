@@ -1,19 +1,19 @@
 ---
 sidebar_position: 1
 title: Bee Overview
-description: "Bee is TokHive's provider agent. It runs on your machine and supplies the ChatGPT, Claude or Google subscription quota you don't use, so you earn from it."
+description: "Bee is TokHive's provider agent. It runs on your machine and supplies the ChatGPT or Claude subscription quota you don't use, so you earn from it."
 ---
 
 # Bee Overview
 
-Bee is the provider agent of TokHive. If your ChatGPT, Claude or Google subscription has quota you don't use, Bee lets you supply it to the TokHive market. Consumers get first-party model access at a lower price, and you earn from capacity that would otherwise go to waste.
+Bee is the provider agent of TokHive. If your ChatGPT or Claude subscription has quota you don't use, Bee lets you supply it to the TokHive market. Consumers get first-party model access at a lower price, and you earn from capacity that would otherwise go to waste.
 
 Bee runs on your own machine and keeps a connection open to a **Hive**, the marketplace service that matches Consumers with Providers.
 
 ## What Bee does
 
 - **Device identity.** You pair Bee once with your Hive account. After that it keeps an authenticated connection open and reports that it is online.
-- **Authorization upkeep.** Bee reads the login of the official client you already use: Codex for an OpenAI subscription, Claude Code for a Claude subscription. For a Google account, which no official client keeps a readable login for, Bee signs in to Antigravity itself (`bee antigravity-login`). It never sends your tokens to Hive in plaintext. Instead it seals your access token to a Trusted Execution Environment (TEE) and reports only the sealed envelope plus account metadata: account fingerprint, expiry, model list and quota windows.
+- **Authorization upkeep.** Bee reads the login of the official client you already use: Codex for an OpenAI subscription, Claude Code for a Claude subscription. It never sends your tokens to Hive in plaintext. Instead it seals your access token to a Trusted Execution Environment (TEE) and reports only the sealed envelope plus account metadata: account fingerprint, expiry, model list and quota windows.
 - **Encrypted egress.** Consumer requests run inside the TEE, which opens its own TLS session to the upstream platform. Bee only relays that already-encrypted traffic to an allowlisted set of hosts.
 
 ## What Bee can and cannot see
@@ -21,7 +21,7 @@ Bee runs on your own machine and keeps a connection open to a **Hive**, the mark
 | | Bee | Hive | TEE |
 | --- | --- | --- | --- |
 | Your access token | Reads it locally, sends it only sealed | Sealed envelope only | Plaintext, inside the enclave |
-| Your refresh token | Stays in the official client's local store, or in Bee's own file for Google | Never | Never |
+| Your refresh token | Stays in the official client's local store | Never | Never |
 | Consumer prompts and model responses | Encrypted TLS traffic only | Plaintext: Hive receives each Consumer request, passes it to the TEE, and returns the response to the Consumer | Plaintext, inside the enclave |
 
 Bee doesn't sign you in or out. It changes the official client's login only to renew it: a Codex login kept in `auth.json` is renewed automatically, and a Claude login only if you turn on token refresh (see [Configuration](./configuration.mdx#claude)). A renewal happens on your machine, and the refresh token is never sent to Hive or to the TEE. See [Renewing the login](./security.mdx#renewing-the-login).
@@ -31,8 +31,8 @@ Every execution produces a receipt signed by the TEE. You can view and download 
 ## Requirements
 
 - **Operating system:** macOS or Linux, on Intel/AMD (`amd64`) or ARM (`arm64`). Linux machines without a desktop or a browser work too.
-- **Subscriptions:** OpenAI (via Codex), Claude (via Claude Code) and Google (via Antigravity) are supported on macOS and on Linux. Sign in as the same system user that runs Bee.
-- **Network:** the machine must reach your Hive over HTTPS, and reach `chatgpt.com:443` (OpenAI), `api.anthropic.com:443` (Claude), or `cloudcode-pa.googleapis.com:443` and `daily-cloudcode-pa.googleapis.com:443` (Google), directly or through a local proxy.
+- **Subscriptions:** OpenAI (via Codex) and Claude (via Claude Code) are both supported on macOS and on Linux. Sign in to the official client as the same system user that runs Bee.
+- **Network:** the machine must reach your Hive over HTTPS, and reach `chatgpt.com:443` (OpenAI) or `api.anthropic.com:443` (Claude), directly or through a local proxy.
 - **Account:** a TokHive account on the Hive you supply to. You confirm the pairing in its web console.
 
 ## How to start

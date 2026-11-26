@@ -13,11 +13,8 @@ This page collects what you should know before you decide to supply a subscripti
 | --- | --- | --- |
 | OpenAI | Codex CLI | Free, Go, Plus, Pro (including the Pro Lite and Pro Max tiers), Team, Business, Enterprise, Edu |
 | Claude | Claude Code | Pro, Max, Ultra, Team, Enterprise |
-| Google | None: Bee signs in to Antigravity itself (`bee antigravity-login`) | The free tier, Google AI Pro and Google AI Ultra of a personal Google account |
 
-A plan takes work only when the marketplace has set a concurrency limit for it. Otherwise the account shows `plan_not_configured`. Bee reads the plan from the official client's login, or for Google from the account itself. You can't choose it.
-
-A Google account supplies the Gemini models through Antigravity, Google's coding agent, and also the Claude models Antigravity offers. Google meters the two groups separately. The Claude models are used only for Claude requests that no Claude subscription can take.
+A plan takes work only when the marketplace has set a concurrency limit for it. Otherwise the account shows `plan_not_configured`. Bee reads the plan from the official client's login. You can't choose it.
 
 :::caution[Workspace accounts]
 A Team, Business, Enterprise or Edu seat belongs to the organization that pays for it. Supplying it may break that organization's own rules as well as the vendor's terms. Workspace administrators can usually see usage, and on some plans also content, so work you supply may show up in the organization's usage or compliance records. Supply a workspace seat only if you are entitled to.
@@ -27,12 +24,6 @@ A Team, Business, Enterprise or Edu seat belongs to the organization that pays f
 
 OpenAI's and Anthropic's consumer terms don't allow an account to be shared with others. A vendor may restrict or suspend an account it considers shared. **TokHive offers no compensation if that happens to an account you supply.**
 
-:::warning[Google accounts carry a higher risk]
-Google's Antigravity terms forbid using an Antigravity sign-in in third-party software, which is what Bee does. In November 2026 Google disabled Antigravity for accounts it found doing so. The reports so far say the account's Gemini app and AI Studio kept working, but Antigravity itself stopped. Bee then shows `BEE-ANTIGRAVITY-DISABLED`, and Hive stops sending the account work. Supply a Google account only if you accept losing its Antigravity access.
-
-Antigravity can also use your interactions, which here include Consumers' requests, to improve Google's products, depending on your Google account's settings. Bee doesn't change those settings.
-:::
-
 TokHive is designed to keep that likelihood as low as it can, by making supplied work look and behave like your own use of the official client:
 
 - **Your network.** Every upstream connection leaves from your own IP and your usual network, not from a shared server.
@@ -40,7 +31,7 @@ TokHive is designed to keep that likelihood as low as it can, by making supplied
 - **Your plan's pace.** An account never runs more requests at once than the concurrency limit set for its plan.
 - **Stopping at limits.** Bee stops at a fully used quota window. When the upstream rate-limits the account, it stays out of rotation until the time the upstream gives.
 - **One account per conversation.** A conversation stays on the account that started it, rather than jumping between accounts.
-- **Your login stays yours.** Bee doesn't sign in to or out of the official clients. It renews an expiring login only for Codex, for Claude only if you turn on Claude token refresh, and for the Google sign-in it keeps itself. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
+- **Your login stays yours.** Bee doesn't sign in or sign out. It renews an expiring login only for Codex, and for Claude only if you turn on Claude token refresh. Bee also doesn't switch accounts behind your back: a change of account waits for your confirmation.
 
 **Consumer content is not reviewed today.** Consumers' requests run on your account, and TokHive does not yet check what they ask. The vendor's own safety systems still apply to every request, as they do to your own use. A check that refuses requests for illegal content is planned.
 
@@ -60,9 +51,9 @@ Weigh the risk against the return. For an account that supplies regularly, earni
 ## Your own quota
 
 - Supplied work counts against the **same subscription quota** you use yourself. No part of it is reserved for you.
-- Bee keeps taking work until any of your quota windows (for example the five-hour or weekly window) is **100% used**. Then the account shows `quota_exhausted`, and supply resumes after the window resets. A Google account has windows for its Gemini models and separate ones for its Claude models; a used-up group stops only its own models.
+- Bee keeps taking work until any of your quota windows (for example the five-hour or weekly window) is **100% used**. Then the account shows `quota_exhausted`, and supply resumes after the window resets.
 - Supplied work is not added to your ChatGPT or Claude conversation history. OpenAI requests are sent with `store: false`, and Claude requests go through Claude Code's API, not claude.ai. It does show in the usage your vendor reports for the account.
-- To keep quota for yourself, pause supply while you work: `bee pause --platform openai` (or `claude`, or `google`), then `bee resume` when you are done. Work already running finishes; no new work starts.
+- To keep quota for yourself, pause supply while you work: `bee pause --platform openai` (or `claude`), then `bee resume` when you are done. Work already running finishes; no new work starts.
 - Each account runs at most a fixed number of requests at once, a limit the marketplace sets per plan. When it is reached, new requests wait or go to other providers (`concurrency_full`).
 
 ## Usage that is billed beyond your subscription
@@ -78,16 +69,16 @@ Claude's **fast mode** is billed to extra usage from the first token. TokHive ne
 
 ## What runs through your machine
 
-- **Every upstream connection leaves from your own IP**, as it would when you use Codex or Claude Code yourself. Bee connects only to your Hive and to `chatgpt.com:443`, `api.anthropic.com:443`, or for Google `cloudcode-pa.googleapis.com:443` and `daily-cloudcode-pa.googleapis.com:443`.
+- **Every upstream connection leaves from your own IP**, as it would when you use Codex or Claude Code yourself. Bee connects only to your Hive and to `chatgpt.com:443` or `api.anthropic.com:443`.
 - **Bee relays encrypted bytes** and can't read them. The prompts and responses of Consumers are not visible to you or to anything else on your machine. See [Trust Model](../trust/trust-model.mdx).
 - **Network use** is the size of the Consumers' requests and responses. Requests from coding agents carry the whole conversation and are often several hundred kilobytes each, so expect noticeable upload traffic while you supply. CPU and memory use are small.
 - The machine has to be awake and online while you want to supply.
 
 ## Your login
 
-- Your access token leaves your machine only sealed to the TEE. Your refresh token is never sent to TokHive: Bee uses it only on your machine, to renew a Codex login, a Claude login if you turn on Claude token refresh, or the Google sign-in. For Google, no official client keeps the sign-in, so Bee keeps it in a private file of its own. See [Renewing the login](./security.mdx#renewing-the-login).
+- Your access token leaves your machine only sealed to the TEE. Your refresh token is never sent to TokHive: Bee uses it only on your machine, to renew a Codex login, or a Claude login if you turn on Claude token refresh. See [Renewing the login](./security.mdx#renewing-the-login).
 - Hive can't open the sealed token. The TEE can use it only through a connection that your running Bee relays: **when Bee is stopped, no request can run on your account.**
-- You can keep using Codex or Claude Code on the same account while Bee supplies it, and Antigravity on a Google account.
+- You can keep using Codex or Claude Code on the same account while Bee supplies it.
 
 ## Staying in control, and leaving
 
@@ -96,7 +87,7 @@ Claude's **fast mode** is billed to extra usage from the first token. TokHive ne
 | Pause one platform | `bee pause --platform PLATFORM`; `bee resume --platform PLATFORM` to continue. |
 | Stop supplying for now | Stop Bee. Hive stops sending work immediately, and there is no penalty. |
 | Stop supplying for good | Stop Bee and [uninstall it](./install.mdx#uninstall). Without a running Bee, the token it sealed can't be used, and it lapses when the access token expires. |
-| Supply a different account | Sign in to it in the official client (for Google, run `bee antigravity-login` again) and confirm the change with `bee confirm-account`. See [I switched accounts](./troubleshooting.mdx#i-switched-accounts-in-the-official-client). |
+| Supply a different account | Sign in to it in the official client and confirm the change with `bee confirm-account`. See [I switched accounts](./troubleshooting.mdx#i-switched-accounts-in-the-official-client). |
 
 The pairing itself stays on your TokHive account after you stop. You don't need to remove it, and a paired Bee that is not running takes no work. To delete your TokHive account and its data, email [hello@tokhive.ai](mailto:hello@tokhive.ai).
 
